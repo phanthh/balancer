@@ -49,7 +49,15 @@ class Factory(private val game: Game) {
     newID -> newScale
   }
 
-  def build_player(name: String): (String, Scale) = {
-    ???
+  def build_bot(name: String): (String, Bot) = {
+    val newID = nextID(PLAYER)
+    val newPlayer = new Bot(name, newID, game)
+    newID -> newPlayer
+  }
+
+  def build_human(name: String): (String, Human) = {
+    val newID = nextID(PLAYER)
+    val newPlayer = new Human(name, newID, game)
+    newID -> newPlayer
   }
 }
