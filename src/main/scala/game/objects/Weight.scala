@@ -24,20 +24,20 @@ sealed class Weight(val parent: Option[Weight], id: String, game: Game)
 
 case class Scale(parent_scale: Option[Scale], val radius: Int, _id: String, _game: Game)
   extends Weight(parent_scale, _id, _game) {
-  private var board: Array[Option[Weight]] = Array.ofDim[Option[Weight]](2*radius+1)
+  private var board: Array[Weight] = Array.ofDim[Weight](2*radius+1)
 
-  def place_at(pos: Int, it: Weight) = { board(pos+radius) = Some(it) }
+  def place_at(pos: Int, it: Weight) = { board(pos+radius) = it }
 
-  def isFreeAt(pos: Int) = board(pos+radius).isEmpty
+  def isFreeAt(pos: Int) = board(pos+radius) != null
 
-  override def mass: Int = board.flatten.map(_.mass).sum
+  override def mass: Int = board.map(_.mass).sum
 
   override def score_of(player: Player): Int = ???
 
-  override def height: Int = board.flatten.map(_.height).max
+  override def height: Int = board.map(_.height).max
 
   override def owner: Option[Player] =
-    board.flatten.map(_.owner).groupBy(identity).view.mapValues(_.length).maxBy(_._2)._1
+    board.map(_.owner).groupBy(identity).view.mapValues(_.length).maxBy(_._2)._1
 
   def isBalanced: Boolean = ???
 
