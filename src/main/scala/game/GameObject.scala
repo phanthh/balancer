@@ -1,4 +1,6 @@
 package game
 
-class GameObject(val id: String, private val game: Game)
+abstract class GameObject(val id: String, private val game: Game)
+
+
 
