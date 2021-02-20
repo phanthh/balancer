@@ -4,20 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Hello Worlds !!!">
-      <change afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/GameObject.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/grid/GridCell.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/grid/GridObject.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/ui/ConsoleManager.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/ui/GraphicManager.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
-    </list>
+    <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -167,7 +154,14 @@
       <option name="project" value="LOCAL" />
       <updated>1613796274843</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Basic class structure setup.">
+      <created>1613808201777</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1613808201777</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -185,6 +179,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Project Started" />
     <MESSAGE value="Hello Worlds !!!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Hello Worlds !!!" />
+    <MESSAGE value="Basic class structure setup." />
+    <option name="LAST_COMMIT_MESSAGE" value="Basic class structure setup." />
   </component>
 </project>
