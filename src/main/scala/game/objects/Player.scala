@@ -20,3 +20,5 @@ case class Human(_name: String, _id: String, _game: Game)
 
   override def place_weight(): Unit = ???
 }
+
+// TODO: add algorithm for Bot

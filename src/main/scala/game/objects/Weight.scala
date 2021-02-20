@@ -56,7 +56,25 @@ case class Scale(parent_scale: Option[Scale], val radius: Int, _id: String, _gam
     if(num_weight_owned >= radius) owner else None
   }
 
-  def isBalanced: Boolean = ???
+  def left_torque = {
+    var torque = 0
+    for(pos <- -radius to -1) {
+      if(board(pos+radius).isInstanceOf[Weight])
+        torque += scala.math.abs(pos)*board(pos+radius).mass
+    }
+    torque
+  }
+
+  def right_torque = {
+    var torque = 0
+    for(pos <- 1 to radius) {
+      if(board(pos+radius).isInstanceOf[Weight])
+        torque += pos*board(pos+radius).mass
+    }
+    torque
+  }
+
+  def isBalanced: Boolean = scala.math.abs(left_torque-right_torque) <= radius
 
   def isBuffed: Boolean = owner.isDefined
 }
@@ -76,5 +94,3 @@ case class Stack(parent_scale: Scale, val bottom_weight: Weight, _id: String, _g
 
   def append(it: Weight) = stack.append(it)
 }
-
-/*TODO: Add factory methods/companion objects to each objects*/
