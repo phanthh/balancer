@@ -15,7 +15,10 @@ object Factory {
 class Factory(private val game: Game) {
 
   private var _idCounter = 0
+  private var _scaleCode: Char = 96
+  private var _playerCode: Char = 96
   private def nextID(types: String): String = {_idCounter += 1; types + _idCounter.toString}
+  private def nextScaleCode(): Char = {_scaleCode += 1; _scaleCode}
 
   def build_weight(pos: Int, parent_scale: Scale, owner: Option[Player] = None): (String, Weight) = {
     val newID = nextID(WEIGHT)
@@ -37,27 +40,23 @@ class Factory(private val game: Game) {
   }
 
   def build_first_scale(radius: Int): (String, Scale) = {
-    val newID = nextID(SCALE)
-    val newScale = new Scale(None, radius, newID, game)
-    newID -> newScale
+    val newScale = new Scale(None, radius, nextScaleCode(), nextID(SCALE), game)
+    newScale.id -> newScale
   }
 
   def build_scale(pos: Int, radius: Int, parent_scale: Scale): (String, Scale) = {
-    val newID = nextID(SCALE)
-    val newScale = new Scale(Some(parent_scale), radius, newID, game)
+    val newScale = new Scale(Some(parent_scale), radius, nextScaleCode(), nextID(SCALE), game)
     parent_scale.place_at(pos, newScale)
-    newID -> newScale
+    newScale.id -> newScale
   }
 
   def build_bot(name: String): (String, Bot) = {
-    val newID = nextID(PLAYER)
-    val newPlayer = new Bot(name, newID, game)
-    newID -> newPlayer
+    val newPlayer = new Bot(name, nextID(PLAYER), game)
+    newPlayer.id -> newPlayer
   }
 
   def build_human(name: String): (String, Human) = {
-    val newID = nextID(PLAYER)
-    val newPlayer = new Human(name, newID, game)
-    newID -> newPlayer
+    val newPlayer = new Human(name, nextID(PLAYER), game)
+    newPlayer.id-> newPlayer
   }
 }

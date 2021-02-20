@@ -25,7 +25,7 @@ sealed class Weight(val parent: Option[Weight], id: String, game: Game)
   }
 }
 
-case class Scale(parent_scale: Option[Scale], val radius: Int, _id: String, _game: Game)
+case class Scale(parent_scale: Option[Scale], val radius: Int, val scale_code: Char, _id: String, _game: Game)
   extends Weight(parent_scale, _id, _game) {
 
   private var board: Array[Weight] = Array.ofDim[Weight](2*radius+1)
