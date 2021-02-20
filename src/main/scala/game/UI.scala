@@ -3,6 +3,11 @@ import game.objects.{Factory, Scale}
 
 import scala.io.StdIn._
 
+object UI {
+  val CONSOLE = 0
+  val GRAPHIC = 1
+}
+
 sealed abstract class UI {
   val game: Game
   def run(): Unit
@@ -41,13 +46,26 @@ case class ConsoleManager(val game: Game) extends UI {
   def print_game_state() = ???
 
   override def round_loop(): Unit = {
-    print_game_state()
+    var weightsLeft = game.weightsPerRound
+    var turn =
+    while(weightsLeft > 0) {
+      print_game_state()
 
-    println("Enter the parent scale: ")
-    val parentScale = game.scale_with_id(Factory.
+      println("Enter the parent scale code: ")
+      val parentScale =
+        game.scaleWithCode(readChar()).getOrElse(throw new Exception("Invalid Scale Code")) // Temporary
+      println("Enter the position: ")
+      val pos = readInt()
+
+      ???
+
+      weightsLeft -= 1
+    }
 
 
   }
 }
 
 // TODO: Implement print_game_state()
+// TODO: Custom Exception
+// TODO: Implement Game mechanics - round, game, winner, ....
