@@ -24,6 +24,8 @@ case class Scale(parent_scale: Option[Scale], val radius: Int, _id: String, _gam
   extends Weight(parent_scale, _id, _game) {
   private var board: Array[Weight] = new Array[Weight](2 * radius + 1)
 
+  def place_at(pos: Int, it: Weight) = { board(pos+radius) = it }
+
   override def mass: Int = board.map(_.mass).sum
 
   override def score_of(player: Player): Int = ???
