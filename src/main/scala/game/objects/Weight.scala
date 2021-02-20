@@ -9,15 +9,15 @@ sealed class Weight(val parent: Option[Weight], id: String, game: Game)
 
   private var _owner: Option[Player] = None
 
-  abstract def mass: Int = 1
+  def mass: Int = 1
 
-  abstract def height: Int = 1
+  def height: Int = 1
 
-  abstract def owner: Option[Player] = _owner
+  def owner: Option[Player] = _owner
 
   def isBuffed: Boolean = _owner.isDefined
 
-  abstract def score_of(player: Player): Int = ???
+  def score_of(player: Player): Int = ???
 }
 
 case class Scale(parent_scale: Option[Scale], val radius: Int, _id: String, _game: Game)

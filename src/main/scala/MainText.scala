@@ -1,7 +1,7 @@
-import game.Game
+import game.{ConsoleManager, Game}
 
 object MainText extends App {
-  println("Welcome to Balancer!!!")
   val game = new Game
-  game.
+  val console = new ConsoleManager(game)
+  console.run()
 }
