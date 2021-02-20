@@ -10,3 +10,5 @@ logo/
 *.out
 *.synctex.gz
 *.toc
+*.bbl
+*.blg
