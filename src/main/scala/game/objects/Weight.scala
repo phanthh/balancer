@@ -17,7 +17,12 @@ sealed class Weight(val parent: Option[Weight], id: String, game: Game)
 
   final def set_owner(player: Option[Player]): Unit = { _owner = player }
 
-  def score_of(player: Player): Int = ???
+  def score_of(player: Player): Int = {
+    _owner match {
+      case Some(p) if(p eq player) => 1
+      case _ => 0
+    }
+  }
 }
 
 case class Scale(parent_scale: Option[Scale], val radius: Int, _id: String, _game: Game)
@@ -33,7 +38,14 @@ case class Scale(parent_scale: Option[Scale], val radius: Int, _id: String, _gam
 
   override def mass: Int = board.map(_.mass).sum
 
-  override def score_of(player: Player): Int = ???
+  override def score_of(player: Player): Int = {
+    var count = 0
+    for((w, i) <- board.zipWithIndex) {
+      if(w.isInstanceOf[Weight])
+        count += scala.math.abs(i-radius)*w.score_of(player)
+    }
+    count
+  }
 
   override def height: Int = board.map(_.height).max
 
@@ -55,7 +67,7 @@ case class Stack(parent_scale: Scale, val bottom_weight: Weight, _id: String, _g
 
   override def mass: Int = stack.map(_.mass).sum
 
-  override def score_of(player: Player): Int = ???
+  override def score_of(player: Player): Int = stack.map(_.score_of(player)).sum
 
   override def height: Int = stack.length
 
