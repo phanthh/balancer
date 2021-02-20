@@ -19,6 +19,7 @@ class Game {
     _idCounter += 1
     val newWeight = new Weight(Some(parent_scale), newID, this)
     newWeight.set_owner(owner)
+
     gameObject += (newID -> newWeight)
     newWeight
   }
