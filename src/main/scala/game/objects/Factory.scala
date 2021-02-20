@@ -1,57 +1,55 @@
 package game.objects
 
 import game.Game
+import game.objects.Factory._
+
+object Factory {
+  val WEIGHT = "w"
+  val SCALE = "s"
+  val STACK = "t"
+  val PLAYER = "p"
+
+  def apply(game: Game) = new Factory(game)
+}
 
 class Factory(private val game: Game) {
-  private val WEIGHT = "w"
-  private val SCALE = "s"
-  private val STACK = "t"
-  private val PLAYER = "p"
 
   private var _idCounter = 0
   private def nextID(types: String): String = {_idCounter += 1; types + _idCounter.toString}
 
-  def add_weight(pos: Int, parent_scale: Scale, owner: Option[Player] = None): Weight = {
+  def build_weight(pos: Int, parent_scale: Scale, owner: Option[Player] = None): (String, Weight) = {
     val newID = nextID(WEIGHT)
     val newWeight = new Weight(Some(parent_scale), newID, game)
 
     newWeight.set_owner(owner)
 
     if(parent_scale.isEmptyAt(pos)) {
-      val newStackID = STACK + _idCounter.toString
-      _idCounter += 1
-      val newStack = new Stack(parent_scale, newWeight, newStackID, this)
-
-      parent_scale.place_at(pos, newStack)
-
-      gameObject += (newStackID -> newStack)
-
+      val newStackID = nextID(SCALE)
+      val newStack = new Stack(parent_scale, newWeight, newStackID, game)
       parent_scale.place_at(pos, newStack)
     } else {
-
       parent_scale.objectAt(pos) match {
         case scale: Scale => throw new Exception("Occupied")
         case stack: Stack => stack.append(newWeight)
       }
     }
-
-    gameObject += (newID -> newWeight)
-    newWeight
+    newID -> newWeight
   }
 
-  def add_first_scale(radius: Int): Scale = {
-    val newID = SCALE + _idCounter.toString
-    _idCounter += 1
-    val newScale = new Scale(None, radius, newID, this)
-    gameObject += (newID -> newScale)
-    newScale
+  def build_first_scale(radius: Int): (String, Scale) = {
+    val newID = nextID(SCALE)
+    val newScale = new Scale(None, radius, newID, game)
+    newID -> newScale
   }
 
-  def add_scale(pos: Int, radius: Int, parent_scale: Scale): Scale = {
-    val newID = SCALE + _idCounter.toString
-    _idCounter += 1
-    val newScale = new Scale(None, radius, newID, this)
+  def build_scale(pos: Int, radius: Int, parent_scale: Scale): (String, Scale) = {
+    val newID = nextID(SCALE)
+    val newScale = new Scale(Some(parent_scale), radius, newID, game)
     parent_scale.place_at(pos, newScale)
-    newScale
+    newID -> newScale
+  }
+
+  def build_player(name: String): (String, Scale) = {
+    ???
   }
 }
