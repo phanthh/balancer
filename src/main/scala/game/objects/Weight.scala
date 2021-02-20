@@ -15,6 +15,8 @@ sealed class Weight(val parent: Option[Weight], id: String, game: Game)
 
   def owner: Option[Player] = _owner
 
+  final def set_owner(player: Option[Player]): Unit = { _owner = player }
+
   def isBuffed: Boolean = _owner.isDefined
 
   def score_of(player: Player): Int = ???
@@ -36,6 +38,7 @@ case class Scale(parent_scale: Option[Scale], val radius: Int, _id: String, _gam
     board.map(_.owner).groupBy(identity).view.mapValues(_.length).maxBy(_._2)._1
 
   def isBalanced: Boolean = ???
+
 }
 
 case class Stack(parent_scale: Scale, val bottom_weight: Weight, _id: String, _game: Game)
