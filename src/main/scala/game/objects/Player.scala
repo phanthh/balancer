@@ -1,6 +1,6 @@
 package game.objects
 
-import game.{Game, GameObject}
+import game.Game
 
 sealed abstract class Player
   extends GameObject {
@@ -23,5 +23,3 @@ case class Bot(val name: String , val id: String, val game: Game)
 }
 
 case class Human(val name: String, val id: String, val game: Game) extends Player
-
-// TODO: add algorithm for Bot

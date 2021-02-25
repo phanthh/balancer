@@ -1,6 +1,6 @@
 package game.objects
 
-import game.{Game, GameObject}
+import game.Game
 
 import scala.collection.mutable.Buffer
 

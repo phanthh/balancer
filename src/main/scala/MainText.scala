@@ -1,7 +1,7 @@
-import game.{ConsoleManager, Game}
+import game.{Game, UI}
+import game.UI.{GRAPHIC, CONSOLE}
 
 object MainText extends App {
   val game = new Game(2)
-  val console = new ConsoleManager(game)
-  console.run()
+  UI(game, CONSOLE).run()
 }

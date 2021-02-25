@@ -1,6 +1,6 @@
 package game.objects
 
-import game.{Game, GameObject}
+import game.Game
 
 class Weight(val stack: Stack, val id: String, val game: Game, var owner: Option[Player] = None)
   extends GameObject with Owner with Mass with Scorable {

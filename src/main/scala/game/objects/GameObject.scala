@@ -1,5 +1,7 @@
 package game.objects
 
+import game.Game
+
 trait Owner {
   def owner: Option[Player]
 }
@@ -15,3 +17,11 @@ trait Scorable {
 trait Height {
   def height: Int
 }
+
+abstract class GameObject {
+  val id: String
+  val game: Game
+}
+
+
+

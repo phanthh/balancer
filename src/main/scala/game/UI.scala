@@ -6,6 +6,13 @@ import scala.io.StdIn._
 object UI {
   val CONSOLE = 0
   val GRAPHIC = 1
+
+  def apply(game: Game, types: Int = CONSOLE) = {
+    types match {
+      case GRAPHIC => new GraphicManager(game)
+      case _ => new ConsoleManager(game)
+    }
+  }
 }
 
 sealed abstract class UI {
@@ -14,7 +21,7 @@ sealed abstract class UI {
 }
 
 case class GraphicManager(val game: Game) extends UI {
-  override def run(): Unit = ???
+  override def run(): Unit = ??? // TODO: Graphical Interface
 }
 
 case class ConsoleManager(val game: Game) extends UI {
@@ -46,8 +53,7 @@ case class ConsoleManager(val game: Game) extends UI {
         println(f">>>>>>>>> ${players(idx).name.toUpperCase}%-5s TURN <<<<<<<<<")
         players(idx) match {
           case p: Player =>
-            // TODO: Refractor, add better prompt, and refactor exception
-            // TODO: Custom Exception
+            // TODO: Refracting, Exception handling
             println(s"Which scale ? (${game.scales.map(_.scale_code).mkString(",")}): ")
             val parent_scale = game.scaleWithCode(readChar()).getOrElse(throw new Exception("Scale code invalid"))
             println(s"Position ? [-${parent_scale.radius},${parent_scale.radius}]: ")
@@ -69,7 +75,6 @@ case class ConsoleManager(val game: Game) extends UI {
     println("========== Congratulation !!!! =================")
   }
 
-  // TODO: Implement print_game_state()
   private def print_game_state() = {
     print_score_board()
     game.scales.foreach(print_scale)
@@ -100,6 +105,6 @@ case class ConsoleManager(val game: Game) extends UI {
     println()
   }
 
-  private def updateGrid() = ???
+  private def updateGrid() = ??? // TODO: Grid implementation for console screen
   private def drawGrid() = ???
 }
