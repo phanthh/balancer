@@ -1,5 +1,5 @@
 package game
-import game.objects.{Bot, Player, Scale}
+import game.objects.{Bot, Human, Player, Scale}
 
 import scala.io.StdIn._
 
@@ -40,20 +40,19 @@ case class ConsoleManager(val game: Game) extends UI {
       var weightsLeft = game.weightsPerRound
       var players = game.players.toList
       var idx = 0
-      println(s"=============== ROUND NUMBER $i ================")
+      println(f"========== ROUND $i%2s ==========")
       while(weightsLeft > 0) {
         print_game_state()
-        println(s" ${players(idx).name} Turn !!!!")
+        println(f">>>>>>>>> ${players(idx).name.toUpperCase}%-5s TURN <<<<<<<<<")
         players(idx) match {
           case p: Player =>
             // TODO: Refractor, add better prompt, and refactor exception
             // TODO: Custom Exception
-            println("Please enter the scale code: ")
+            println(s"Which scale ? (${game.scales.map(_.scale_code).mkString(",")}): ")
             val parent_scale = game.scaleWithCode(readChar()).getOrElse(throw new Exception("Scale code invalid"))
-            println("Please enter the pos: ")
+            println(s"Position ? [-${parent_scale.radius},${parent_scale.radius}]: ")
             val pos = readInt()
             game.factory.build_weight(pos, parent_scale, Some(p))
-
           case b: Bot =>
             b.place_weight()
         }
@@ -72,15 +71,35 @@ case class ConsoleManager(val game: Game) extends UI {
 
   // TODO: Implement print_game_state()
   private def print_game_state() = {
-    println(game.scales.map(_.toString).mkString) // In developement only
+    print_score_board()
+    game.scales.foreach(print_scale)
   }
 
-  private def updateGrid() = {
-  }
-
-  private def drawGrid() = {
+  private def print_score_board() = {
+    val score_board = game.players.map(p =>
+      f"| ${p.player_code}: ${p.score}%2s points (${if(p.isInstanceOf[Human]) "human" else "bot"}%5s)  |"
+    ).mkString("\n")
+    println("_________________________")
+    println(score_board)
+    println("|_______________________|")
   }
 
   private def print_scale(scale: Scale) = {
+    println()
+    println(s"Scale [${scale.scale_code},${scale.radius}]")
+    println("----------------------------")
+    val rep = scale.board.zipWithIndex.map {
+      case (Some(p), i) => p.toString
+      case (None, i) if i==scale.radius => s"[${scale.scale_code}]"
+      case (None, i) => "-"
+    }.mkString
+    println(s"$scale: " + "<" + rep + ">")
+    println(s"TORQUE: [${scale.left_torque}--${scale.mass}--${scale.right_torque}]")
+    println("STATUS: " + (if(scale.isBalanced) "Balanced" else "Flipped"))
+    println(s"OWNER: ${scale.owner match { case Some(p) => p.name case None => "No one"}}")
+    println()
   }
+
+  private def updateGrid() = ???
+  private def drawGrid() = ???
 }

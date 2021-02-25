@@ -16,7 +16,6 @@ class Factory(private val game: Game) {
 
   private var _idCounter = 0
   private var _scaleCode: Char = 96
-  private var _playerCode: Char = 96
   private def nextID(types: String): String = {_idCounter += 1; types + _idCounter.toString}
   private def nextScaleCode(): Char = {_scaleCode = (_scaleCode.toInt + 1).toChar; _scaleCode}
 
@@ -33,6 +32,7 @@ class Factory(private val game: Game) {
         val newStack = new Stack(parent_scale, pos, newStackID, game)
         val newWeightID = nextID(WEIGHT)
         val newWeight = new Weight(newStack, newWeightID, game, owner)
+        newStack.append(newWeight)
         parent_scale.place_at(pos, newStack)
         game.register(newStackID -> newStack)
         game.register(newWeightID -> newWeight)

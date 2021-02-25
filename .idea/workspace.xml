@@ -5,13 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Traits.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/GameObject.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/GameObject.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/UI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/UI.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Factory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Factory.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" afterDir="false" />
     </list>

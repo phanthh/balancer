@@ -2,15 +2,16 @@ package game.objects
 
 import game.{Game, GameObject}
 
-sealed abstract class Player(val name: String, _id: String, _game: Game)
-  extends GameObject(_id, _game){
+sealed abstract class Player
+  extends GameObject {
+  val name: String
   def player_code: Char = name(0)
   def score: Int = game.baseScale.score_of(this)
   var roundWon = 0
 }
 
-case class Bot(_name: String , _id: String, _game: Game)
-  extends Player(_name, _id, _game) {
+case class Bot(val name: String , val id: String, val game: Game)
+  extends Player {
   def place_weight(): Unit = {
     val place_pos = 0
     val parent_scale = null
@@ -21,11 +22,6 @@ case class Bot(_name: String , _id: String, _game: Game)
   }
 }
 
-case class Human(_name: String, _id: String, _game: Game)
-  extends Player(_name, _id, _game) {
-  def place_weight(): Unit = {
-
-  }
-}
+case class Human(val name: String, val id: String, val game: Game) extends Player
 
 // TODO: add algorithm for Bot
