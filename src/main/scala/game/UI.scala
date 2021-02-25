@@ -1,5 +1,5 @@
 package game
-import game.objects.{Factory, Scale}
+import game.objects.{Bot, Player, Scale}
 
 import scala.io.StdIn._
 
@@ -11,61 +11,76 @@ object UI {
 sealed abstract class UI {
   val game: Game
   def run(): Unit
-  def round_loop(): Unit
 }
 
 case class GraphicManager(val game: Game) extends UI {
   override def run(): Unit = ???
-  override def round_loop(): Unit = ???
-
 }
 
 case class ConsoleManager(val game: Game) extends UI {
-  def factory = game.factory
   override def run(): Unit = {
     println("Welcome to Balancer !!")
     println("Enter the number of Human players: ")
-    val numHumans = readInt()
-    println("Enter the number of Bots: ")
-    val numBots = readInt()
+//    val numHumans = readInt()
+    val numHumans = 2 // TESTING ONLY
+//    println("Enter the number of Bots: ")
+//    val numBots = readInt()
+
     for(i <- 1 to numHumans){
       println(f"Enter the #$i human's name: ")
-      game.register(factory.build_human(readLine()))
+      game.factory.build_human(readLine())
     }
 
-    for(i <- 1 to numBots){
-      println(f"Enter the #$i bots's name: ")
-      game.register(factory.build_bot(readLine()))
-    }
+//    for(i <- 1 to numBots){
+//      println(f"Enter the #$i bots's name: ")
+//      game.register(factory.build_bot(readLine()))
+//    }
 
     for(i <- 1 to game.numRounds){
-      round_loop()
+      var weightsLeft = game.weightsPerRound
+      var players = game.players.toList
+      var idx = 0
+      println(s"=============== ROUND NUMBER $i ================")
+      while(weightsLeft > 0) {
+        print_game_state()
+        println(s" ${players(idx).name} Turn !!!!")
+        players(idx) match {
+          case p: Player =>
+            // TODO: Refractor, add better prompt, and refactor exception
+            // TODO: Custom Exception
+            println("Please enter the scale code: ")
+            val parent_scale = game.scaleWithCode(readChar()).getOrElse(throw new Exception("Scale code invalid"))
+            println("Please enter the pos: ")
+            val pos = readInt()
+            game.factory.build_weight(pos, parent_scale, Some(p))
+
+          case b: Bot =>
+            b.place_weight()
+        }
+        weightsLeft -= 1
+        idx += 1
+        if(idx >= players.length) idx = 0
+      }
+      println("End of round !!")
+      println(s"The winner of this rounds is: ${game.winner}")
+      game.winner.roundWon += 1
     }
+    println("================================================")
+    println(s"The winner of the game is: ${game.finalWinner}")
+    println("========== Congratulation !!!! =================")
   }
 
-  def print_game_state() = ???
+  // TODO: Implement print_game_state()
+  private def print_game_state() = {
+    println(game.scales.map(_.toString).mkString) // In developement only
+  }
 
-  override def round_loop(): Unit = {
-    var weightsLeft = game.weightsPerRound
-    var turn =
-    while(weightsLeft > 0) {
-      print_game_state()
+  private def updateGrid() = {
+  }
 
-      println("Enter the parent scale code: ")
-      val parentScale =
-        game.scaleWithCode(readChar()).getOrElse(throw new Exception("Invalid Scale Code")) // Temporary
-      println("Enter the position: ")
-      val pos = readInt()
+  private def drawGrid() = {
+  }
 
-      ???
-
-      weightsLeft -= 1
-    }
-
-
+  private def print_scale(scale: Scale) = {
   }
 }
-
-// TODO: Implement print_game_state()
-// TODO: Custom Exception
-// TODO: Implement Game mechanics - round, game, winner, ....
