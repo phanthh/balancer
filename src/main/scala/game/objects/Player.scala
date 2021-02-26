@@ -13,12 +13,40 @@ sealed abstract class Player
 case class Bot(val name: String, val factory: Factory)
   extends Player {
   def place_weight(): Unit = {
-    val place_pos = 0
-    val parent_scale = null
-
     // TODO: Implement the algorithm
+    var max_score = -1
+    var max_score_pos = 0
+    var max_score_scale: Scale = null
 
-    factory.build_weight(place_pos, parent_scale, Some(this))
+    def update(scale: Scale, pos: Int) = {
+      val currentScore = score
+      if(currentScore > max_score && scale.isBalanced) {
+        max_score = currentScore
+        max_score_scale = scale
+        max_score_pos = pos
+      }
+    }
+
+    for(scale <- factory.scales){
+      for(idx <- 0 until 2*scale.radius+1){
+        val pos = idx - scale.radius
+        if(pos != 0){
+          scale.object_at(pos) match {
+            case Some(scale: Scale) =>
+            case Some(stack: Stack) =>
+              factory.build_weight(pos, scale, Some(this), true)
+              update(scale, pos)
+              stack.soft_pop()
+            case None =>
+              factory.build_weight(pos, scale, Some(this), true)
+              update(scale, pos)
+              scale.remove_at(pos)
+          }
+        }
+      }
+    }
+
+    factory.build_weight(max_score_pos, max_score_scale, Some(this))
   }
 }
 

@@ -1,7 +1,6 @@
 package game
 
 import game.grid.Grid
-import game.objects.Scale
 
 
 class Game (val numRounds: Int = 5, val weightsPerRound: Int = 10, base_scale_radius: Int = 5) {
@@ -16,12 +15,9 @@ class Game (val numRounds: Int = 5, val weightsPerRound: Int = 10, base_scale_ra
   def players = factory.players
   def scaleWithCode(code: Char) = factory.scaleWithCode(code)
   def reset() = factory.reset()
+  def scales = factory.scales
   //
 
-  // Recursive function for get all scales
-  private def _scales(root_scale: Scale): Vector[Scale] =
-    root_scale.scales.map(_scales).flatMap(_.toList).appended(root_scale)
-  def scales = _scales(baseScale)
 
   // Winners
   def winner = players.maxBy(_.score)

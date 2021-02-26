@@ -1,6 +1,7 @@
 package game.objects
 
 import game.Factory
+import scala.collection.mutable.Buffer
 
 sealed abstract class Placable
   extends GameObject with Owner with Mass with Height {
@@ -15,7 +16,14 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
 
   def board_vec = board.toVector
 
+  def scales = board.flatMap {
+    case Some(s: Scale) => Some(s)
+    case _ => None
+  }.toVector
+
   def place_at(pos: Int, it: Placable) = { board(pos+radius) = Some(it)}
+
+  def remove_at(pos: Int) = { board(pos+radius) = None }
 
   def is_empty_at(pos: Int) = board(pos+radius).isEmpty
 
@@ -52,7 +60,7 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
   }
 
   override def owner: Option[Player] = {
-    // Note: Inefficient since multiple call of count and count is recursive
+    // TODO: Inefficient since multiple call of count and count is recursive
     val top2 = factory.players.sortBy(count).takeRight(2)
     if(count(top2(1)) - count(top2(0)) > radius) Some(top2(1)) else None
   }
@@ -81,11 +89,6 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
 
   def isBalanced: Boolean = scala.math.abs(left_torque-right_torque) <= radius
 
-  def scales: Vector[Scale] = board.flatMap {
-    case Some(s: Scale) => Some(s)
-    case _ => None
-  }.toVector
-
   def scaleWithCode(code: Char): Option[Scale] =
     if(code == scale_code)
       Some(this)
@@ -104,7 +107,7 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
 case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: Factory)
   extends Placable {
 
-  private var stack = scala.collection.mutable.Stack[Weight]()
+  private var stack = Buffer[Weight]()
 
   def stack_vec = stack.toVector
 
@@ -123,6 +126,7 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: F
   }
 
   def soft_append(it: Weight) = stack.append(it)
+  def soft_pop() = stack.dropRightInPlace(1)
 
   def append(it: Weight) = {
     it.owner match {
@@ -136,10 +140,6 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: F
       case None =>
     }
     stack.append(it)
-  }
-
-  def update() = {
-
   }
 
   override def toString: String = "|" + stack.mkString(",") + "|"

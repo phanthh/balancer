@@ -61,4 +61,9 @@ class Factory(private val game: Game, base_scale_radius: Int) {
     players.append(newHuman)
     newHuman
   }
+
+  // Recursive function for get all scales
+  private def _scales(root_scale: Scale): Vector[Scale] =
+    root_scale.scales.map(_scales).flatMap(_.toList).appended(root_scale)
+  def scales = _scales(baseScale)
 }

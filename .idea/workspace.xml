@@ -5,13 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
-      <change afterPath="$PROJECT_DIR$/writtenfile.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/savefile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/savefile.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/MainText.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Factory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Factory.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/UI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/UI.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,7 +152,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Scala REPL" type="ScalaScriptConsoleRunConfiguration" factoryName="Scala Console" temporary="true" show_console_on_std_err="false" show_console_on_std_out="false">
+    <configuration name="Scala REPL" type="ScalaScriptConsoleRunConfiguration" factoryName="Scala Console" show_console_on_std_err="false" show_console_on_std_out="false">
       <module name="balancer" />
       <option name="allowRunningInParallel" value="false" />
       <option name="javaOptions" value="-Djline.terminal=NONE" />
@@ -173,11 +173,6 @@
       <item itemvalue="sbt Task.Run Main Once" />
       <item itemvalue="Scala REPL.Scala REPL" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Scala REPL.Scala REPL" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

@@ -16,21 +16,23 @@ case class GraphicManager(val game: Game) extends UI {
 
 case class ConsoleManager(val game: Game) extends UI {
   def input_prompt() = {
-    println("Enter the number of Human players: ")
-    //    val numHumans = readInt()
-    val numHumans = 2 // TESTING ONLY
-    //    println("Enter the number of Bots: ")
-    //    val numBots = readInt()
+//    println("Enter the number of Human players: ")
+//    val numHumans = readInt()
+//    println("Enter the number of Bots: ")
+//    val numBots = readInt()
+//
+//    for(i <- 1 to numHumans){
+//      println(f"Enter the #$i human's name: ")
+//      game.factory.build_human(readLine())
+//    }
+//
+//    for(i <- 1 to numBots){
+//      println(f"Enter the #$i bots's name: ")
+//      game.factory.build_bot(readLine())
+//    }
 
-    for(i <- 1 to numHumans){
-      println(f"Enter the #$i human's name: ")
-      game.factory.build_human(readLine())
-    }
-
-    //    for(i <- 1 to numBots){
-    //      println(f"Enter the #$i bots's name: ")
-    //      game.register(factory.build_bot(readLine()))
-    //    }
+    game.factory.build_human("Hau") // TODO: Delete this, this is for debug
+    game.factory.build_bot("Jack")
   }
 
   def run(filename: String = null): Unit = {
@@ -42,22 +44,22 @@ case class ConsoleManager(val game: Game) extends UI {
 
     while(game.currentRound <= game.numRounds){
       var weightsLeft = game.weightsPerRound
-      var players = game.players.toList
+      var players = game.players
       var idx = 0
       println(f"========== ROUND ${game.currentRound}%2s ==========")
       while(weightsLeft > 0) {
-        print_game_state()
-        println(f">>>>>>>>> ${players(idx).name.toUpperCase}%-5s TURN <<<<<<<<<")
         players(idx) match {
-          case p: Player =>
+          case h: Human =>
             // TODO: Refracting, Exception handling
+            print_game_state()
+            println(f">>>>>>>>> ${players(idx).name.toUpperCase}%-5s TURN <<<<<<<<<")
             println(s"Which scale ? (${game.scales.map(_.scale_code).mkString(",")}): ")
             val parent_scale = game.scaleWithCode(readChar()).getOrElse(
               throw new InvalidInput("Scale Code should be a Char")
             )
             println(s"Position ? [-${parent_scale.radius},${parent_scale.radius}]: ")
             val pos = readInt()
-            game.factory.build_weight(pos, parent_scale, Some(p))
+            game.factory.build_weight(pos, parent_scale, Some(h))
           case b: Bot =>
             b.place_weight()
         }
