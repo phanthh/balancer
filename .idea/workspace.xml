@@ -5,16 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
+      <change afterPath="$PROJECT_DIR$/plans/general_plan/:w" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/savefile.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/game/Factory.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plans/general_plan/src.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/plans/general_plan/src.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plans/general_plan/src.tex" beforeDir="false" afterPath="$PROJECT_DIR$/plans/general_plan/src.tex" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Main.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/MainText.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/GameObject.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/UI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/UI.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Factory.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Traits.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Traits.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -70,12 +75,15 @@
     <option name="version" value="1" />
   </component>
   <component name="ProjectId" id="1ojL7pYc0GadqDTy7NhVH0HyPnr" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -84,6 +92,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.13218391" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RecentsManager">
@@ -91,7 +100,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MainText">
+  <component name="RunManager" selected="Application.MainText with SaveFile">
     <configuration name="Main" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="balancer" />
@@ -101,6 +110,14 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainText with SaveFile" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="MainText" />
+      <module name="balancer" />
+      <option name="PROGRAM_PARAMETERS" value="savefile.txt" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -159,6 +176,7 @@
     </configuration>
     <list>
       <item itemvalue="Application.MainText" />
+      <item itemvalue="Application.MainText with SaveFile" />
       <item itemvalue="Application.Main" />
       <item itemvalue="sbt Task.Run Main" />
       <item itemvalue="sbt Task.Run Main Once" />
@@ -216,6 +234,7 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Project Started" />
     <MESSAGE value="Hello Worlds !!!" />
     <MESSAGE value="Basic class structure setup." />

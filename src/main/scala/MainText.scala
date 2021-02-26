@@ -1,7 +1,8 @@
-import game.{Game, UI}
-import game.UI.{GRAPHIC, CONSOLE}
+import game.{ConsoleManager, Game, UI}
+import game.UI.{CONSOLE, GRAPHIC}
 
 object MainText extends App {
   val game = new Game(2)
-  UI(game, CONSOLE).run()
+  val savedfile = if(args.nonEmpty) args(0) else null
+  (new ConsoleManager(game)).run(savedfile)
 }

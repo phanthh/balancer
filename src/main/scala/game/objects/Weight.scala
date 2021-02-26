@@ -2,7 +2,7 @@ package game.objects
 
 import game.Game
 
-class Weight(val stack: Stack, val id: String, val game: Game, var owner: Option[Player] = None)
+class Weight(val stack: Stack, val game: Game, var owner: Option[Player] = None)
   extends GameObject with Owner with Mass with Scorable {
   override val mass: Int = 1
   override def score_of(player: Player): Int = {

@@ -2,19 +2,18 @@ package game.objects
 
 import game.Game
 
-import scala.collection.mutable.Buffer
-
-sealed abstract class Placable(id: String, game: Game)
+sealed abstract class Placable
   extends GameObject with Owner with Mass with Scorable with Height {
-
   val pos: Int
 }
 
 case class Scale(val scale: Scale, val pos: Int, val radius: Int, val scale_code: Char,
-                 val id: String, val game: Game)
-  extends Placable(id, game) {
+                 protected val game: Game)
+  extends Placable {
 
-  var board = Array.fill[Option[Placable]](2*radius+1)(None)
+  private var board = Array.fill[Option[Placable]](2*radius+1)(None)
+
+  def board_vec = board.toVector
 
   def place_at(pos: Int, it: Placable) = { board(pos+radius) = Some(it)}
 
@@ -70,6 +69,18 @@ case class Scale(val scale: Scale, val pos: Int, val radius: Int, val scale_code
 
   def isBalanced: Boolean = scala.math.abs(left_torque-right_torque) <= radius
 
+  def scales: Vector[Scale] = board.flatMap {
+    case Some(s: Scale) => Some(s)
+    case _ => None
+  }.toVector
+
+  def scaleWithCode(code: Char): Option[Scale] =
+    if(code == scale_code)
+      Some(this)
+    else
+      scales.find(_.scale_code == code)
+
+
   // RENDERING
   private var fulcrum_height = 0
 
@@ -78,10 +89,10 @@ case class Scale(val scale: Scale, val pos: Int, val radius: Int, val scale_code
   override def toString: String = s"<$scale_code,$mass>"
 }
 
-case class Stack(val scale: Scale, val pos: Int, val id: String, val game: Game)
-  extends Placable(id, game) {
+case class Stack(val scale: Scale, val pos: Int, protected val game: Game)
+  extends Placable {
 
-  private var stack: Buffer[Weight] = Buffer[Weight]()
+  private var stack = scala.collection.mutable.Stack[Weight]()
 
   override def mass: Int = stack.map(_.mass).sum
 
@@ -93,6 +104,10 @@ case class Stack(val scale: Scale, val pos: Int, val id: String, val game: Game)
     if(stack.isEmpty) None else {
       stack.map(_.owner).groupBy(identity).view.mapValues(_.size).maxBy(_._2)._1
     }
+  }
+
+  def updateWeight() = {
+
   }
 
   def append(it: Weight) = {

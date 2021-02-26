@@ -6,48 +6,45 @@ import scala.io.StdIn._
 object UI {
   val CONSOLE = 0
   val GRAPHIC = 1
-
-  def apply(game: Game, types: Int = CONSOLE) = {
-    types match {
-      case GRAPHIC => new GraphicManager(game)
-      case _ => new ConsoleManager(game)
-    }
-  }
 }
 
-sealed abstract class UI {
-  val game: Game
-  def run(): Unit
-}
+sealed abstract class UI { val game: Game }
 
 case class GraphicManager(val game: Game) extends UI {
-  override def run(): Unit = ??? // TODO: Graphical Interface
+  def run(): Unit = ??? // TODO: Graphical Interface
 }
 
 case class ConsoleManager(val game: Game) extends UI {
-  override def run(): Unit = {
-    println("Welcome to Balancer !!")
+  def input_prompt() = {
     println("Enter the number of Human players: ")
-//    val numHumans = readInt()
+    //    val numHumans = readInt()
     val numHumans = 2 // TESTING ONLY
-//    println("Enter the number of Bots: ")
-//    val numBots = readInt()
+    //    println("Enter the number of Bots: ")
+    //    val numBots = readInt()
 
     for(i <- 1 to numHumans){
       println(f"Enter the #$i human's name: ")
       game.factory.build_human(readLine())
     }
 
-//    for(i <- 1 to numBots){
-//      println(f"Enter the #$i bots's name: ")
-//      game.register(factory.build_bot(readLine()))
-//    }
+    //    for(i <- 1 to numBots){
+    //      println(f"Enter the #$i bots's name: ")
+    //      game.register(factory.build_bot(readLine()))
+    //    }
+  }
 
-    for(i <- 1 to game.numRounds){
+  def run(filename: String = null): Unit = {
+    println("Welcome to Balancer !!")
+    if(filename == null)
+      input_prompt()
+    else
+      game.fileManager.load_game(filename)
+
+    while(game.currentRound <= game.numRounds){
       var weightsLeft = game.weightsPerRound
       var players = game.players.toList
       var idx = 0
-      println(f"========== ROUND $i%2s ==========")
+      println(f"========== ROUND ${game.currentRound}%2s ==========")
       while(weightsLeft > 0) {
         print_game_state()
         println(f">>>>>>>>> ${players(idx).name.toUpperCase}%-5s TURN <<<<<<<<<")
@@ -69,6 +66,7 @@ case class ConsoleManager(val game: Game) extends UI {
       println("End of round !!")
       println(s"The winner of this rounds is: ${game.winner}")
       game.winner.roundWon += 1
+      game.currentRound += 1
     }
     println("================================================")
     println(s"The winner of the game is: ${game.finalWinner}")
@@ -82,18 +80,18 @@ case class ConsoleManager(val game: Game) extends UI {
 
   private def print_score_board() = {
     val score_board = game.players.map(p =>
-      f"| ${p.player_code}: ${p.score}%2s points (${if(p.isInstanceOf[Human]) "human" else "bot"}%5s)  |"
+      f"| ${p.name}%-5s (${p.player_code}) : ${p.score}%2s points (${if(p.isInstanceOf[Human]) "human" else "bot"}%5s)  |"
     ).mkString("\n")
-    println("_________________________")
+    println("__________________________________")
     println(score_board)
-    println("|_______________________|")
+    println("|________________________________|")
   }
 
   private def print_scale(scale: Scale) = {
     println()
     println(s"Scale [${scale.scale_code},${scale.radius}]")
     println("----------------------------")
-    val rep = scale.board.zipWithIndex.map {
+    val rep = scale.board_vec.zipWithIndex.map {
       case (Some(p), i) => p.toString
       case (None, i) if i==scale.radius => s"[${scale.scale_code}]"
       case (None, i) => "-"

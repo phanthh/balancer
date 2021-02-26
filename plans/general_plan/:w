@@ -218,9 +218,9 @@ scale.
 Weights can be \textbf{stacked}. One can capture all the weights by placing
 his/her weights on top of the stack.
 
-To capture a scale, one must have \textbf{at least} $r$ weights more compared to
-the player with the 2nd most weights on the scale, where $r$ is the radius of
-the scale.  (See the example below)
+To capture a scale, one must have \textbf{at least} $r$ weights compared to the
+player with 2nd most weights on the scale, where $r$ is the radius of the scale.
+(See the example below)
 
 \textbf{Example:}
 \begin{verbatim}
@@ -393,11 +393,11 @@ in the form:
   <\text{scale's code}, \text{scale's weight}>
 \end{align*}
 
-On the parent scale, child scales are also represented is this way: <d,3> is
-scale "d" with 3 weight on it, <b,1> is scale "b" with 1 weight on it. 
+On the other scale, the scale are also represented is this way: <4,3> is the
+4th scale with 3 weight on it, <2,1> is the 2nd scale with 1 weight on it. 
 
-$[scale's code]$ i.e [a], [b],... represents the center of the scale and each hyphen (-) denotes
-an empty space on the scale with no weights.
+"[1]" represents the center of the scale and each hyphen (-) denotes an empty
+space on the scale with no weights.
 
 A stack of weights is represented by two vertical bars surrounding the weights.
 Each weight is represented by its respective owners' letter: i.e "a", "b", "c",
@@ -446,9 +446,9 @@ Round: 2
 Turn: c
 
 # Scale
-_,_,5   : -4,c,c | 2,b
-a,3,4   : -1,b |   2,a,c
-a,-1,4  : 1,a    |-1,a
+0,0,5   : -4,c,c   2,b
+a,3,1   : -1,b     2,a,c
+1,-1  : 1,a     -1,a
 
 END
 
@@ -481,11 +481,11 @@ END
     the right arm.
   \item For example, this line in the Scale block:
     \begin{verbatim}
-                        1,3,3  : -1,b  |  2,a,c
+                        1,3   : -1,b     2,a,c
     \end{verbatim}
     from left to right indicates: the parent scale (scale with index 1), where
     on the parent scale this scale is placed (on the right arm, distance 3 from
-    the center) and the radius (the scale have radius 3)
+    the center). 
   \item After the colon are the weights' position on the scale, it must be
     listed from left to right (thus the indices must be from smallest to
     biggest). 

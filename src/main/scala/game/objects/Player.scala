@@ -10,7 +10,7 @@ sealed abstract class Player
   var roundWon = 0
 }
 
-case class Bot(val name: String , val id: String, val game: Game)
+case class Bot(val name: String, val game: Game)
   extends Player {
   def place_weight(): Unit = {
     val place_pos = 0
@@ -22,4 +22,4 @@ case class Bot(val name: String , val id: String, val game: Game)
   }
 }
 
-case class Human(val name: String, val id: String, val game: Game) extends Player
+case class Human(val name: String, val game: Game) extends Player

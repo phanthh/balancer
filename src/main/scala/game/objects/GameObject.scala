@@ -19,8 +19,7 @@ trait Height {
 }
 
 abstract class GameObject {
-  val id: String
-  val game: Game
+  protected val game: Game
 }
 
 
