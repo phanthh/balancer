@@ -32,6 +32,10 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
         case None =>
       }
     }
+    owner match {
+      case Some(p) if p eq player => score *= 2
+      case _ =>
+    }
     score
   }
 
@@ -102,6 +106,8 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: F
 
   private var stack = scala.collection.mutable.Stack[Weight]()
 
+  def stack_vec = stack.toVector
+
   override def mass: Int = stack.map(_.mass).sum
 
   override def score(player: Player): Int = stack.map(_.score(player)).sum
@@ -130,6 +136,10 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: F
       case None =>
     }
     stack.append(it)
+  }
+
+  def update() = {
+
   }
 
   override def toString: String = "|" + stack.mkString(",") + "|"

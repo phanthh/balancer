@@ -4,8 +4,7 @@ Human: phuc,jack,king
 Round: 2
 Turn: hau
 # Scale
-_,0,5,a : -4,k,j | 2,b
+_,0,5,a : -4,k,j
 a,3,4,b : -1,j | 2,j,j
-a,-1,4,c : 1,p |-1,p | 2,p,p,p | -2,p,p,p
+a,-1,4,c : -2,p,p,p | -1,p | 1,p | 2,p,p,p
 END
-

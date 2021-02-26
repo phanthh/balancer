@@ -52,7 +52,9 @@ case class ConsoleManager(val game: Game) extends UI {
           case p: Player =>
             // TODO: Refracting, Exception handling
             println(s"Which scale ? (${game.scales.map(_.scale_code).mkString(",")}): ")
-            val parent_scale = game.scaleWithCode(readChar()).getOrElse(throw new Exception("Scale code invalid"))
+            val parent_scale = game.scaleWithCode(readChar()).getOrElse(
+              throw new InvalidInput("Scale Code should be a Char")
+            )
             println(s"Position ? [-${parent_scale.radius},${parent_scale.radius}]: ")
             val pos = readInt()
             game.factory.build_weight(pos, parent_scale, Some(p))
@@ -106,3 +108,9 @@ case class ConsoleManager(val game: Game) extends UI {
   private def updateGrid() = ??? // TODO: Grid implementation for console screen
   private def drawGrid() = ???
 }
+
+
+
+final case class InvalidInput(private val message: String = "",
+                            private val cause: Throwable = None.orNull)
+  extends Exception(message, cause)

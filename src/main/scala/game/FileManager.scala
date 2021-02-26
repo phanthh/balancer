@@ -1,9 +1,9 @@
 package game
 
-import game.objects.Scale
+import game.objects.{Scale, Stack}
 
-import java.io.{BufferedReader, FileNotFoundException, FileReader}
-import scala.collection.mutable.Map
+import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter}
+import scala.collection.mutable.{Map, Buffer}
 
 final case class ParseError(private val message: String = "",
                             private val cause: Throwable = None.orNull)
@@ -11,7 +11,33 @@ final case class ParseError(private val message: String = "",
 
 class FileManager(private val game: Game) {
 
-  def save_game(filePath: String) = ??? // TODO: File Managing, save / load from file
+  def save_game(filePath: String) = {
+    val lw = new BufferedWriter(new FileWriter(filePath))
+
+    lw.write("BALANCER 1.3 SAVE FILE\n")
+    lw.write("# Meta\n")
+    lw.write("Human: " + game.players.map(_.name).mkString(",") + "\n")
+    lw.write("Round: " + game.currentRound + "\n")
+    lw.write("Turn: " + game.currentTurn + "\n")
+    lw.write("# Scale\n")
+    for(scale <- game.scales.sortBy(_.scale_code)){
+      if(scale == game.baseScale)
+        lw.write("_,0")
+      else
+        lw.write(s"${scale.parent_scale.scale_code},${scale.pos}")
+      lw.write(s",${scale.radius},${scale.scale_code} : ")
+      val buf = Buffer[String]()
+      scale.board_vec.flatten.foreach {
+        case stack: Stack =>
+          buf.append(stack.stack_vec.flatMap(_.owner).map(_.player_code).prepended(stack.pos.toString).mkString(","))
+        case scale: Scale =>
+      }
+      lw.write(buf.mkString(" | "))
+      lw.write("\n")
+    }
+    lw.write("END\n")
+    lw.close()
+  }
 
   def load_game(filePath: String): Unit = {
     val fileReader = try {
@@ -139,6 +165,8 @@ class FileManager(private val game: Game) {
           }
         }
       } while (line != null)
+
+      lineReader.close()
 
       if(blocksToProcess.valuesIterator.contains(false))
         throw new ParseError("Missing blocks entry in file: " + blocksToProcess.filter(!_._2).keys.mkString(","))
