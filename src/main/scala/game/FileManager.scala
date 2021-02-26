@@ -113,7 +113,7 @@ class FileManager(private val game: Game) {
                       )
 
                       stackStringSplitted.drop(1).map(_(0)).foreach(w_code => {
-                        newFactory.build_weight(pos, newFactory.baseScale, newFactory.players.find(_.player_code==w_code))
+                        newFactory.build_weight(pos, newFactory.baseScale, newFactory.players.find(_.player_code==w_code), soft_append = true)
                       })
                     }
                   } else {
@@ -128,7 +128,7 @@ class FileManager(private val game: Game) {
                           )
 
                           stackStringSplitted.drop(1).map(_(0)).foreach(w_code => {
-                            newFactory.build_weight(pos, newScale, newFactory.players.find(_.player_code==w_code))
+                            newFactory.build_weight(pos, newScale, newFactory.players.find(_.player_code==w_code), soft_append = true)
                           })
                         }
                       case None => throw new ParseError(line + "\n=> Invalid parent scale code")

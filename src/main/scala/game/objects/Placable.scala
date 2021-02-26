@@ -1,14 +1,14 @@
 package game.objects
 
-import game.Game
+import game.Factory
 
 sealed abstract class Placable
-  extends GameObject with Owner with Mass with Scorable with Height {
+  extends GameObject with Owner with Mass with Height {
   val pos: Int
 }
 
-case class Scale(val scale: Scale, val pos: Int, val radius: Int, val scale_code: Char,
-                 protected val game: Game)
+case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val scale_code: Char,
+                 protected val factory: Factory)
   extends Placable {
 
   private var board = Array.fill[Option[Placable]](2*radius+1)(None)
@@ -23,12 +23,24 @@ case class Scale(val scale: Scale, val pos: Int, val radius: Int, val scale_code
 
   override def mass = board.flatten.map(_.mass).sum
 
-  override def score_of(player: Player): Int = {
+  override def score(player: Player) = {
+    var score = 0
+    for((w, i) <- board.zipWithIndex) {
+      w match {
+        case Some(p) =>
+          score += scala.math.abs(i-radius)*p.score(player)
+        case None =>
+      }
+    }
+    score
+  }
+
+  override def count(player: Player) = {
     var count = 0
     for((w, i) <- board.zipWithIndex) {
       w match {
         case Some(p) =>
-          count += scala.math.abs(i-radius)*p.score_of(player)
+          count += p.count(player)
         case None =>
       }
     }
@@ -36,13 +48,9 @@ case class Scale(val scale: Scale, val pos: Int, val radius: Int, val scale_code
   }
 
   override def owner: Option[Player] = {
-    if(board.forall(_.isEmpty)) None
-    else {
-      val pair = board.flatten.map(_.owner).groupBy(identity).view.mapValues(_.length).maxBy(_._2)
-      val owner = pair._1
-      val num_weight_owned = pair._2
-      if(num_weight_owned >= radius) owner else None
-    }
+    // Note: Inefficient since multiple call of count and count is recursive
+    val top2 = factory.players.sortBy(count).takeRight(2)
+    if(count(top2(1)) - count(top2(0)) > radius) Some(top2(1)) else None
   }
 
   def left_torque = {
@@ -89,14 +97,16 @@ case class Scale(val scale: Scale, val pos: Int, val radius: Int, val scale_code
   override def toString: String = s"<$scale_code,$mass>"
 }
 
-case class Stack(val scale: Scale, val pos: Int, protected val game: Game)
+case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: Factory)
   extends Placable {
 
   private var stack = scala.collection.mutable.Stack[Weight]()
 
   override def mass: Int = stack.map(_.mass).sum
 
-  override def score_of(player: Player): Int = stack.map(_.score_of(player)).sum
+  override def score(player: Player): Int = stack.map(_.score(player)).sum
+
+  override def count(player: Player): Int = stack.map(_.score(player)).sum
 
   override def height: Int = stack.length
 
@@ -106,14 +116,12 @@ case class Stack(val scale: Scale, val pos: Int, protected val game: Game)
     }
   }
 
-  def updateWeight() = {
-
-  }
+  def soft_append(it: Weight) = stack.append(it)
 
   def append(it: Weight) = {
     it.owner match {
       case Some(o: Player) =>
-        scale.owner match {
+        parent_scale.owner match {
           case Some(p: Player) => stack.foreach(w =>
             if(w.owner != Some(p)) w.owner = Some(o)
           )

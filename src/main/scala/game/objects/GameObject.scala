@@ -1,17 +1,15 @@
 package game.objects
 
-import game.Game
+import game.Factory
 
 trait Owner {
   def owner: Option[Player]
+  def score(player: Player): Int
+  def count(player: Player): Int
 }
 
 trait Mass {
   def mass: Int
-}
-
-trait Scorable {
-  def score_of(player: Player): Int
 }
 
 trait Height {
@@ -19,7 +17,7 @@ trait Height {
 }
 
 abstract class GameObject {
-  protected val game: Game
+  protected val factory: Factory
 }
 
 
