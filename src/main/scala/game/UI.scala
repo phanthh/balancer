@@ -1,4 +1,5 @@
 package game
+import game.objects.Bot.{BESTMOVE, RANDOM, RANDOMBESTMOVE}
 import game.objects.{Bot, Human, Player, Scale}
 
 import java.io.IOException
@@ -112,7 +113,8 @@ case class ConsoleManager(val game: Game) extends UI {
             }
 
           case b: Bot =>
-            b.place_weight()
+            print_game_state() // TODO: Delete this if there is human players
+            b.place_weight(RANDOMBESTMOVE)
         }
         weightsLeft -= 1
         idx += 1

@@ -23,6 +23,7 @@ class Factory(private val game: Game, base_scale_radius: Int) {
   }
 
   def build_weight(pos: Int, parent_scale: Scale, owner: Option[Player] = None, soft_append: Boolean = false): Weight = {
+    if(pos == 0) throw new Exception("Position must not be 0")
     parent_scale.at(pos) match {
       case Some(scale: Scale) => throw new Exception("Occupied")
       case Some(stack: Stack) =>
