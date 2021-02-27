@@ -84,11 +84,11 @@ class FileManager(private val game: Game) {
 
             val trimmedLine = line.split(':').map(_.trim)
 
-            if(trimmedLine.length != 2)
+            if(trimmedLine.length > 2 || trimmedLine.length == 0)
               throw new ParseError(line + "\n=> Must be 'key:value' pair")
 
-            val key = trimmedLine(0).toLowerCase
-            val value = trimmedLine(1)
+            var key: String = trimmedLine(0).toLowerCase
+            var value: String = if(trimmedLine.length == 1) "" else trimmedLine(1)
 
             block match {
               case "meta" =>
@@ -120,7 +120,7 @@ class FileManager(private val game: Game) {
 
                   val scale_code = splittedKey(3)(0)
 
-                  val splittedValue = value.split('|').map(_.trim)
+                  val splittedValue = if(value != "") value.split('|').map(_.trim) else Array.empty[String]
 
                   // Special case for base scale (parent scale is just "_")
                   // This is where the factory is initialized (in a file, there should only be one time this is called)

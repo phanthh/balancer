@@ -1,6 +1,7 @@
 package game.objects
 
 import game.Factory
+import game.grid.Coord
 
 trait Owner {
   def owner: Option[Player]
@@ -12,8 +13,9 @@ trait Mass {
   def mass: Int
 }
 
-trait Height {
+trait Renderable {
   def height: Int
+  def coord: Coord
 }
 
 abstract class GameObject {

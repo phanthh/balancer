@@ -1,6 +1,7 @@
 package game
 import game.objects.{Bot, Human, Player, Scale}
 
+import java.io.IOException
 import scala.io.StdIn._
 
 object UI {
@@ -16,18 +17,35 @@ case class GraphicManager(val game: Game) extends UI {
 
 case class ConsoleManager(val game: Game) extends UI {
   def input_prompt() = {
-//    println("Enter the number of Human players: ")
-//    val numHumans = readInt()
-//    println("Enter the number of Bots: ")
-//    val numBots = readInt()
+//    var numHumans = -1
+//    var numBots = -1
+//    while(numHumans == -1){
+//      try {
+//        print("Enter the number of Human players: ")
+//        numHumans = readInt()
+//      } catch {
+//        case e: IOException => println(e.getMessage)
+//        case e: Exception => println("Invalid Input" + e.getMessage)
+//      }
+//    }
+//
+//    while(numHumans == -1){
+//      try {
+//        print("Enter the number of Bots: ")
+//        numBots = readInt()
+//      } catch {
+//        case e: IOException => println(e.getMessage)
+//        case e: Exception => println("Invalid Input" + e.getMessage)
+//      }
+//    }
 //
 //    for(i <- 1 to numHumans){
-//      println(f"Enter the #$i human's name: ")
+//      print(f"Enter the #$i human's name: ")
 //      game.factory.build_human(readLine())
 //    }
 //
 //    for(i <- 1 to numBots){
-//      println(f"Enter the #$i bots's name: ")
+//      print(f"Enter the #$i bots's name: ")
 //      game.factory.build_bot(readLine())
 //    }
 
@@ -46,20 +64,53 @@ case class ConsoleManager(val game: Game) extends UI {
       var weightsLeft = game.weightsPerRound
       var players = game.players
       var idx = 0
-      println(f"========== ROUND ${game.currentRound}%2s ==========")
+      println(f"============ ROUND ${game.currentRound}%2s ============")
       while(weightsLeft > 0) {
         players(idx) match {
           case h: Human =>
             // TODO: Refracting, Exception handling
             print_game_state()
             println(f">>>>>>>>> ${players(idx).name.toUpperCase}%-5s TURN <<<<<<<<<")
-            println(s"Which scale ? (${game.scales.map(_.scale_code).mkString(",")}): ")
-            val parent_scale = game.scaleWithCode(readChar()).getOrElse(
-              throw new InvalidInput("Scale Code should be a Char")
-            )
-            println(s"Position ? [-${parent_scale.radius},${parent_scale.radius}]: ")
-            val pos = readInt()
-            game.factory.build_weight(pos, parent_scale, Some(h))
+
+            var parent_scale: Scale = null
+            var pos: Int = 0
+
+            while(parent_scale == null){
+              try {
+                print(s"Which scale ? (${game.scales.map(_.scale_code).mkString(",")}): ")
+                parent_scale = game.scaleWithCode(readChar()).getOrElse(
+                  throw new InvalidInput(s"Invalid scale code must be: ${game.scales.map(_.scale_code).mkString(",")}")
+                )
+              } catch {
+                case e: IOException =>
+                  println(e.getMessage); parent_scale = null
+                case e: InvalidInput =>
+                  println(e.getMessage); parent_scale = null
+                case e: Exception =>
+                  println("Invalid Input" + e.getMessage); parent_scale = null
+              }
+            }
+
+            while(pos == 0){
+              try {
+                print(s"Position ? [-${parent_scale.radius},${parent_scale.radius}]: ")
+                pos = readInt()
+                if(pos == 0) throw new InvalidInput("Position cannot be 0")
+
+                //// GAME STATE CHANGED HERE
+                game.factory.build_weight(pos, parent_scale, Some(h))
+              } catch {
+                case e: IOException =>
+                  println(e.getMessage); pos = 0
+                case e: InvalidInput =>
+                  println(e.getMessage); pos = 0
+                case e: ArrayIndexOutOfBoundsException =>
+                  println(s"Invalid position, must be between -${parent_scale.radius} and ${parent_scale.radius}"); pos = 0
+                case e: Exception =>
+                  println("Invalid Input: " + e.getMessage); pos = 0
+              }
+            }
+
           case b: Bot =>
             b.place_weight()
         }
@@ -74,12 +125,15 @@ case class ConsoleManager(val game: Game) extends UI {
     }
     println("================================================")
     println(s"The winner of the game is: ${game.finalWinner}")
-    println("========== Congratulation !!!! =================")
+    println("================================================")
+    println("========== !!!! Congratulation !!!! ============")
+    println("================================================")
   }
 
   private def print_game_state() = {
     print_score_board()
-    game.scales.foreach(print_scale)
+    print_grid()
+//    game.scales.foreach(print_scale)
   }
 
   private def print_score_board() = {
@@ -93,8 +147,10 @@ case class ConsoleManager(val game: Game) extends UI {
 
   private def print_scale(scale: Scale) = {
     println()
-    println(s"Scale [${scale.scale_code},${scale.radius}]")
-    println("----------------------------")
+    println(s"Scale [${scale.scale_code},${scale.radius}] Coord: ${scale.coord}")
+    println(s"up_height: ${scale.up_height}, lo_height: ${scale.lo_height}") // TODO: THis is for debug only
+    println(s"Span ${scale.span}") // TODO: THis is for debug only
+    println("----------------------------------")
     val rep = scale.board_vec.zipWithIndex.map {
       case (Some(p), i) => p.toString
       case (None, i) if i==scale.radius => s"[${scale.scale_code}]"
@@ -107,11 +163,15 @@ case class ConsoleManager(val game: Game) extends UI {
     println()
   }
 
-  private def updateGrid() = ??? // TODO: Grid implementation for console screen
-  private def drawGrid() = ???
+  private def print_grid() = {
+    game.grid.update()
+    for(i <- 0 until game.grid.height){
+      for(j <- 0 until game.grid.width)
+        print(game.grid(i,j))
+      println()
+    }
+  }
 }
-
-
 
 final case class InvalidInput(private val message: String = "",
                             private val cause: Throwable = None.orNull)

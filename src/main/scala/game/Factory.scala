@@ -16,14 +16,14 @@ class Factory(private val game: Game, base_scale_radius: Int) {
   var baseScale = new Scale(null, 0, base_scale_radius, nextScaleCode(), this)
   val players = ArrayBuffer[Player]()
 
-  def scaleWithCode(code: Char) = baseScale.scaleWithCode(code)
+  def scaleWithCode(code: Char) = scales.find(_.scale_code == code)
 
   def reset(): Unit = {
     _scaleCode = 96
   }
 
   def build_weight(pos: Int, parent_scale: Scale, owner: Option[Player] = None, soft_append: Boolean = false): Weight = {
-    parent_scale.object_at(pos) match {
+    parent_scale.at(pos) match {
       case Some(scale: Scale) => throw new Exception("Occupied")
       case Some(stack: Stack) =>
         val newWeight = new Weight(stack,this, owner)
@@ -39,14 +39,14 @@ class Factory(private val game: Game, base_scale_radius: Int) {
           newStack.soft_append(newWeight)
         else
           newStack.append(newWeight)
-        parent_scale.place_at(pos, newStack)
+        parent_scale.put(pos, newStack)
         newWeight
     }
   }
 
   def build_scale(pos: Int, radius: Int, parent_scale: Scale, scale_code: Option[Char] = None): Scale = {
     val newScale = new Scale(parent_scale, pos, radius, scale_code.getOrElse(nextScaleCode()), this)
-    parent_scale.place_at(pos, newScale)
+    parent_scale.put(pos, newScale)
     newScale
   }
 
@@ -62,7 +62,7 @@ class Factory(private val game: Game, base_scale_radius: Int) {
     newHuman
   }
 
-  // Recursive function for get all scales
+  // Recursive function to get all scales
   private def _scales(root_scale: Scale): Vector[Scale] =
     root_scale.scales.map(_scales).flatMap(_.toList).appended(root_scale)
   def scales = _scales(baseScale)

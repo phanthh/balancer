@@ -1,10 +1,12 @@
 package game.objects
 
 import game.Factory
+import game.grid.Coord
+
 import scala.collection.mutable.Buffer
 
 sealed abstract class Placable
-  extends GameObject with Owner with Mass with Height {
+  extends GameObject with Owner with Mass with Renderable {
   val pos: Int
 }
 
@@ -21,13 +23,18 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
     case _ => None
   }.toVector
 
-  def place_at(pos: Int, it: Placable) = { board(pos+radius) = Some(it)}
+  def stacks = board.flatMap {
+    case Some(s: Stack) => Some(s)
+    case _ => None
+  }.toVector
+
+  def put(pos: Int, it: Placable) = { board(pos+radius) = Some(it)}
 
   def remove_at(pos: Int) = { board(pos+radius) = None }
 
   def is_empty_at(pos: Int) = board(pos+radius).isEmpty
 
-  def object_at(pos: Int) = board(pos+radius)
+  def at(pos: Int) = board(pos+radius)
 
   override def mass = board.flatten.map(_.mass).sum
 
@@ -89,17 +96,24 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
 
   def isBalanced: Boolean = scala.math.abs(left_torque-right_torque) <= radius
 
-  def scaleWithCode(code: Char): Option[Scale] =
-    if(code == scale_code)
-      Some(this)
-    else
-      scales.find(_.scale_code == code)
-
-
   // RENDERING
-  private var fulcrum_height = 0
 
-  override def height = board.flatten.map(_.height).max + fulcrum_height + 1
+  def up_height = stacks.map(_.height).maxOption match {
+    case Some(i: Int) => i
+    case None => 0
+  }
+
+  def lo_height = if(parent_scale == null) 4 else scala.math.max(parent_scale.up_height + 2, 4)
+  override def height = up_height + lo_height
+
+  override def coord: Coord =
+    if(parent_scale == null)
+      Coord(0,0)
+    else
+      parent_scale.coord + Coord(2*pos, parent_scale.lo_height)
+
+
+  def span = (coord - Coord(2*radius+1,0), coord + Coord(2*radius+1,0))
 
   override def toString: String = s"<$scale_code,$mass>"
 }
@@ -117,13 +131,12 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: F
 
   override def count(player: Player): Int = stack.map(_.score(player)).sum
 
-  override def height: Int = stack.length
+  override def owner: Option[Player] = { stack.last.owner }
+//    if(stack.isEmpty) None else {
+//      stack.map(_.owner).groupBy(identity).view.mapValues(_.size).maxBy(_._2)._1
+//    }
 
-  override def owner: Option[Player] = {
-    if(stack.isEmpty) None else {
-      stack.map(_.owner).groupBy(identity).view.mapValues(_.size).maxBy(_._2)._1
-    }
-  }
+  def at(idx: Int) = stack(idx)
 
   def soft_append(it: Weight) = stack.append(it)
   def soft_pop() = stack.dropRightInPlace(1)
@@ -141,6 +154,11 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: F
     }
     stack.append(it)
   }
+
+  // RENDERING
+  override def height: Int = stack.length
+
+  override def coord: Coord = parent_scale.coord + Coord(2*pos, parent_scale.lo_height)
 
   override def toString: String = "|" + stack.mkString(",") + "|"
 }

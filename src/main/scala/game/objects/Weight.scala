@@ -14,9 +14,11 @@ class Weight(val stack: Stack, val factory: Factory, var owner: Option[Player] =
   }
   override def count(player: Player): Int = score(player)
 
-  override def toString: String = owner match {
-    case Some(p) => p.player_code.toString
-    case None => "x"
+  def code: Char = owner match {
+    case Some(p) => p.player_code
+    case None => '?'
   }
+
+  override def toString: String = code.toString
 }
 

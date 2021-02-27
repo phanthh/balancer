@@ -13,7 +13,6 @@ sealed abstract class Player
 case class Bot(val name: String, val factory: Factory)
   extends Player {
   def place_weight(): Unit = {
-    // TODO: Implement the algorithm
     var max_score = -1
     var max_score_pos = 0
     var max_score_scale: Scale = null
@@ -31,7 +30,7 @@ case class Bot(val name: String, val factory: Factory)
       for(idx <- 0 until 2*scale.radius+1){
         val pos = idx - scale.radius
         if(pos != 0){
-          scale.object_at(pos) match {
+          scale.at(pos) match {
             case Some(scale: Scale) =>
             case Some(stack: Stack) =>
               factory.build_weight(pos, scale, Some(this), true)

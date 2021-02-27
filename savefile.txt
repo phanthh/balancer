@@ -1,11 +1,12 @@
 BALANCER 1.3 SAVE FILE
 # Meta
-Human: phuc,jack,king
-Round: 2
+Human: hau
+Bot: jack
+Round: 1
 Turn: hau
 # Scale
-_,0,5,a : -4,k,j | 2,b
-a,3,4,b : -1,j | 2,j,j
-a,-1,4,c : 1,p |-1,p | 2,p,p,p | -2,p,p,p
+_,0,6,a :
+a,4,4,b :
+a,-5,3,c :
 END
 
