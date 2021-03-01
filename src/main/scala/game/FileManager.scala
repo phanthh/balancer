@@ -11,7 +11,7 @@ final case class ParseError(private val message: String = "",
 
 class FileManager(private val game: Game) {
 
-  def save_game(filePath: String) = {
+  def saveGame(filePath: String) = {
     val lw = new BufferedWriter(new FileWriter(filePath))
 
     lw.write("BALANCER 1.3 SAVE FILE\n")
@@ -27,9 +27,9 @@ class FileManager(private val game: Game) {
         lw.write(s"${scale.parent_scale.scale_code},${scale.pos}")
       lw.write(s",${scale.radius},${scale.scale_code} : ")
       val buf = Buffer[String]()
-      scale.board_vec.flatten.foreach {
+      scale.boardVector.flatten.foreach {
         case stack: Stack =>
-          buf.append(stack.stack_vec.flatMap(_.owner).map(_.player_code).prepended(stack.pos.toString).mkString(","))
+          buf.append(stack.weightsVector.flatMap(_.owner).map(_.player_code).prepended(stack.pos.toString).mkString(","))
         case scale: Scale =>
       }
       lw.write(buf.mkString(" | "))
@@ -39,7 +39,7 @@ class FileManager(private val game: Game) {
     lw.close()
   }
 
-  def load_game(filePath: String): Unit = {
+  def loadGame(filePath: String): Unit = {
     val fileReader = try {
       new FileReader(filePath)
     } catch {
@@ -65,7 +65,7 @@ class FileManager(private val game: Game) {
       var bot_names = Array[String]()
 
       // We will try to build a new factory from file
-      var newFactory: Factory = null
+      var newFactory: Store = null
 
       val blocksToProcess =
         Map[String, Boolean]("meta" -> false, "scale" -> false)
@@ -125,11 +125,11 @@ class FileManager(private val game: Game) {
                   // Special case for base scale (parent scale is just "_")
                   // This is where the factory is initialized (in a file, there should only be one time this is called)
                   if(parent_scale_code == '_') {
-                    newFactory = Factory(game, scale_radius)
+                    newFactory = Store(game, scale_radius)
 
                     // Adding players
-                    human_names.foreach(newFactory.build_human)
-                    bot_names.foreach(newFactory.build_bot)
+                    human_names.foreach(newFactory.buildHuman)
+                    bot_names.foreach(newFactory.buildBot)
 
                     // TODO: Settings file to initialize factory or Included in the Saved File as well?
                     for(stackString <- splittedValue){
@@ -139,13 +139,13 @@ class FileManager(private val game: Game) {
                       )
 
                       stackStringSplitted.drop(1).map(_(0)).foreach(w_code => {
-                        newFactory.build_weight(pos, newFactory.baseScale, newFactory.players.find(_.player_code==w_code), soft_append = true)
+                        newFactory.buildWeight(pos, newFactory.baseScale, newFactory.players.find(_.player_code==w_code), soft_append = true)
                       })
                     }
                   } else {
                     newFactory.scaleWithCode(parent_scale_code) match {
                       case Some(parent_scale: Scale) =>
-                        val newScale = newFactory.build_scale(pos_on_parent_scale, scale_radius, parent_scale, Some(scale_code))
+                        val newScale = newFactory.buildScale(pos_on_parent_scale, scale_radius, parent_scale, Some(scale_code))
 
                         for(stackString <- splittedValue){
                           val stackStringSplitted = stackString.split(',').map(_.trim)
@@ -154,7 +154,7 @@ class FileManager(private val game: Game) {
                           )
 
                           stackStringSplitted.drop(1).map(_(0)).foreach(w_code => {
-                            newFactory.build_weight(pos, newScale, newFactory.players.find(_.player_code==w_code), soft_append = true)
+                            newFactory.buildWeight(pos, newScale, newFactory.players.find(_.player_code==w_code), soft_append = true)
                           })
                         }
                       case None => throw new ParseError(line + "\n=> Invalid parent scale code")

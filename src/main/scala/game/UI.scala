@@ -1,6 +1,7 @@
 package game
 import game.objects.Bot.{BESTMOVE, RANDOM, RANDOMBESTMOVE}
 import game.objects.{Bot, Human, Player, Scale}
+import scalafx.application.JFXApp
 
 import java.io.IOException
 import scala.io.StdIn._
@@ -10,14 +11,15 @@ object UI {
   val GRAPHIC = 1
 }
 
-sealed abstract class UI { val game: Game }
+sealed trait UI { val game: Game }
 
-case class GraphicManager(val game: Game) extends UI {
-  def run(): Unit = ??? // TODO: Graphical Interface
+case class GraphicManager(val game: Game) extends JFXApp with UI {
+  def run(): Unit = {
+  }
 }
 
 case class ConsoleManager(val game: Game) extends UI {
-  def input_prompt() = {
+  def promptInput() = {
 //    var numHumans = -1
 //    var numBots = -1
 //    while(numHumans == -1){
@@ -42,24 +44,24 @@ case class ConsoleManager(val game: Game) extends UI {
 //
 //    for(i <- 1 to numHumans){
 //      print(f"Enter the #$i human's name: ")
-//      game.factory.build_human(readLine())
+//      game.factory.buildHuman(readLine())
 //    }
 //
 //    for(i <- 1 to numBots){
 //      print(f"Enter the #$i bots's name: ")
-//      game.factory.build_bot(readLine())
+//      game.factory.buildBot(readLine())
 //    }
 
-    game.factory.build_human("Hau") // TODO: Delete this, this is for debug
-    game.factory.build_bot("Jack")
+    game.factory.buildHuman("Hau") // TODO: Delete this, this is for debug
+    game.factory.buildBot("Jack")
   }
 
   def run(filename: String = null): Unit = {
     println("Welcome to Balancer !!")
     if(filename == null)
-      input_prompt()
+      promptInput()
     else
-      game.fileManager.load_game(filename)
+      game.fileManager.loadGame(filename)
 
     while(game.currentRound <= game.numRounds){
       var weightsLeft = game.weightsPerRound
@@ -70,7 +72,7 @@ case class ConsoleManager(val game: Game) extends UI {
         players(idx) match {
           case h: Human =>
             // TODO: Refracting, Exception handling
-            print_game_state()
+            printGameState()
             println(f">>>>>>>>> ${players(idx).name.toUpperCase}%-5s TURN <<<<<<<<<")
 
             var parent_scale: Scale = null
@@ -99,7 +101,7 @@ case class ConsoleManager(val game: Game) extends UI {
                 if(pos == 0) throw new InvalidInput("Position cannot be 0")
 
                 //// GAME STATE CHANGED HERE
-                game.factory.build_weight(pos, parent_scale, Some(h))
+                game.factory.buildWeight(pos, parent_scale, Some(h))
               } catch {
                 case e: IOException =>
                   println(e.getMessage); pos = 0
@@ -113,8 +115,8 @@ case class ConsoleManager(val game: Game) extends UI {
             }
 
           case b: Bot =>
-            print_game_state() // TODO: Delete this if there is human players
-            b.place_weight(RANDOMBESTMOVE)
+            printGameState() // TODO: Delete this if there is human players
+            b.placeWeight(RANDOM)
         }
         weightsLeft -= 1
         idx += 1
@@ -130,42 +132,43 @@ case class ConsoleManager(val game: Game) extends UI {
     println("================================================")
     println("========== !!!! Congratulation !!!! ============")
     println("================================================")
+    printGameState()
   }
 
-  private def print_game_state() = {
-    print_score_board()
-    print_grid()
-//    game.scales.foreach(print_scale)
+  private def printGameState() = {
+    printScoreBoard()
+    printGrid()
+//    game.scalesVector.foreach(printScale)
   }
 
-  private def print_score_board() = {
+  private def printScoreBoard() = {
     val score_board = game.players.map(p =>
-      f"| ${p.name}%-5s (${p.player_code}) : ${p.score}%2s points (${if(p.isInstanceOf[Human]) "human" else "bot"}%5s)  |"
+      f"| ${p.name}%-5s (${p.player_code}, ${p.roundWon}) : ${p.score}%5s points (${if(p.isInstanceOf[Human]) "human" else "bot"}%5s)  |"
     ).mkString("\n")
-    println("__________________________________")
+    println("_"*(score_board.length/game.players.length))
     println(score_board)
-    println("|________________________________|")
+    println("|" + "_"*(score_board.length/game.players.length-2) + "|")
   }
 
-  private def print_scale(scale: Scale) = {
+  private def printScale(scale: Scale) = {
     println()
     println(s"Scale [${scale.scale_code},${scale.radius}] Coord: ${scale.coord}")
-    println(s"up_height: ${scale.up_height}, lo_height: ${scale.lo_height}") // TODO: THis is for debug only
+    println(s"uHeight: ${scale.uHeight}, lHeight: ${scale.lHeight}") // TODO: THis is for debug only
     println(s"Span ${scale.span}") // TODO: THis is for debug only
     println("----------------------------------")
-    val rep = scale.board_vec.zipWithIndex.map {
+    val rep = scale.boardVector.zipWithIndex.map {
       case (Some(p), i) => p.toString
       case (None, i) if i==scale.radius => s"[${scale.scale_code}]"
       case (None, i) => "-"
     }.mkString
     println(s"$scale: " + "<" + rep + ">")
-    println(s"TORQUE: [${scale.left_torque}--${scale.mass}--${scale.right_torque}]")
+    println(s"TORQUE: [${scale.leftTorque}--${scale.mass}--${scale.rightTorque}]")
     println("STATUS: " + (if(scale.isBalanced) "Balanced" else "Flipped"))
     println(s"OWNER: ${scale.owner match { case Some(p) => p.name case None => "No one"}}")
     println()
   }
 
-  private def print_grid() = {
+  private def printGrid() = {
     game.grid.update()
     for(i <- 0 until game.grid.height){
       for(j <- 0 until game.grid.width)

@@ -1,11 +1,12 @@
 BALANCER 1.3 SAVE FILE
 # Meta
-Bot: jack,brad
+Bot: jack,brad,mike
 Round: 1
 # Scale
 _,0,6,a :
 a,4,2,b :
 a,-5,3,c :
 c,3,2,d :
+d,1,4,e :
 END
 

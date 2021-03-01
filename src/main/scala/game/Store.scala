@@ -4,11 +4,11 @@ import game.objects._
 
 import scala.collection.mutable.ArrayBuffer
 
-object Factory {
-  def apply(game: Game, base_scale_radius: Int = 5) = new Factory(game, base_scale_radius)
+object Store {
+  def apply(game: Game, base_scale_radius: Int = 5) = new Store(game, base_scale_radius)
 }
 
-class Factory(private val game: Game, base_scale_radius: Int) {
+private class Store(private val game: Game, base_scale_radius: Int) {
 
   private var _scaleCode: Char = 96
   def nextScaleCode(): Char = {_scaleCode = (_scaleCode.toInt + 1).toChar; _scaleCode}
@@ -22,14 +22,14 @@ class Factory(private val game: Game, base_scale_radius: Int) {
     _scaleCode = 96
   }
 
-  def build_weight(pos: Int, parent_scale: Scale, owner: Option[Player] = None, soft_append: Boolean = false): Weight = {
+  def buildWeight(pos: Int, parent_scale: Scale, owner: Option[Player] = None, soft_append: Boolean = false): Weight = {
     if(pos == 0) throw new Exception("Position must not be 0")
     parent_scale.at(pos) match {
       case Some(scale: Scale) => throw new Exception("Occupied")
       case Some(stack: Stack) =>
         val newWeight = new Weight(stack,this, owner)
         if(soft_append)
-          stack.soft_append(newWeight)
+          stack.softAppend(newWeight)
         else
           stack.append(newWeight)
         newWeight
@@ -37,7 +37,7 @@ class Factory(private val game: Game, base_scale_radius: Int) {
         val newStack = new Stack(parent_scale, pos, this)
         val newWeight = new Weight(newStack, this, owner)
         if(soft_append)
-          newStack.soft_append(newWeight)
+          newStack.softAppend(newWeight)
         else
           newStack.append(newWeight)
         parent_scale.put(pos, newStack)
@@ -45,26 +45,26 @@ class Factory(private val game: Game, base_scale_radius: Int) {
     }
   }
 
-  def build_scale(pos: Int, radius: Int, parent_scale: Scale, scale_code: Option[Char] = None): Scale = {
+  def buildScale(pos: Int, radius: Int, parent_scale: Scale, scale_code: Option[Char] = None): Scale = {
     val newScale = new Scale(parent_scale, pos, radius, scale_code.getOrElse(nextScaleCode()), this)
     parent_scale.put(pos, newScale)
     newScale
   }
 
-  def build_bot(name: String): Bot = {
+  def buildBot(name: String): Bot = {
     val newBot = new Bot(name, this)
     players.append(newBot)
     newBot
   }
 
-  def build_human(name: String): Human = {
+  def buildHuman(name: String): Human = {
     val newHuman = new Human(name, this)
     players.append(newHuman)
     newHuman
   }
 
-  // Recursive function to get all scales
+  // Recursive function to get all scalesVector
   private def _scales(root_scale: Scale): Vector[Scale] =
-    root_scale.scales.map(_scales).flatMap(_.toList).appended(root_scale)
+    root_scale.scalesVector.map(_scales).flatMap(_.toList).appended(root_scale)
   def scales = _scales(baseScale)
 }

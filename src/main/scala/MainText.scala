@@ -1,9 +1,9 @@
 import game.{ConsoleManager, Game}
 
 object MainText extends App {
-  val game = new Game(2)
+  val game = new Game(numRounds=3, weightsPerRound=20)
   val savedfile = if(args.nonEmpty) args(0) else null
-//  game.fileManager.load_game(savedfile)
-//  game.fileManager.save_game("writtenfile.txt")
   (new ConsoleManager(game)).run(savedfile)
+//  game.fileManager.loadGame(savedfile)
+//  game.fileManager.saveGame("writtenfile.txt")
 }

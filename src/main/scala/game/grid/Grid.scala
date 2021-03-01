@@ -15,22 +15,22 @@ object Grid {
 
   def apply(game: Game) = {
     val grid = new Grid(game)
-    grid.update_offset()
+    grid.updateOffset()
     grid
   }
 }
 
-class Grid(private val game: Game){
-  private var _width = 0
-  private var _height = 0
-  private var _minX = 0
-  private var _maxX = 0
-  private var _grid: Array[Array[Char]] = Array.empty[Array[Char]]
+private class Grid(private val game: Game){
+  private var _width: Int = _
+  private var _height: Int = _
+  private var _minX: Int = _
+  private var _maxX: Int = _
+  private var _grid: Array[Array[Char]] = _
 
   def width = _width
   def height = _height
 
-  def update_offset() = {
+  def updateOffset() = {
     _height = game.scales.map(s => s.coord.y + s.height).max
     _maxX = game.scales.map(_.span._2.x).max
     _minX = game.scales.map(_.span._1.x).min
@@ -39,9 +39,9 @@ class Grid(private val game: Game){
     _grid = Array.tabulate(_height, _width)((_,_) => EMPTY)
   }
 
-  def update_grid() = _register(game.baseScale)
+  def updateGrid() = _register(game.baseScale)
 
-  def update() = { update_offset(); update_grid() }
+  def update() = { updateOffset(); updateGrid() }
 
   def at(coord: Coord) = _grid(_height-coord.y-1)(coord.x-_minX)
 
@@ -51,9 +51,9 @@ class Grid(private val game: Game){
     _grid(_height-coord.y-1)(coord.x-_minX) = marker
 
   def _register(scale: Scale): Unit = {
-    // Register the scale and it child stacks
+    // Register the scale and it child stacksVector
     // Rendering fulcrum
-    val fulcrum_height = scale.lo_height - 1
+    val fulcrum_height = scale.lHeight - 1
     for(i <- 0 until fulcrum_height-1){
       put(scale.coord + Coord(0, i), FULCRUM)
     }
@@ -77,13 +77,13 @@ class Grid(private val game: Game){
     put(board_center + Coord(-2*scale.radius-1,0), LEFT)
 
     // Render stack on the scale
-    for(stack <- scale.stacks){
+    for(stack <- scale.stacksVector){
       for(i <- 0 until stack.height){
         put(stack.coord + Coord(0, i), stack.at(i).code)
       }
     }
 
     // Recursive
-    scale.scales.foreach(_register)
+    scale.scalesVector.foreach(_register)
   }
 }
