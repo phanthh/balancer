@@ -5,49 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
-      <change afterPath="$PROJECT_DIR$/.attach_pid431379" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid433259" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid434166" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid434536" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid435930" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid436761" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid438963" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid439726" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid441276" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid441599" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid442819" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid443064" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid443220" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid443562" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid444870" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid446007" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid447537" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid447702" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid450151" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid450521" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid450837" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid451089" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid451689" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid451897" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid452117" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid452364" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid469749" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.attach_pid476156" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/MainGUI.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plans/general_plan/:w" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/savefile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/savefile.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/MainText.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Factory.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Store.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/UI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/UI.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
