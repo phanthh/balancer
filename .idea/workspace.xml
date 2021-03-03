@@ -5,31 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
-      <change beforePath="$PROJECT_DIR$/.bsp/sbt.json" beforeDir="false" afterPath="$PROJECT_DIR$/.bsp/sbt.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_base_14_0_1_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_base_14_0_1_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_base_14_0_1_linux_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_controls_14_0_1_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_controls_14_0_1_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_controls_14_0_1_linux_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_fxml_14_0_1_linux_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_graphics_14_0_1_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_graphics_14_0_1_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_graphics_14_0_1_linux_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_media_14_0_1_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_media_14_0_1_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_media_14_0_1_linux_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_swing_14_0_1_linux_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_openjfx_javafx_web_14_0_1_linux_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_scala_lang_scala_library_2_13_4_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_scala_lang_scala_reflect_2_13_4_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scala_lang_scala_reflect_2_13_4_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalafx_scalafx_2_13_14_R19_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/sbt__org_scalafx_scalafx_2_13_14_R19_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/balancer-build.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/balancer-build.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/balancer.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/balancer.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/loadfile.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/MainTextLoadSave.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Command.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/savefile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/savefile.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/MainGUI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainGUI.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/MainText.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Store.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Store.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Store.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/State.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/UI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/UI.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,6 +97,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.352518" />
     <property name="restartRequiresConfirmation" value="false" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RecentsManager">
@@ -113,7 +105,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MainText with SaveFile">
+  <component name="RunManager" selected="Application.MainText loaded from &quot;loadfile.txt&quot;">
     <configuration name="Main" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="MainGUI" />
       <module name="balancer" />
@@ -127,10 +119,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MainText with SaveFile" type="Application" factoryName="Application">
+    <configuration name="MainText load &quot;loadfile&quot; and save to &quot;savefile&quot;" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="MainTextLoadSave" />
+      <module name="balancer" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainText loaded from &quot;loadfile.txt&quot;" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="MainText" />
       <module name="balancer" />
-      <option name="PROGRAM_PARAMETERS" value="savefile.txt" />
+      <option name="PROGRAM_PARAMETERS" value="loadfile.txt" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -189,7 +188,8 @@
     </configuration>
     <list>
       <item itemvalue="Application.MainText" />
-      <item itemvalue="Application.MainText with SaveFile" />
+      <item itemvalue="Application.MainText load &quot;loadfile&quot; and save to &quot;savefile&quot;" />
+      <item itemvalue="Application.MainText loaded from &quot;loadfile.txt&quot;" />
       <item itemvalue="Application.Main" />
       <item itemvalue="sbt Task.Run Main" />
       <item itemvalue="sbt Task.Run Main Once" />
@@ -247,6 +247,16 @@
     <MESSAGE value="Hello Worlds !!!" />
     <MESSAGE value="Basic class structure setup." />
     <option name="LAST_COMMIT_MESSAGE" value="Basic class structure setup." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/balancer$MainText.ic" NAME="MainText Coverage Results" MODIFIED="1614357481604" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />

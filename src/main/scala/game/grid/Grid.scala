@@ -26,20 +26,22 @@ class Grid(private val game: Game){
   private var _minX: Int = _
   private var _maxX: Int = _
   private var _grid: Array[Array[Char]] = _
+  private def state = game.state
 
   def width = _width
   def height = _height
 
+
   def updateOffset() = {
-    _height = game.scales.map(s => s.coord.y + s.height).max
-    _maxX = game.scales.map(_.span._2.x).max
-    _minX = game.scales.map(_.span._1.x).min
+    _height = state.scales.map(s => s.coord.y + s.height).max
+    _maxX = state.scales.map(_.span._2.x).max
+    _minX = state.scales.map(_.span._1.x).min
     _width = _maxX - _minX
     if(_width % 2 == 0) _width += 1
     _grid = Array.tabulate(_height, _width)((_,_) => EMPTY)
   }
 
-  def updateGrid() = _register(game.baseScale)
+  def updateGrid() = _register(state.baseScale)
 
   def update() = { updateOffset(); updateGrid() }
 
@@ -53,28 +55,28 @@ class Grid(private val game: Game){
   def _register(scale: Scale): Unit = {
     // Register the scale and it child stacksVector
     // Rendering fulcrum
-    val fulcrum_height = scale.lHeight - 1
-    for(i <- 0 until fulcrum_height-1){
+    val fulcrumHeight = scale.lHeight - 1
+    for(i <- 0 until fulcrumHeight-1){
       put(scale.coord + Coord(0, i), FULCRUM)
     }
-    put(scale.coord + Coord(0, fulcrum_height-1), scale.scale_code)
+    put(scale.coord + Coord(0, fulcrumHeight-1), scale.scale_code)
 
     // Render board
-    val board_center = scale.coord + Coord(0, fulcrum_height)
-    put(board_center, scale.owner match {
+    val boardCenter = scale.coord + Coord(0, fulcrumHeight)
+    put(boardCenter, scale.owner match {
       case Some(p: Player) => p.player_code.toUpper
       case None => '?'
     })
     for(i <- 1 to scale.radius){
-      put(board_center + Coord(2*i-1, 0), PADDER)
-      put(board_center + Coord(2*i, 0), i.toString.charAt(0))
+      put(boardCenter + Coord(2*i-1, 0), PADDER)
+      put(boardCenter + Coord(2*i, 0), i.toString.charAt(0))
 
-      put(board_center + Coord(-2*i+1, 0), PADDER)
-      put(board_center + Coord(-2*i, 0), i.toString.charAt(0))
+      put(boardCenter + Coord(-2*i+1, 0), PADDER)
+      put(boardCenter + Coord(-2*i, 0), i.toString.charAt(0))
     }
 
-    put(board_center + Coord(2*scale.radius+1,0), RIGHT)
-    put(board_center + Coord(-2*scale.radius-1,0), LEFT)
+    put(boardCenter + Coord(2*scale.radius+1,0), RIGHT)
+    put(boardCenter + Coord(-2*scale.radius-1,0), LEFT)
 
     // Render stack on the scale
     for(stack <- scale.stacksVector){

@@ -1,63 +1,48 @@
 package game.objects
 
-import game.Store
-import game.objects.Bot.{BESTMOVE, RANDOM, RANDOMBESTMOVE}
+import game.State
+import game.objects.Command.placeWeight
 
 import scala.util.Random
 
-sealed abstract class Player
+sealed trait Player
   extends GameObject {
   val name: String
   def player_code: Char = name(0)
-  def score: Int = factory.baseScale.score(this)
+  def score: Int = state.baseScale.score(this)
   var roundWon = 0
+  override def toString: String = name
 }
 
-case class Human(val name: String, val factory: Store) extends Player
+case class Human(val name: String, val state: State) extends Player
 
-object Bot {
-  val BESTMOVE = 1
-  val RANDOM = 2
-  val RANDOMBESTMOVE = 3
-}
-
-case class Bot(val name: String, val factory: Store)
+case class Bot(val name: String, val state: State)
   extends Player {
 
-  def placeWeight(method: Int = BESTMOVE): Unit = {
-    method match {
-      case BESTMOVE => bestMove()
-      case RANDOM => random()
-      case RANDOMBESTMOVE =>
-        if(Random.nextFloat()>0.3) random() else bestMove()
-      case _ => random()
-    }
-  }
-
   def random(): Unit = {
-    val scales = factory.scales
+    val scales = state.scales
     var pos = 0
     var scale: Scale = null
+    var command: Command = null
 
     while(pos == 0){
       scale = scales(Random.nextInt(scales.length))
       pos = Random.between(-scale.radius, scale.radius)
-      if(pos != 0){
+      if(pos != 0) {
+        command = placeWeight(this, pos, scale, state)
         scale(pos) match {
-          case Some(scale: Scale) => pos = 0
-          case Some(stack: Stack) =>
-            factory.buildWeight(pos, scale, Some(this), true)
-            if(!scale.isBalanced) pos = 0
-            stack.pop()
-          case None =>
-            factory.buildWeight(pos, scale, Some(this), true)
-            if(!scale.isBalanced) pos = 0
-            scale.remove(pos)
+          case Some(s: Scale) => pos = 0
+          case _ =>
+            command.execute()
+            if (!scale.isBalanced) {
+              pos = 0
+              command.undo()
+            }
         }
       }
     }
 
-    factory.buildWeight(pos, scale, Some(this))
+    state.undoStack.append(command)
   }
 
   def bestMove(): Unit = {
@@ -74,25 +59,23 @@ case class Bot(val name: String, val factory: Store)
       }
     }
 
-    for(scale <- factory.scales){
+    for(scale <- state.scales){
       for(idx <- 0 until 2*scale.radius+1){
         val pos = idx - scale.radius
         if(pos != 0){
           scale(pos) match {
-            case Some(scale: Scale) =>
-            case Some(stack: Stack) =>
-              factory.buildWeight(pos, scale, Some(this), true)
+            case Some(s: Scale) =>
+            case _ =>
+              val command = placeWeight(this, pos, scale, state)
+              command.execute()
               update(scale, pos)
-              stack.pop()
-            case None =>
-              factory.buildWeight(pos, scale, Some(this), true)
-              update(scale, pos)
-              scale.remove(pos)
+              command.undo()
           }
         }
       }
     }
 
-    factory.buildWeight(best_pos, best_scale, Some(this))
+    state.undoStack.append(placeWeight(this, best_pos, best_scale, state).execute())
   }
 }
+

@@ -1,9 +1,7 @@
 package game.objects
 
-import game.Store
+import game.State
 import game.grid.Coord
-
-import scala.collection.mutable.Stack
 
 sealed trait Placable
   extends GameObject with Owner with Mass with Renderable {
@@ -11,7 +9,7 @@ sealed trait Placable
 }
 
 case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val scale_code: Char,
-                 protected val factory: Store)
+                 protected val state: State)
   extends Placable with Iterable[Option[Placable]]{
 
   private var board = Array.fill[Option[Placable]](2*radius+1)(None)
@@ -60,9 +58,8 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
   }
 
   override def owner: Option[Player] = {
-    // TODO: Inefficient since multiple call of count and count is recursive
-    val top2 = factory.players.sortBy(count).takeRight(2)
-    if(count(top2(1)) - count(top2(0)) > radius) Some(top2(1)) else None
+    val top2 = state.players.map(p => (p, count(p))).sortBy(_._2).takeRight(2)
+    if(top2(1)._2 - top2(0)._2 > radius) Some(top2(1)._1) else None
   }
 
   def leftTorque = {
@@ -119,7 +116,7 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
   override def toString: String = s"<$scale_code,$mass>"
 }
 
-case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: Store)
+case class Stack(val parentScale: Scale, val pos: Int, protected val state: State)
   extends Placable with Iterable[Weight]{
 
   private var stack = scala.collection.mutable.Stack[Weight]()
@@ -135,16 +132,20 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: S
   override def owner: Option[Player] = { stack.last.owner }
 
   def updateOwner() = {
+    val prevOwnerStack = stack.map(_.owner).clone().toArray
     stack.last.owner match {
-      case Some(o: Player) =>
-        parent_scale.owner match {
-          case Some(p: Player) => stack.foreach(w =>
-            if(w.owner != Some(p)) w.owner = Some(o)
-          )
-          case None => stack.foreach(_.owner = Some(o))
+      case Some(newOwner: Player) =>
+        parentScale.owner match {
+          case Some(scaleOwner: Player) =>
+            stack.foreach(weight =>
+              if(weight.owner != Some(scaleOwner))
+                weight.owner = Some(newOwner)
+            )
+          case None => stack.foreach(_.owner = Some(newOwner))
         }
       case None =>
     }
+    prevOwnerStack
   }
 
   // ITERATOR
@@ -157,7 +158,7 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: S
   // RENDERING
   override def height: Int = stack.length
 
-  override def coord: Coord = parent_scale.coord + Coord(2*pos, parent_scale.lHeight)
+  override def coord: Coord = parentScale.coord + Coord(2*pos, parentScale.lHeight)
 
   override def toString: String = "|" + stack.mkString(",") + "|"
 }

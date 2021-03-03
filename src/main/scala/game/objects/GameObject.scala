@@ -1,6 +1,6 @@
 package game.objects
 
-import game.Store
+import game.State
 import game.grid.Coord
 
 trait Owner {
@@ -18,8 +18,8 @@ trait Renderable {
   def coord: Coord
 }
 
-abstract class GameObject {
-  protected val factory: Store
+trait GameObject {
+  protected val state: State
 }
 
 
