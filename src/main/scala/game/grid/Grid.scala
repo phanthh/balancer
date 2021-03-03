@@ -20,7 +20,7 @@ object Grid {
   }
 }
 
-private class Grid(private val game: Game){
+class Grid(private val game: Game){
   private var _width: Int = _
   private var _height: Int = _
   private var _minX: Int = _
@@ -79,7 +79,7 @@ private class Grid(private val game: Game){
     // Render stack on the scale
     for(stack <- scale.stacksVector){
       for(i <- 0 until stack.height){
-        put(stack.coord + Coord(0, i), stack.at(i).code)
+        put(stack.coord + Coord(0, i), stack(i).code)
       }
     }
 

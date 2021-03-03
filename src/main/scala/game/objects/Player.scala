@@ -43,12 +43,12 @@ case class Bot(val name: String, val factory: Store)
       scale = scales(Random.nextInt(scales.length))
       pos = Random.between(-scale.radius, scale.radius)
       if(pos != 0){
-        scale.at(pos) match {
+        scale(pos) match {
           case Some(scale: Scale) => pos = 0
           case Some(stack: Stack) =>
             factory.buildWeight(pos, scale, Some(this), true)
             if(!scale.isBalanced) pos = 0
-            stack.softPop()
+            stack.pop()
           case None =>
             factory.buildWeight(pos, scale, Some(this), true)
             if(!scale.isBalanced) pos = 0
@@ -78,12 +78,12 @@ case class Bot(val name: String, val factory: Store)
       for(idx <- 0 until 2*scale.radius+1){
         val pos = idx - scale.radius
         if(pos != 0){
-          scale.at(pos) match {
+          scale(pos) match {
             case Some(scale: Scale) =>
             case Some(stack: Stack) =>
               factory.buildWeight(pos, scale, Some(this), true)
               update(scale, pos)
-              stack.softPop()
+              stack.pop()
             case None =>
               factory.buildWeight(pos, scale, Some(this), true)
               update(scale, pos)

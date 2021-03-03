@@ -8,7 +8,7 @@ object Store {
   def apply(game: Game, base_scale_radius: Int = 5) = new Store(game, base_scale_radius)
 }
 
-private class Store(private val game: Game, base_scale_radius: Int) {
+class Store(private val game: Game, base_scale_radius: Int) {
 
   private var _scaleCode: Char = 96
   def nextScaleCode(): Char = {_scaleCode = (_scaleCode.toInt + 1).toChar; _scaleCode}
@@ -16,38 +16,34 @@ private class Store(private val game: Game, base_scale_radius: Int) {
   var baseScale = new Scale(null, 0, base_scale_radius, nextScaleCode(), this)
   val players = ArrayBuffer[Player]()
 
-  def scaleWithCode(code: Char) = scales.find(_.scale_code == code)
+  def scaleWithCode(code: Char): Option[Scale] = scales.find(_.scale_code == code)
 
   def reset(): Unit = {
     _scaleCode = 96
   }
 
-  def buildWeight(pos: Int, parent_scale: Scale, owner: Option[Player] = None, soft_append: Boolean = false): Weight = {
+  def buildWeight(pos: Int, parent_scale: Scale, owner: Option[Player] = None, update: Boolean = false): Weight = {
     if(pos == 0) throw new Exception("Position must not be 0")
-    parent_scale.at(pos) match {
+    parent_scale(pos) match {
       case Some(scale: Scale) => throw new Exception("Occupied")
       case Some(stack: Stack) =>
         val newWeight = new Weight(stack,this, owner)
-        if(soft_append)
-          stack.softAppend(newWeight)
-        else
-          stack.append(newWeight)
+        stack.append(newWeight)
+        if(update) stack.updateOwner()
         newWeight
       case None =>
         val newStack = new Stack(parent_scale, pos, this)
         val newWeight = new Weight(newStack, this, owner)
-        if(soft_append)
-          newStack.softAppend(newWeight)
-        else
-          newStack.append(newWeight)
-        parent_scale.put(pos, newStack)
+        newStack.append(newWeight)
+        if(update) newStack.updateOwner()
+        parent_scale(pos) = newStack
         newWeight
     }
   }
 
   def buildScale(pos: Int, radius: Int, parent_scale: Scale, scale_code: Option[Char] = None): Scale = {
     val newScale = new Scale(parent_scale, pos, radius, scale_code.getOrElse(nextScaleCode()), this)
-    parent_scale.put(pos, newScale)
+    parent_scale(pos) = newScale
     newScale
   }
 
