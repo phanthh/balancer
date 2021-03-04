@@ -6,16 +6,16 @@ class Weight(val stack: Stack, val state: State, var owner: Option[Player] = Non
   extends GameObject with Owner with Mass {
   override val mass: Int = 1
 
-  override def score(player: Player): Int = {
+  override def score(player: Player) = {
     owner match {
       case Some(p) if(p eq player) => 1
       case _ => 0
     }
   }
-  override def count(player: Player): Int = score(player)
+  override def count(player: Player) = score(player)
 
   def code: Char = owner match {
-    case Some(p) => p.player_code
+    case Some(p) => p.playerCode
     case None => '?'
   }
 

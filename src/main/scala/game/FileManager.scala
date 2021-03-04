@@ -12,7 +12,7 @@ final case class ParseError(private val message: String = "",
 class FileManager(private val game: Game) {
   private def state = game.state
 
-  def saveGame(filePath: String) = {
+  def saveGame(filePath: String): Unit = {
 
     val lw = new BufferedWriter(new FileWriter(filePath))
 
@@ -34,16 +34,16 @@ class FileManager(private val game: Game) {
 
     lw.write("# Scale\n")
 
-    for (scale <- state.scales.sortBy(_.scale_code)) {
+    for (scale <- state.scales.sortBy(_.code)) {
       if (scale == state.baseScale)
         lw.write("_,0")
       else
-        lw.write(s"${scale.parent_scale.scale_code},${scale.pos}")
-      lw.write(s",${scale.radius},${scale.scale_code} : ")
+        lw.write(s"${scale.parentScale.code},${scale.pos}")
+      lw.write(s",${scale.radius},${scale.code} : ")
       val buf = Buffer[String]()
       scale.boardVector.flatten.foreach {
         case stack: Stack =>
-          buf.append(stack.weightsVector.flatMap(_.owner).map(_.player_code).prepended(stack.pos.toString).mkString(","))
+          buf.append(stack.weightsVector.flatMap(_.owner).map(_.playerCode).prepended(stack.pos.toString).mkString(","))
         case scale: Scale =>
       }
       lw.write(buf.mkString(" | "))
@@ -159,7 +159,7 @@ class FileManager(private val game: Game) {
                     )
 
                     stackStringSplitted.drop(1).map(_ (0)).foreach(w_code => {
-                      val refs = newState.buildWeight(pos, parentScale, newState.players.find(_.player_code == w_code))
+                      val refs = newState.buildWeight(pos, parentScale, newState.players.find(_.playerCode == w_code))
                       refs._2.updateOwner()
                     })
                   }

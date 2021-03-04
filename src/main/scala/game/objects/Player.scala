@@ -2,7 +2,8 @@ package game.objects
 
 import game.State
 import game.objects.Command.placeWeight
-import scalafx.beans.property.{IntegerProperty, StringProperty}
+import scalafx.beans.property.{IntegerProperty}
+import scalafx.scene.paint.Color
 
 import scala.util.Random
 
@@ -14,8 +15,9 @@ sealed trait Player
   // BINDING POINT FOR GUI
   var propScore: IntegerProperty = IntegerProperty(0)
   var propRoundWon: IntegerProperty = IntegerProperty(0)
+  var propColor: Color = Color.Red
 
-  def player_code: Char = name(0)
+  def playerCode: Char = name(0)
   def score: Int = {
     propScore.update(state.baseScale.score(this))
     propScore.value
@@ -55,7 +57,6 @@ case class Bot(val name: String, val state: State)
         }
       }
     }
-
     state.undoStack.append(command)
   }
 
@@ -64,7 +65,7 @@ case class Bot(val name: String, val state: State)
     var best_pos = 0
     var best_scale: Scale = null
 
-    def update(scale: Scale, pos: Int) = {
+    def update(scale: Scale, pos: Int): Unit = {
       val currentScore = score
       if(currentScore > best_score && scale.isBalanced) {
         best_score = currentScore
@@ -88,7 +89,6 @@ case class Bot(val name: String, val state: State)
         }
       }
     }
-
     state.undoStack.append(placeWeight(this, best_pos, best_scale, state).execute())
   }
 }

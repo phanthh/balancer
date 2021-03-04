@@ -8,7 +8,7 @@ sealed trait Placable
   val pos: Int
 }
 
-case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val scale_code: Char,
+case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code: Char,
                  protected val state: State)
   extends Placable with Iterable[Option[Placable]]{
 
@@ -45,19 +45,12 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
     score
   }
 
-  override def count(player: Player) = {
-    var count = 0
-    for((w, i) <- board.zipWithIndex) {
-      w match {
-        case Some(p) =>
-          count += p.count(player)
-        case None =>
-      }
-    }
-    count
-  }
+  override def count(player: Player) = board.flatMap{
+    case Some(stack: Stack) => Some(stack)
+    case _ => None
+  }.foldLeft(0)((acc, stack) => acc + stack.count(player))
 
-  override def owner: Option[Player] = {
+  override def owner = {
     val top2 = state.players.map(p => (p, count(p))).sortBy(_._2).takeRight(2)
     if(top2(1)._2 - top2(0)._2 > radius) Some(top2(1)._1) else None
   }
@@ -84,10 +77,10 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
     torque
   }
 
-  def isBalanced: Boolean = scala.math.abs(leftTorque-rightTorque) <= radius
+  def isBalanced = scala.math.abs(leftTorque-rightTorque) <= radius
 
   // ITERATOR
-  def iterator: Iterator[Option[Placable]] = board.iterator
+  def iterator = board.iterator
   def remove(pos: Int) = { board(pos+radius) = None }
   def apply(pos: Int) = board(pos+radius)
   def update(pos: Int, p: Option[Placable]) = { board(pos+radius) = p }
@@ -101,19 +94,19 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
     case None => 0
   }
 
-  def lHeight = if(parent_scale == null) 4 else scala.math.max(parent_scale.uHeight + 2, 4)
+  def lHeight = if(parentScale == null) 4 else scala.math.max(parentScale.uHeight + 2, 4)
   override def height = uHeight + lHeight
 
-  override def coord: Coord =
-    if(parent_scale == null)
+  override def coord =
+    if(parentScale == null)
       Coord(0,0)
     else
-      parent_scale.coord + Coord(2*pos, parent_scale.lHeight)
+      parentScale.coord + Coord(2*pos, parentScale.lHeight)
 
 
   def span = (coord - Coord(2*radius+1,0), coord + Coord(2*radius+1,0))
 
-  override def toString: String = s"<$scale_code,$mass>"
+  override def toString: String = s"<$code,$mass>"
 }
 
 case class Stack(val parentScale: Scale, val pos: Int, protected val state: State)
@@ -125,11 +118,11 @@ case class Stack(val parentScale: Scale, val pos: Int, protected val state: Stat
 
   override def mass: Int = stack.map(_.mass).sum
 
-  override def score(player: Player): Int = stack.map(_.score(player)).sum
+  override def score(player: Player) = stack.map(_.score(player)).sum
 
-  override def count(player: Player): Int = stack.map(_.score(player)).sum
+  override def count(player: Player) = stack.map(_.score(player)).sum
 
-  override def owner: Option[Player] = { stack.last.owner }
+  override def owner = { stack.last.owner }
 
   def updateOwner() = {
     val prevOwnerStack = stack.map(_.owner).clone().toArray
@@ -156,9 +149,9 @@ case class Stack(val parentScale: Scale, val pos: Int, protected val state: Stat
   def append(it: Weight) = stack.append(it)
 
   // RENDERING
-  override def height: Int = stack.length
+  override def height = stack.length
 
-  override def coord: Coord = parentScale.coord + Coord(2*pos, parentScale.lHeight)
+  override def coord = parentScale.coord + Coord(2*pos, parentScale.lHeight)
 
   override def toString: String = "|" + stack.mkString(",") + "|"
 }

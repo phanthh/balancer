@@ -3,10 +3,10 @@ package game
 import game.grid.Grid
 
 
-class Game (var numRounds: Int = 3, var weightsPerRound: Int = 10, var baseScaleRadius: Int = 5) {
+class Game (var numRounds: Int = 3, var weightsPerRound: Int = 10, var baseScaleRadius: Int = 5, var botDiffiiculty: Double = 0.3) {
   var state = new State(this)
   val fileManager = new FileManager(this)
-  val grid = Grid(this)
+  val grid = new Grid(this)
 
   // Game over
   var over = false

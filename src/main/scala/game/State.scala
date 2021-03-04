@@ -7,25 +7,26 @@ import scala.collection.mutable.ArrayBuffer
 class State(private val game: Game) {
 
   // CREATE NEW OBJECT
-  private var _scaleCode: Char = 96
-  def nextScaleCode(): Char = {_scaleCode = (_scaleCode.toInt + 1).toChar; _scaleCode }
-  def reset(): Unit = {_scaleCode = 96}
+  private var scaleIndex: Char = 96
+  def nextScaleCode(): Char = {scaleIndex = (scaleIndex.toInt + 1).toChar; scaleIndex }
 
   // STATE
   var currentRound = 1
   var currentIdx = 0
   def currentTurn = players(currentIdx)
+  var weightLeftOfRound = game.weightsPerRound
+
+  //
   var baseScale = new Scale(null, 0, game.baseScaleRadius, nextScaleCode(), this)
   val players = ArrayBuffer[Player]()
-  def scaleWithCode(code: Char): Option[Scale] = scales.find(_.scale_code == code)
+  def scaleWithCode(code: Char) = scales.find(_.code == code)
   def update() = scales.foreach(scale => {
     if(!scale.isBalanced) {
       if(scale == baseScale)
         game.over = true
       else
-        scale.parent_scale.remove(scale.pos)
+        scale.parentScale.remove(scale.pos)
     }
-
   })
 
   def buildWeight(pos: Int, parentScale: Scale, owner: Option[Player] = None): (Weight, Stack) = {

@@ -26,7 +26,7 @@ case class PlaceWeightCommand(val player: Player, val pos: Int, val parentScale:
         undoStack = state.buildWeight(pos, parentScale, Some(player))._2
         undoOwnerList = undoStack.updateOwner()
     }
-    state.update()
+//    state.update() // TODO: SCALE DISAPPEAR WHEN FLIPPED
     this
   }
 

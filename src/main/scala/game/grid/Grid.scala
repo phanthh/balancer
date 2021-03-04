@@ -12,12 +12,6 @@ object Grid {
   val WILD = '?'
   val GROUND = 'X'
   val EMPTY = ' '
-
-  def apply(game: Game) = {
-    val grid = new Grid(game)
-    grid.updateOffset()
-    grid
-  }
 }
 
 class Grid(private val game: Game){
@@ -31,6 +25,7 @@ class Grid(private val game: Game){
   def width = _width
   def height = _height
 
+  updateOffset()
 
   def updateOffset() = {
     _height = state.scales.map(s => s.coord.y + s.height).max
@@ -62,12 +57,12 @@ class Grid(private val game: Game){
     for(i <- 0 until fulcrumHeight-1){
       put(scale.coord + Coord(0, i), FULCRUM)
     }
-    put(scale.coord + Coord(0, fulcrumHeight-1), scale.scale_code)
+    put(scale.coord + Coord(0, fulcrumHeight-1), scale.code)
 
     // Render board
     val boardCenter = scale.coord + Coord(0, fulcrumHeight)
     put(boardCenter, scale.owner match {
-      case Some(p: Player) => p.player_code.toUpper
+      case Some(p: Player) => p.playerCode
       case None => WILD
     })
     for(i <- 1 to scale.radius){

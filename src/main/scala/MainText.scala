@@ -23,11 +23,11 @@ object MainText extends App {
   println("Welcome to Balancer !!")
 
   while(state.currentRound <= game.numRounds && !(game.over)){
-    var weightsLeft = game.weightsPerRound
     var players = state.players
+    state.weightLeftOfRound = game.weightsPerRound
     state.currentIdx = 0
     println(f"============ ROUND ${state.currentRound}%2s ============")
-    while(weightsLeft > 0) {
+    while(state.weightLeftOfRound > 0 && !(game.over)) {
       players(state.currentIdx) match {
         case h: Human =>
           // TODO: Refracting, Exception handling
@@ -39,9 +39,9 @@ object MainText extends App {
 
           while(parentScale == null){
             try {
-              print(s"Which scale ? (${state.scales.map(_.scale_code).mkString(",")}): ")
+              print(s"Which scale ? (${state.scales.map(_.code).mkString(",")}): ")
               parentScale = state.scaleWithCode(readChar()).getOrElse(
-                throw new InvalidInput(s"Invalid scale code must be: ${state.scales.map(_.scale_code).mkString(",")}")
+                throw new InvalidInput(s"Invalid scale code must be: ${state.scales.map(_.code).mkString(",")}")
               )
             } catch {
               case e: IOException =>
@@ -75,13 +75,13 @@ object MainText extends App {
 
         case b: Bot =>
           printGameState() // TODO: Delete this if there is human players
-          if(Random.nextFloat() > 0.3) {
+          if(Random.nextFloat() > game.botDiffiiculty) {
             b.random()
           } else {
             b.bestMove()
           }
       }
-      weightsLeft -= 1
+      state.weightLeftOfRound -= 1
       state.currentIdx += 1
       if(state.currentIdx >= players.length) state.currentIdx = 0
     }
@@ -104,23 +104,23 @@ object MainText extends App {
   }
 
   private def printScoreBoard() = {
-    val score_board = state.players.map(p =>
-      f"| ${p.name}%-5s (${p.player_code}, ${p.roundWon}) : ${p.score}%5s points (${if(p.isInstanceOf[Human]) "human" else "bot"}%5s)  |"
+    val scoreBoard = state.players.map(p =>
+      f"| ${p.name}%-5s (${p.playerCode}, ${p.roundWon}) : ${p.score}%5s points (${if(p.isInstanceOf[Human]) "human" else "bot"}%5s)  |"
     ).mkString("\n")
-    println("_"*(score_board.length/state.players.length))
-    println(score_board)
-    println("|" + "_"*(score_board.length/state.players.length-2) + "|")
+    println("_"*(scoreBoard.length/state.players.length))
+    println(scoreBoard)
+    println("|" + "_"*(scoreBoard.length/state.players.length-2) + "|")
   }
 
   private def printScale(scale: Scale) = {
     println()
-    println(s"Scale [${scale.scale_code},${scale.radius}] Coord: ${scale.coord}")
+    println(s"Scale [${scale.code},${scale.radius}] Coord: ${scale.coord}")
     println(s"uHeight: ${scale.uHeight}, lHeight: ${scale.lHeight}") // TODO: THis is for debug only
     println(s"Span ${scale.span}") // TODO: THis is for debug only
     println("----------------------------------")
     val rep = scale.boardVector.zipWithIndex.map {
       case (Some(p), i) => p.toString
-      case (None, i) if i==scale.radius => s"[${scale.scale_code}]"
+      case (None, i) if i==scale.radius => s"[${scale.code}]"
       case (None, i) => "-"
     }.mkString
     println(s"$scale: " + "<" + rep + ">")

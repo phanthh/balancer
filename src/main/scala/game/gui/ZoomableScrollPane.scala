@@ -8,7 +8,7 @@ import scalafx.scene.layout.VBox
 
 
 class ZoomableScrollPane(var target: Node) extends ScrollPane {
-  private var scaleValue = 0.7
+  private var scaleValue = 0.9
   private val zoomIntensity = 0.02
   var zoomNode: Group = new Group(target)
   this.setContent(outerNode(zoomNode))
