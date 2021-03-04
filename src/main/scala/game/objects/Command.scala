@@ -5,7 +5,6 @@ import game.State
 sealed trait Command {
   def execute(): Command
   def undo(): Command
-  def redo(): Command
 }
 
 object Command {
@@ -17,30 +16,26 @@ object Command {
 case class PlaceWeightCommand(val player: Player, val pos: Int, val parentScale: Scale, val state: State)
   extends Command with GameObject {
 
-  private var affectedStack: Stack = _
-  private var prevOwnerList: Array[Option[Player]] = _
+  private var undoStack: Stack = _
+  private var undoOwnerList: Array[Option[Player]] = _
 
   override def execute() = {
     parentScale(pos) match {
       case Some(scale: Scale) => throw new InvalidPosition(pos.toString)
       case _ =>
-        affectedStack = state.buildWeight(pos, parentScale, Some(player))._2
-        prevOwnerList = affectedStack.updateOwner()
+        undoStack = state.buildWeight(pos, parentScale, Some(player))._2
+        undoOwnerList = undoStack.updateOwner()
     }
+    state.update()
     this
   }
 
   override def undo() = {
-    affectedStack.pop()
-    if(affectedStack.isEmpty)
+    undoStack.pop()
+    if(undoStack.isEmpty)
       parentScale.remove(pos)
     else
-      affectedStack.zipWithIndex.foreach(p => p._1.owner = prevOwnerList(p._2)) // Restore
-    this
-  }
-
-  override def redo() = {
-    execute()
+      undoStack.zipWithIndex.foreach(p => p._1.owner = undoOwnerList(p._2)) // Restore
     this
   }
 }

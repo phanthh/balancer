@@ -8,6 +8,9 @@ class Game (var numRounds: Int = 3, var weightsPerRound: Int = 10, var baseScale
   val fileManager = new FileManager(this)
   val grid = Grid(this)
 
+  // Game over
+  var over = false
+
   // Winners
   def winner = state.players.maxBy(_.score)
   def finalWinner = state.players.maxBy(_.roundWon)

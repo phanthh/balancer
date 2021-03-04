@@ -1,4 +1,4 @@
-import game.{ConsoleManager, Game}
+import game.Game
 
 object MainTextLoadSave extends App {
   val game = new Game()

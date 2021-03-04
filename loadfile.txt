@@ -1,10 +1,9 @@
 BALANCER 1.3 SAVE FILE
 # Setting
-WeightPerRound: 50
-NumberOfRound: 1
+WeightPerRound: 10
+NumberOfRound: 5
 # Meta
-Bot: jack,     brad
-Human:          hau
+Human: jack,     brad
 Round: 1
 Turn :        jack
 # Scale

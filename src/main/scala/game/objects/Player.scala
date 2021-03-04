@@ -2,15 +2,29 @@ package game.objects
 
 import game.State
 import game.objects.Command.placeWeight
+import scalafx.beans.property.{IntegerProperty, StringProperty}
 
 import scala.util.Random
 
 sealed trait Player
   extends GameObject {
+
   val name: String
+
+  // BINDING POINT FOR GUI
+  var propScore: IntegerProperty = IntegerProperty(0)
+  var propRoundWon: IntegerProperty = IntegerProperty(0)
+
   def player_code: Char = name(0)
-  def score: Int = state.baseScale.score(this)
-  var roundWon = 0
+  def score: Int = {
+    propScore.update(state.baseScale.score(this))
+    propScore.value
+  }
+
+  def roundWon = propRoundWon.value
+
+  def win() = propRoundWon.update(propRoundWon.value + 1)
+
   override def toString: String = name
 }
 

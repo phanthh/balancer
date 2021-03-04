@@ -1,7 +1,7 @@
 package game.grid
 
 import game.Game
-import game.grid.Grid.{EMPTY, FULCRUM, LEFT, PADDER, RIGHT}
+import game.grid.Grid.{EMPTY, FULCRUM, LEFT, PADDER, RIGHT, WILD}
 import game.objects.{Player, Scale}
 
 object Grid {
@@ -45,12 +45,15 @@ class Grid(private val game: Game){
 
   def update() = { updateOffset(); updateGrid() }
 
-  def at(coord: Coord) = _grid(_height-coord.y-1)(coord.x-_minX)
+  def apply(coord: Coord) = _grid(_height-coord.y-1)(coord.x-_minX)
 
   def apply(i: Int, j: Int) = _grid(i)(j)
 
   def put(coord: Coord, marker: Char) =
     _grid(_height-coord.y-1)(coord.x-_minX) = marker
+
+  def put(i: Int, j: Int, marker: Char) =
+    _grid(i)(j) = marker
 
   def _register(scale: Scale): Unit = {
     // Register the scale and it child stacksVector
@@ -65,7 +68,7 @@ class Grid(private val game: Game){
     val boardCenter = scale.coord + Coord(0, fulcrumHeight)
     put(boardCenter, scale.owner match {
       case Some(p: Player) => p.player_code.toUpper
-      case None => '?'
+      case None => WILD
     })
     for(i <- 1 to scale.radius){
       put(boardCenter + Coord(2*i-1, 0), PADDER)

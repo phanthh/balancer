@@ -5,22 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
-      <change afterPath="$PROJECT_DIR$/loadfile.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/MainTextLoadSave.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Command.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/game/gui/MainGUI.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/game/gui/ZoomableScrollPane.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/savefile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/savefile.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/MainGUI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainGUI.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/loadfile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/loadfile.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/MainGUI.scala" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/MainText.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/MainTextLoadSave.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainTextLoadSave.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Store.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/State.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/UI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/UI.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/State.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/State.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/UI.scala" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Command.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Command.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,8 +52,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Scala Object" />
         <option value="Package Object" />
+        <option value="Scala Object" />
       </list>
     </option>
   </component>
@@ -98,35 +95,24 @@
     <property name="project.structure.side.proportion" value="0.352518" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="Errors" />
+    <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
   </component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MainText loaded from &quot;loadfile.txt&quot;">
-    <configuration name="Main" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="MainGUI" />
-      <module name="balancer" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value=".*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MainText load &quot;loadfile&quot; and save to &quot;savefile&quot;" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="MainTextLoadSave" />
+  <component name="RunManager" selected="Application.MainGUI">
+    <configuration name="MainGUI" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="openjdk-15" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="game.gui.MainGUI" />
       <module name="balancer" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MainText loaded from &quot;loadfile.txt&quot;" type="Application" factoryName="Application">
+    <configuration name="MainText  from &quot;loadfile.txt&quot;" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="MainText" />
       <module name="balancer" />
       <option name="PROGRAM_PARAMETERS" value="loadfile.txt" />
@@ -134,8 +120,8 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MainText" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="MainText" />
+    <configuration name="MainText load/save Test" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="MainTextLoadSave" />
       <module name="balancer" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -187,12 +173,11 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.MainText" />
-      <item itemvalue="Application.MainText load &quot;loadfile&quot; and save to &quot;savefile&quot;" />
-      <item itemvalue="Application.MainText loaded from &quot;loadfile.txt&quot;" />
-      <item itemvalue="Application.Main" />
-      <item itemvalue="sbt Task.Run Main" />
+      <item itemvalue="Application.MainText  from &quot;loadfile.txt&quot;" />
+      <item itemvalue="Application.MainGUI" />
+      <item itemvalue="Application.MainText load/save Test" />
       <item itemvalue="sbt Task.Run Main Once" />
+      <item itemvalue="sbt Task.Run Main" />
       <item itemvalue="Scala REPL.Scala REPL" />
     </list>
   </component>

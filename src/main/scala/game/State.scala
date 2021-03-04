@@ -14,10 +14,19 @@ class State(private val game: Game) {
   // STATE
   var currentRound = 1
   var currentIdx = 0
+  def currentTurn = players(currentIdx)
   var baseScale = new Scale(null, 0, game.baseScaleRadius, nextScaleCode(), this)
   val players = ArrayBuffer[Player]()
   def scaleWithCode(code: Char): Option[Scale] = scales.find(_.scale_code == code)
+  def update() = scales.foreach(scale => {
+    if(!scale.isBalanced) {
+      if(scale == baseScale)
+        game.over = true
+      else
+        scale.parent_scale.remove(scale.pos)
+    }
 
+  })
 
   def buildWeight(pos: Int, parentScale: Scale, owner: Option[Player] = None): (Weight, Stack) = {
     if (pos == 0) throw new Exception("Position must not be 0")
@@ -57,9 +66,7 @@ class State(private val game: Game) {
   // Recursive function to get all scalesVector
   private def _scales(root_scale: Scale): Vector[Scale] =
     root_scale.scalesVector.map(_scales).flatMap(_.toList).appended(root_scale)
-
   def scales = _scales(baseScale)
-
 
   // UNDO PLAYER MOVE
   val undoStack = scala.collection.mutable.Stack[Command]()
