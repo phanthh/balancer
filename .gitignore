@@ -13,3 +13,4 @@ logo/
 *.bbl
 *.blg
 .idea/
+.bsp/
