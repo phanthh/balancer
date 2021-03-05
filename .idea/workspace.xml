@@ -5,22 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/gui/InfoPane.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/gui/MidSplitPlane.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/game/gui/TopMenuBar.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/loadfile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/loadfile.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/MainText.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/State.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/State.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/savefile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/savefile.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/InfoPane.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/gui/InfoPane.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/MainGUI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/gui/MainGUI.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/MidSplitPlane.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/gui/MidSplitPlane.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/TopMenuBar.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/gui/TopMenuBar.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/ZoomableScrollPane.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/gui/ZoomableScrollPane.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Command.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Command.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

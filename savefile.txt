@@ -1,7 +1,7 @@
 BALANCER 1.3 SAVE FILE
 # Setting
 WeightPerRound: 10
-NumberOfRound: 3
+NumberOfRound: 1
 # Meta
 Bot: jack,brad
 Round: 1

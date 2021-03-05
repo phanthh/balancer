@@ -22,15 +22,17 @@ class Grid(private val game: Game){
   private var _grid: Array[Array[Char]] = _
   private def state = game.state
 
+  private var _padding = 3
+
   def width = _width
   def height = _height
 
   updateOffset()
 
   def updateOffset() = {
-    _height = state.scales.map(s => s.coord.y + s.height).max
-    _maxX = state.scales.map(_.span._2.x).max
-    _minX = state.scales.map(_.span._1.x).min
+    _height = state.scales.map(s => s.coord.y + s.height).max + _padding
+    _maxX = state.scales.map(_.span._2.x).max + _padding
+    _minX = state.scales.map(_.span._1.x).min - _padding
     _width = _maxX - _minX
     if(_width % 2 == 0) _width += 1
     _grid = Array.tabulate(_height, _width)((_,_) => EMPTY)
@@ -60,7 +62,7 @@ class Grid(private val game: Game){
     put(scale.coord + Coord(0, fulcrumHeight-1), scale.code)
 
     // Render board
-    val boardCenter = scale.coord + Coord(0, fulcrumHeight)
+    val boardCenter = scale.boardCenter
     put(boardCenter, scale.owner match {
       case Some(p: Player) => p.playerCode
       case None => WILD
@@ -86,4 +88,9 @@ class Grid(private val game: Game){
     // Recursive
     scale.scalesVector.foreach(_register)
   }
+
+  def coordToGrid(coord: Coord): (Int, Int) = (_height-coord.y-1, coord.x-_minX)
+
+  def gridToCoord(i: Int, j: Int) = Coord(j+_minX, _height-1-i)
+
 }

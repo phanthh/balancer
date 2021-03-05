@@ -1,8 +1,9 @@
 package game.objects
 
 import game.State
+import game.gui.MainGUI.randomColor
 import game.objects.Command.placeWeight
-import scalafx.beans.property.{IntegerProperty}
+import scalafx.beans.property.IntegerProperty
 import scalafx.scene.paint.Color
 
 import scala.util.Random
@@ -12,10 +13,11 @@ sealed trait Player
 
   val name: String
 
-  // BINDING POINT FOR GUI
+  // BINDING POINT FOR GUI PROPS
   var propScore: IntegerProperty = IntegerProperty(0)
   var propRoundWon: IntegerProperty = IntegerProperty(0)
-  var propColor: Color = Color.Red
+  var propColor: Color = randomColor()
+  ///
 
   def playerCode: Char = name(0)
   def score: Int = {

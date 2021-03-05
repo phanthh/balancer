@@ -103,6 +103,7 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
     else
       parentScale.coord + Coord(2*pos, parentScale.lHeight)
 
+  def boardCenter = coord + Coord(0, lHeight-1)
 
   def span = (coord - Coord(2*radius+1,0), coord + Coord(2*radius+1,0))
 

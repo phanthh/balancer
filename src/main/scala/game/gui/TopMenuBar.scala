@@ -3,7 +3,7 @@ package game.gui
 import scalafx.scene.control.{Menu, MenuBar, MenuItem, SeparatorMenuItem}
 
 class TopMenuBar extends MenuBar {
-  this.menus = List(
+  menus = List(
     new Menu("File") {
       items = List(
         new MenuItem("New"),
