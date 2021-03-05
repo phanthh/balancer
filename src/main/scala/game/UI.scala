@@ -1,17 +1,21 @@
 package game
-import game.objects.Bot.{BESTMOVE, RANDOM, RANDOMBESTMOVE}
-import game.objects.{Bot, Human, Player, Scale}
+import game.objects.{Bot, Human, Scale}
+import game.objects.Command.placeWeight
 import scalafx.application.JFXApp
 
 import java.io.IOException
 import scala.io.StdIn._
+import scala.util.Random
 
 object UI {
   val CONSOLE = 0
   val GRAPHIC = 1
 }
 
-sealed trait UI { val game: Game }
+sealed trait UI {
+  val game: Game
+  protected def state = game.state
+}
 
 case class GraphicManager(val game: Game) extends JFXApp with UI {
   def run(): Unit = {
@@ -19,42 +23,6 @@ case class GraphicManager(val game: Game) extends JFXApp with UI {
 }
 
 case class ConsoleManager(val game: Game) extends UI {
-  def promptInput() = {
-//    var numHumans = -1
-//    var numBots = -1
-//    while(numHumans == -1){
-//      try {
-//        print("Enter the number of Human players: ")
-//        numHumans = readInt()
-//      } catch {
-//        case e: IOException => println(e.getMessage)
-//        case e: Exception => println("Invalid Input" + e.getMessage)
-//      }
-//    }
-//
-//    while(numHumans == -1){
-//      try {
-//        print("Enter the number of Bots: ")
-//        numBots = readInt()
-//      } catch {
-//        case e: IOException => println(e.getMessage)
-//        case e: Exception => println("Invalid Input" + e.getMessage)
-//      }
-//    }
-//
-//    for(i <- 1 to numHumans){
-//      print(f"Enter the #$i human's name: ")
-//      game.factory.buildHuman(readLine())
-//    }
-//
-//    for(i <- 1 to numBots){
-//      print(f"Enter the #$i bots's name: ")
-//      game.factory.buildBot(readLine())
-//    }
-
-    game.factory.buildHuman("Hau") // TODO: Delete this, this is for debug
-    game.factory.buildBot("Jack")
-  }
 
   def run(filename: String = null): Unit = {
     println("Welcome to Balancer !!")
@@ -63,52 +31,52 @@ case class ConsoleManager(val game: Game) extends UI {
     else
       game.fileManager.loadGame(filename)
 
-    while(game.currentRound <= game.numRounds){
+    while(state.currentRound <= game.numRounds){
       var weightsLeft = game.weightsPerRound
-      var players = game.players
-      var idx = 0
-      println(f"============ ROUND ${game.currentRound}%2s ============")
+      var players = state.players
+      state.currentIdx = 0
+      println(f"============ ROUND ${state.currentRound}%2s ============")
       while(weightsLeft > 0) {
-        players(idx) match {
+        players(state.currentIdx) match {
           case h: Human =>
             // TODO: Refracting, Exception handling
             printGameState()
-            println(f">>>>>>>>> ${players(idx).name.toUpperCase}%-5s TURN <<<<<<<<<")
+            println(f">>>>>>>>> ${players(state.currentIdx).name.toUpperCase}%-5s TURN <<<<<<<<<")
 
-            var parent_scale: Scale = null
+            var parentScale: Scale = null
             var pos: Int = 0
 
-            while(parent_scale == null){
+            while(parentScale == null){
               try {
-                print(s"Which scale ? (${game.scales.map(_.scale_code).mkString(",")}): ")
-                parent_scale = game.scaleWithCode(readChar()).getOrElse(
-                  throw new InvalidInput(s"Invalid scale code must be: ${game.scales.map(_.scale_code).mkString(",")}")
+                print(s"Which scale ? (${state.scales.map(_.scale_code).mkString(",")}): ")
+                parentScale = state.scaleWithCode(readChar()).getOrElse(
+                  throw new InvalidInput(s"Invalid scale code must be: ${state.scales.map(_.scale_code).mkString(",")}")
                 )
               } catch {
                 case e: IOException =>
-                  println(e.getMessage); parent_scale = null
+                  println(e.getMessage); parentScale = null
                 case e: InvalidInput =>
-                  println(e.getMessage); parent_scale = null
+                  println(e.getMessage); parentScale = null
                 case e: Exception =>
-                  println("Invalid Input" + e.getMessage); parent_scale = null
+                  println("Invalid Input" + e.getMessage); parentScale = null
               }
             }
 
             while(pos == 0){
               try {
-                print(s"Position ? [-${parent_scale.radius},${parent_scale.radius}]: ")
+                print(s"Position ? [-${parentScale.radius},${parentScale.radius}]: ")
                 pos = readInt()
                 if(pos == 0) throw new InvalidInput("Position cannot be 0")
 
                 //// GAME STATE CHANGED HERE
-                game.factory.buildWeight(pos, parent_scale, Some(h))
+                state.undoStack.append(placeWeight(h, pos, parentScale, state).execute())
               } catch {
                 case e: IOException =>
                   println(e.getMessage); pos = 0
                 case e: InvalidInput =>
                   println(e.getMessage); pos = 0
                 case e: ArrayIndexOutOfBoundsException =>
-                  println(s"Invalid position, must be between -${parent_scale.radius} and ${parent_scale.radius}"); pos = 0
+                  println(s"Invalid position, must be between -${parentScale.radius} and ${parentScale.radius}"); pos = 0
                 case e: Exception =>
                   println("Invalid Input: " + e.getMessage); pos = 0
               }
@@ -116,16 +84,20 @@ case class ConsoleManager(val game: Game) extends UI {
 
           case b: Bot =>
             printGameState() // TODO: Delete this if there is human players
-            b.placeWeight(RANDOM)
+            if(Random.nextFloat() > 0.3) {
+              b.random()
+            } else {
+              b.bestMove()
+            }
         }
         weightsLeft -= 1
-        idx += 1
-        if(idx >= players.length) idx = 0
+        state.currentIdx += 1
+        if(state.currentIdx >= players.length) state.currentIdx = 0
       }
       println("End of round !!")
       println(s"The winner of this rounds is: ${game.winner}")
       game.winner.roundWon += 1
-      game.currentRound += 1
+      state.currentRound += 1
     }
     println("================================================")
     println(s"The winner of the game is: ${game.finalWinner}")
@@ -142,12 +114,12 @@ case class ConsoleManager(val game: Game) extends UI {
   }
 
   private def printScoreBoard() = {
-    val score_board = game.players.map(p =>
+    val score_board = state.players.map(p =>
       f"| ${p.name}%-5s (${p.player_code}, ${p.roundWon}) : ${p.score}%5s points (${if(p.isInstanceOf[Human]) "human" else "bot"}%5s)  |"
     ).mkString("\n")
-    println("_"*(score_board.length/game.players.length))
+    println("_"*(score_board.length/state.players.length))
     println(score_board)
-    println("|" + "_"*(score_board.length/game.players.length-2) + "|")
+    println("|" + "_"*(score_board.length/state.players.length-2) + "|")
   }
 
   private def printScale(scale: Scale) = {
@@ -175,6 +147,43 @@ case class ConsoleManager(val game: Game) extends UI {
         print(game.grid(i,j))
       println()
     }
+  }
+
+
+  def promptInput() = {
+    //    var numHumans = -1
+    //    var numBots = -1
+    //    while(numHumans == -1){
+    //      try {
+    //        print("Enter the number of Human players: ")
+    //        numHumans = readInt()
+    //      } catch {
+    //        case e: IOException => println(e.getMessage)
+    //        case e: Exception => println("Invalid Input" + e.getMessage)
+    //      }
+    //    }
+    //
+    //    while(numHumans == -1){
+    //      try {
+    //        print("Enter the number of Bots: ")
+    //        numBots = readInt()
+    //      } catch {
+    //        case e: IOException => println(e.getMessage)
+    //        case e: Exception => println("Invalid Input" + e.getMessage)
+    //      }
+    //    }
+    //
+    //    for(i <- 1 to numHumans){
+    //      print(f"Enter the #$i human's name: ")
+    //      game.factory.buildHuman(readLine())
+    //    }
+    //
+    //    for(i <- 1 to numBots){
+    //      print(f"Enter the #$i bots's name: ")
+    //      game.factory.buildBot(readLine())
+    //    }
+    state.buildHuman("Hau") // TODO: Delete this, this is for debug
+    state.buildBot("Jack")
   }
 }
 

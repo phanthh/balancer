@@ -1,8 +1,8 @@
 package game.objects
 
-import game.Store
+import game.State
 
-class Weight(val stack: Stack, val factory: Store, var owner: Option[Player] = None)
+class Weight(val stack: Stack, val state: State, var owner: Option[Player] = None)
   extends GameObject with Owner with Mass {
   override val mass: Int = 1
 

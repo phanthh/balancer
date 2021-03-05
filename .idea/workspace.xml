@@ -5,7 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
+      <change afterPath="$PROJECT_DIR$/loadfile.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/MainTextLoadSave.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Command.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/savefile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/savefile.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/MainGUI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainGUI.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/MainText.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/Game.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Store.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/State.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/UI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/UI.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,19 +93,24 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.intellij.openapi.externalSystem.service.settings.ExternalSystemGroupConfigurable" value="ALL" />
     <property name="full.screen.before.presentation.mode" value="false" />
+<<<<<<< HEAD
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Modules" />
+=======
+    <property name="project.structure.last.edited" value="Libraries" />
+>>>>>>> e2ba7c5d8dc5f24b2737d58e8bbde1f625c34777
     <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.13218391" />
+    <property name="project.structure.side.proportion" value="0.352518" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="Application.MainText loaded from &quot;loadfile.txt&quot;">
     <configuration name="Main" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="MainGUI" />
       <module name="balancer" />
@@ -104,10 +124,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MainText with SaveFile" type="Application" factoryName="Application">
+    <configuration name="MainText load &quot;loadfile&quot; and save to &quot;savefile&quot;" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="MainTextLoadSave" />
+      <module name="balancer" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainText loaded from &quot;loadfile.txt&quot;" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="MainText" />
       <module name="balancer" />
-      <option name="PROGRAM_PARAMETERS" value="savefile.txt" />
+      <option name="PROGRAM_PARAMETERS" value="loadfile.txt" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -166,7 +193,8 @@
     </configuration>
     <list>
       <item itemvalue="Application.MainText" />
-      <item itemvalue="Application.MainText with SaveFile" />
+      <item itemvalue="Application.MainText load &quot;loadfile&quot; and save to &quot;savefile&quot;" />
+      <item itemvalue="Application.MainText loaded from &quot;loadfile.txt&quot;" />
       <item itemvalue="Application.Main" />
       <item itemvalue="sbt Task.Run Main" />
       <item itemvalue="sbt Task.Run Main Once" />
@@ -224,6 +252,16 @@
     <MESSAGE value="Hello Worlds !!!" />
     <MESSAGE value="Basic class structure setup." />
     <option name="LAST_COMMIT_MESSAGE" value="Basic class structure setup." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/balancer$MainText.ic" NAME="MainText Coverage Results" MODIFIED="1614357481604" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />

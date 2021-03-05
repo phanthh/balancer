@@ -1,18 +1,16 @@
 package game.objects
 
-import game.Store
+import game.State
 import game.grid.Coord
 
-import scala.collection.mutable.Buffer
-
-sealed abstract class Placable
+sealed trait Placable
   extends GameObject with Owner with Mass with Renderable {
   val pos: Int
 }
 
 case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val scale_code: Char,
-                 protected val factory: Store)
-  extends Placable {
+                 protected val state: State)
+  extends Placable with Iterable[Option[Placable]]{
 
   private var board = Array.fill[Option[Placable]](2*radius+1)(None)
 
@@ -28,13 +26,6 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
     case _ => None
   }.toVector
 
-  def put(pos: Int, it: Placable) = { board(pos+radius) = Some(it)}
-
-  def remove(pos: Int) = { board(pos+radius) = None }
-
-  def isEmptyAt(pos: Int) = board(pos+radius).isEmpty
-
-  def at(pos: Int) = board(pos+radius)
 
   override def mass = board.flatten.map(_.mass).sum
 
@@ -67,9 +58,8 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
   }
 
   override def owner: Option[Player] = {
-    // TODO: Inefficient since multiple call of count and count is recursive
-    val top2 = factory.players.sortBy(count).takeRight(2)
-    if(count(top2(1)) - count(top2(0)) > radius) Some(top2(1)) else None
+    val top2 = state.players.map(p => (p, count(p))).sortBy(_._2).takeRight(2)
+    if(top2(1)._2 - top2(0)._2 > radius) Some(top2(1)._1) else None
   }
 
   def leftTorque = {
@@ -96,6 +86,14 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
 
   def isBalanced: Boolean = scala.math.abs(leftTorque-rightTorque) <= radius
 
+  // ITERATOR
+  def iterator: Iterator[Option[Placable]] = board.iterator
+  def remove(pos: Int) = { board(pos+radius) = None }
+  def apply(pos: Int) = board(pos+radius)
+  def update(pos: Int, p: Option[Placable]) = { board(pos+radius) = p }
+  def update(pos: Int, scale: Scale) = { board(pos+radius) = Some(scale) }
+  def update(pos: Int, stack: Stack) = { board(pos+radius) = Some(stack) }
+
   // RENDERING
 
   def uHeight = stacksVector.map(_.height).maxOption match {
@@ -118,10 +116,10 @@ case class Scale(val parent_scale: Scale, val pos: Int, val radius: Int, val sca
   override def toString: String = s"<$scale_code,$mass>"
 }
 
-case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: Store)
-  extends Placable {
+case class Stack(val parentScale: Scale, val pos: Int, protected val state: State)
+  extends Placable with Iterable[Weight]{
 
-  private var stack = Buffer[Weight]()
+  private var stack = scala.collection.mutable.Stack[Weight]()
 
   def weightsVector = stack.toVector
 
@@ -132,33 +130,35 @@ case class Stack(val parent_scale: Scale, val pos: Int, protected val factory: S
   override def count(player: Player): Int = stack.map(_.score(player)).sum
 
   override def owner: Option[Player] = { stack.last.owner }
-//    if(stack.isEmpty) None else {
-//      stack.map(_.owner).groupBy(identity).view.mapValues(_.size).maxBy(_._2)._1
-//    }
 
-  def at(idx: Int) = stack(idx)
-
-  def softAppend(it: Weight) = stack.append(it)
-  def softPop() = stack.dropRightInPlace(1)
-
-  def append(it: Weight) = {
-    it.owner match {
-      case Some(o: Player) =>
-        parent_scale.owner match {
-          case Some(p: Player) => stack.foreach(w =>
-            if(w.owner != Some(p)) w.owner = Some(o)
-          )
-          case None => stack.foreach(_.owner = Some(o))
+  def updateOwner() = {
+    val prevOwnerStack = stack.map(_.owner).clone().toArray
+    stack.last.owner match {
+      case Some(newOwner: Player) =>
+        parentScale.owner match {
+          case Some(scaleOwner: Player) =>
+            stack.foreach(weight =>
+              if(weight.owner != Some(scaleOwner))
+                weight.owner = Some(newOwner)
+            )
+          case None => stack.foreach(_.owner = Some(newOwner))
         }
       case None =>
     }
-    stack.append(it)
+    prevOwnerStack
   }
+
+  // ITERATOR
+  def iterator = stack.iterator
+  def apply(pos: Int) = stack(pos)
+  def update(pos: Int, weight: Weight) = { stack(pos) = weight }
+  def pop() = stack.pop()
+  def append(it: Weight) = stack.append(it)
 
   // RENDERING
   override def height: Int = stack.length
 
-  override def coord: Coord = parent_scale.coord + Coord(2*pos, parent_scale.lHeight)
+  override def coord: Coord = parentScale.coord + Coord(2*pos, parentScale.lHeight)
 
   override def toString: String = "|" + stack.mkString(",") + "|"
 }
