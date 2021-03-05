@@ -9,8 +9,8 @@ Round: 1
 Turn: nemo
 # Scale
 _,0,6,a : 
-a,4,2,b : -1,k | 1,k
+a,4,2,b : -2,k | -1,k | 1,k,k,k
 a,-5,3,c : 
-c,3,2,d : -1,k,k,k
-d,1,4,e : -4,n | -3,k | 1,n | 2,n | 4,k
+c,3,2,d : -2,n,n,n | -1,n,n,n,n,n | 2,n,n,n
+d,1,4,e : -4,k,k,k | -3,k | 1,n | 2,k,k | 4,k,k,k
 END

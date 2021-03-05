@@ -1,6 +1,6 @@
 package balancer.objects
 
-import balancer.State
+import balancer.{Game, State}
 import balancer.gui.MainGUI.randomColor
 import balancer.objects.Command.placeWeight
 import scalafx.beans.property.IntegerProperty
@@ -88,7 +88,7 @@ case class Bot(val name: String, val state: State)
         }
       }
     }
-    state.undoStack.append(placeWeight(this, best_pos, best_scale, state).execute())
+    state.execute(placeWeight(this, best_pos, best_scale, state))
   }
 }
 

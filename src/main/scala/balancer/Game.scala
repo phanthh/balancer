@@ -14,6 +14,8 @@ class Game (var numRounds: Int = 3, var weightsPerRound: Int = 10, var baseScale
     state = new State(this)
     grid = new Grid(this)
     over = false
+    fileManager.saved = false
+    fileManager.savedFilePath = ""
   }
 
   // Winners

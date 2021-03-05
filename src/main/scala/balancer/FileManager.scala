@@ -10,9 +10,14 @@ final case class ParseError(private val message: String = "",
   extends Exception(message, cause)
 
 class FileManager(private val game: Game) {
+  val defaultFile = "defaultfile.txt" // HARCCODE
   private def state = game.state
+  var saved = false
+  var savedFilePath = ""
 
   def saveGame(filePath: String): Unit = {
+    saved = true
+    savedFilePath = filePath
 
     val lw = new BufferedWriter(new FileWriter(filePath))
 
@@ -55,6 +60,8 @@ class FileManager(private val game: Game) {
   }
 
   def loadGame(filePath: String): Unit = {
+    saved = true
+    savedFilePath = filePath
 
     val fileReader = try {
       new FileReader(filePath)
@@ -125,12 +132,13 @@ class FileManager(private val game: Game) {
               case "meta" =>
                 key match {
                   case "human" =>
-                    humanNames = value.split(",").map(_.trim)
+                    humanNames = if(value != "") value.split(",").map(_.trim) else Array.empty[String]
                   case "bot" =>
-                    botNames = value.split(",").map(_.trim)
+                    botNames = if(value != "") value.split(",").map(_.trim) else Array.empty[String]
                   case "round" =>
-                    round = value.toIntOption.getOrElse(
-                      throw new ParseError(line + "\n=> Round number must be an integer"))
+                    round = if(value != "")
+                      value.toIntOption.getOrElse(throw new ParseError(line + "\n=> Round number must be an integer"))
+                    else 0
                   case "turn" =>
                     turn = value
                   case _ =>
@@ -204,7 +212,7 @@ class FileManager(private val game: Game) {
 
       // APPLY CURRENT ROUND AND TURN
       newState.currentRound = round
-      newState.currentIdx = newState.players.indexWhere(_.name == turn)
+      newState.currentIdx = if(turn == "") 0 else newState.players.indexWhere(_.name == turn)
 
       // FINALLY UPDATE STATE
       game.state = newState

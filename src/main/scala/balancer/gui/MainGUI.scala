@@ -1,14 +1,13 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.grid.Grid.{EMPTY, FULCRUM, GROUND, LEFT, PADDER, RIGHT, WILD}
+import balancer.grid.Grid._
 import balancer.gui.Constants.{CellHeight, CellWidth, Height, Width}
 import balancer.objects.{Bot, Human, Player}
 import scalafx.application.JFXApp
 import scalafx.geometry.VPos
 import scalafx.scene.Scene
-import scalafx.scene.canvas.GraphicsContext
-import scalafx.scene.control.{Alert, ButtonType}
+import scalafx.scene.control.Alert
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.layout.{BorderPane, Priority, Region, VBox}
 import scalafx.scene.paint.Color
@@ -26,13 +25,13 @@ object Constants {
 }
 
 object MainGUI extends JFXApp {
-  lazy val game = new Game()
+  private val game = new Game()
 
   // Scene
-  val topMenuBar = new TopMenuBar
-  topMenuBar.load("loadfile.txt")
+  var topMenuBar = new TopMenuBar(game)
+  topMenuBar.load("defaultfile.txt")
 
-  val midSplitPane = new MidSplitPane
+  var midSplitPane = new MidSplitPane(game)
 
   ///
   def state = game.state
@@ -53,6 +52,27 @@ object MainGUI extends JFXApp {
       }
     }
   }
+
+  def updateScene() = {
+    topMenuBar = new TopMenuBar(game)
+
+    val currentWidth = stage.getWidth
+    val currentHeight = stage.getHeight
+
+    midSplitPane = new MidSplitPane(game)
+    this.stage.setScene(new Scene(currentWidth, currentHeight) {
+      root = {
+        new BorderPane {
+          top = topMenuBar
+          center = midSplitPane
+        }
+      }
+    })
+    setup()
+    draw()
+  }
+
+
 
 
   def setup(): Unit = {
@@ -101,6 +121,8 @@ object MainGUI extends JFXApp {
   }
 
   def gameLoopLogic(): Unit = {
+    // A MOVE HAS PASSED SO THE GAME IS NOW UNSAVED
+    if(game.fileManager.saved) game.fileManager.saved = false
     // AFTER A TURN
     state.weightLeftOfRound -= 1
     state.currentIdx += 1

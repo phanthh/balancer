@@ -1,5 +1,6 @@
 package balancer.gui
 
+import balancer.Game
 import balancer.gui.Constants.{CellHeight, CellWidth, Height, Width}
 import balancer.gui.MainGUI._
 import balancer.objects.Command.placeWeight
@@ -8,10 +9,12 @@ import scalafx.scene.canvas.Canvas
 import scalafx.scene.control.SplitPane
 import scalafx.scene.input.MouseButton
 
-class MidSplitPane extends SplitPane {
+class MidSplitPane(private val game: Game) extends SplitPane {
+  def state = game.state
+
   val canvas = new Canvas(Width, Height)
   val gc = canvas.graphicsContext2D
-  val infoPane = new InfoPane
+  var infoPane = new InfoPane(game)
   var i = 0
   var j = 0
 

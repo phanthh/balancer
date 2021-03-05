@@ -71,6 +71,7 @@ class State(private val game: Game) {
 
   // UNDO PLAYER MOVE
   val undoStack = scala.collection.mutable.Stack[Command]()
+  def execute(command: Command) = undoStack.append(command.execute())
   def undo(): Command = undoStack.pop().undo()
 }
 

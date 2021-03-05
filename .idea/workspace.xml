@@ -5,26 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="843a7d19-fa7f-4eb3-a170-b8c81be6b323" name="Default Changelist" comment="Basic class structure setup.">
-      <change afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/MidSplitPane.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/defaultfile.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/loadfile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/loadfile.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/MainText.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainText.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/MainTextLoadSave.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MainTextLoadSave.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/FileManager.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/State.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/State.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/grid/Coord.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/grid/Coord.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/grid/Grid.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/grid/Grid.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/InfoPane.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/InfoPane.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/MainGUI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/MainGUI.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/MidSplitPlane.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/TopMenuBar.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/TopMenuBar.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/gui/ZoomableScrollPane.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/ZoomableScrollPane.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Command.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/objects/Command.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/GameObject.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/objects/GameObject.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Placable.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/objects/Placable.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/objects/Player.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/game/objects/Weight.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/objects/Weight.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/FileManager.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/FileManager.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/Game.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/State.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/State.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/gui/InfoPane.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/InfoPane.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/gui/MainGUI.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/MainGUI.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/gui/MidSplitPane.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/MidSplitPane.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/gui/TopMenuBar.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/TopMenuBar.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/gui/ZoomableScrollPane.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/gui/ZoomableScrollPane.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/balancer/objects/Player.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/balancer/objects/Player.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,6 +89,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.intellij.openapi.externalSystem.service.settings.ExternalSystemGroupConfigurable" value="ALL" />
     <property name="full.screen.before.presentation.mode" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.352518" />
@@ -105,6 +98,9 @@
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Development\balancer" />
+    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
     </key>
@@ -247,8 +243,22 @@
           <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
           <option name="timeStamp" value="2" />
         </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.IndexOutOfBoundsException" package="java.lang" />
+          <option name="timeStamp" value="6" />
+        </breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/balancer/FileManager.scala</url>
+          <line>217</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="currentIdx" language="Scala" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

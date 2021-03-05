@@ -1,9 +1,10 @@
 package balancer.gui
 
 
+import balancer.Game
+import balancer.gui.MainGUI.{createSpacer, draw, gameLoopLogic}
 import balancer.objects.Command.placeWeight
 import balancer.objects.Player
-import balancer.gui.MainGUI.{createSpacer, draw, game, gameLoopLogic, state}
 import scalafx.beans.property.StringProperty
 import scalafx.geometry.Pos
 import scalafx.scene.control._
@@ -11,7 +12,8 @@ import scalafx.scene.layout.{BorderPane, Priority, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
-class InfoPane extends VBox {
+class InfoPane(private val game: Game) extends VBox {
+  def state = game.state
 
   var inputScaleCode: StringProperty = StringProperty("")
   var inputPos: StringProperty = StringProperty("")

@@ -1,6 +1,7 @@
 package balancer.gui
 
-import balancer.gui.MainGUI.{game, stage, state}
+import balancer.Game
+import balancer.gui.MainGUI.{stage, updateScene}
 import scalafx.Includes._
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
@@ -9,65 +10,52 @@ import scalafx.stage.FileChooser.ExtensionFilter
 
 import java.io.File
 
-class TopMenuBar extends MenuBar {
-  var saveFile = ""
-  def saved: Boolean = saveFile.nonEmpty
-  def load(filePath: String) = {
-    saveFile = filePath
-    game.fileManager.loadGame(filePath)
-  }
-  def save() =
-    if(saveFile.isEmpty)
-      saveFile = "loadfile.txt" // TODO: Hardcoded
-    else
-      game.fileManager.saveGame(saveFile)
+class TopMenuBar(private val game: Game) extends MenuBar {
+  def state = game.state
 
+  def defaultFile = game.fileManager.defaultFile
 
-    menus = List(
+  def saved = game.fileManager.saved
+
+  def savedFilePath = game.fileManager.savedFilePath
+
+  def save() = game.fileManager.saveGame(savedFilePath)
+
+  def save(filePath: String) = game.fileManager.saveGame(filePath)
+
+  def load(filePath: String) = game.fileManager.loadGame(filePath)
+
+  menus = List(
     new Menu("File") {
       items = List(
         new MenuItem("New") {
           onAction = _ => {
-            if(!saved)
-              uWannaSaveDialog(
-                reason = "New game",
-                yes = () => {save(); game.reset()},
-                no = () => game.reset(),
-                cancel = () => {}
-              )
-            else game.reset()
+            if (!saved) save()
+            game.reset()
+            load(defaultFile)
+            updateScene()
           }
+
         },
         new MenuItem("Open...") {
-          onAction = _ =>
+          onAction = _ =>{
+            if (!saved) save()
             openDialog(
               success = (f) => {
-                if(!saved)
-                  uWannaSaveDialog(
-                    reason = "Loading New Save File",
-                    yes = () => {
-                      save()
-                      load(f.getAbsolutePath)
-                    },
-                    no = () => load(f.getAbsolutePath),
-                    cancel = () => {}
-                  )
-                else
-                  load(f.getAbsolutePath)
+                game.reset()
+                load(f.getAbsolutePath)
+                updateScene()
               },
               failed = () => {}
             )
+          }
         },
         new SeparatorMenuItem(),
-        new MenuItem("Save") {
-          onAction = _ => save()
-        },
-        new MenuItem("Save as...") {
+        new MenuItem("Save...") {
           onAction = _ =>
-            openDialog(
+            saveDialog(
               success = (f) => {
-                saveFile = f.getAbsolutePath
-                save()
+                save(f.getAbsolutePath)
               },
               failed = () => {}
             )
@@ -82,7 +70,6 @@ class TopMenuBar extends MenuBar {
                 sys.exit(0)
               },
               no = () => sys.exit(0),
-              cancel = () => {}
             )
         }
       )
@@ -92,14 +79,20 @@ class TopMenuBar extends MenuBar {
         new MenuItem("Add Human") {
           onAction = _ =>
             askNameDialog("Adding Human Player") match {
-              case Some(name) => state.buildHuman(name)
+              case Some(name) => {
+                state.buildHuman(name)
+                updateScene()
+              }
               case None =>
             }
         },
         new MenuItem("Add Bot") {
           onAction = _ =>
             askNameDialog("Adding Bot Player") match {
-              case Some(name) => state.buildBot(name)
+              case Some(name) => {
+                state.buildBot(name)
+                updateScene()
+              }
               case None =>
             }
         },
@@ -115,7 +108,7 @@ class TopMenuBar extends MenuBar {
     }
   )
 
-  def uWannaSaveDialog(reason: String, yes: () => Unit, no: () => Unit, cancel: () => Unit) = {
+  def uWannaSaveDialog(reason: String, yes: () => Unit, no: () => Unit) = {
     val yesButton = new ButtonType("Yes")
     val noButton = new ButtonType("No")
 
@@ -130,7 +123,6 @@ class TopMenuBar extends MenuBar {
     result match {
       case Some(yesButton) => yes()
       case Some(noButton) => no()
-      case Some(ButtonType.Cancel) => cancel()
       case _ =>
     }
   }
@@ -146,6 +138,23 @@ class TopMenuBar extends MenuBar {
       )
     }
     val result = fileChooser.showOpenDialog(stage)
+    result match {
+      case f: File => success(f)
+      case _ => failed()
+    }
+  }
+
+  def saveDialog(success: (File) => Unit, failed: () => Unit) = {
+    val fileChooser = new FileChooser {
+      title = "Save File"
+      extensionFilters ++= Seq(
+        new ExtensionFilter("Text Files", "*.txt"),
+        new ExtensionFilter("Image Files", Seq("*.png", "*.jpg", "*.gif")),
+        new ExtensionFilter("Audio Files", Seq("*.wav", "*.mp3", "*.aac")),
+        new ExtensionFilter("All Files", "*.*")
+      )
+    }
+    val result = fileChooser.showSaveDialog(stage)
     result match {
       case f: File => success(f)
       case _ => failed()

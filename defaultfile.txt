@@ -1,0 +1,16 @@
+BALANCER 1.3 SAVE FILE
+# Setting
+WeightPerRound: 20
+NumberOfRound: 2
+# Meta
+Human: ken,tiger
+Bot: samurai
+Round: 0
+Turn: ken
+# Scale
+_,0,6,a : 
+a,4,2,b : 
+a,-5,3,c : 
+c,3,2,d : 
+d,1,4,e : 
+END
