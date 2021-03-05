@@ -1,7 +1,7 @@
-package game.objects
+package balancer.objects
 
-import game.State
-import game.grid.Coord
+import balancer.State
+import balancer.grid.Coord
 
 trait Owner {
   def owner: Option[Player]

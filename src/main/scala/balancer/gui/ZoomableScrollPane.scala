@@ -1,4 +1,4 @@
-package game.gui
+package balancer.gui
 
 import scalafx.geometry.Point2D
 import scalafx.geometry.Pos
@@ -14,7 +14,9 @@ class ZoomableScrollPane(var target: Node) extends ScrollPane {
   var zoomNode: Group = new Group(target)
 
   content = {
-    val centered = new VBox(zoomNode){alignment = Pos.Center}
+    val centered = new VBox(zoomNode) {
+      alignment = Pos.Center
+    }
     centered.setOnScroll(e => {
       e.consume()
       onScroll(e.getTextDeltaY, new Point2D(e.getX, e.getY))
@@ -40,20 +42,18 @@ class ZoomableScrollPane(var target: Node) extends ScrollPane {
     // calculate pixel offsets from [0, 1] range
     val valX = this.getHvalue * (innerBounds.getWidth - viewportBounds.getWidth)
     val valY = this.getVvalue * (innerBounds.getHeight - viewportBounds.getHeight)
-    if(scaleValue * zoomFactor >= 1) {
-      scaleValue = scaleValue * zoomFactor
-      updateScale()
-      this.layout() // refresh ScrollPane scroll positions & target bounds
+    scaleValue = scaleValue * zoomFactor
+    updateScale()
+    this.layout() // refresh ScrollPane scroll positions & target bounds
 
-      // convert target coordinates to zoomTarget coordinates
-      val posInZoomTarget = target.parentToLocal(zoomNode.parentToLocal(mousePoint))
-      // calculate adjustment of scroll position (pixels)
-      val adjustment = target.getLocalToParentTransform.deltaTransform(posInZoomTarget.multiply(zoomFactor - 1))
-      // convert back to [0, 1] range
-      // (too large/small values are automatically corrected by ScrollPane)
-      val updatedInnerBounds = zoomNode.getBoundsInLocal
-      this.setHvalue((valX + adjustment.getX) / (updatedInnerBounds.getWidth - viewportBounds.getWidth))
-      this.setVvalue((valY + adjustment.getY) / (updatedInnerBounds.getHeight - viewportBounds.getHeight))
-    }
+    // convert target coordinates to zoomTarget coordinates
+    val posInZoomTarget = target.parentToLocal(zoomNode.parentToLocal(mousePoint))
+    // calculate adjustment of scroll position (pixels)
+    val adjustment = target.getLocalToParentTransform.deltaTransform(posInZoomTarget.multiply(zoomFactor - 1))
+    // convert back to [0, 1] range
+    // (too large/small values are automatically corrected by ScrollPane)
+    val updatedInnerBounds = zoomNode.getBoundsInLocal
+    this.setHvalue((valX + adjustment.getX) / (updatedInnerBounds.getWidth - viewportBounds.getWidth))
+    this.setVvalue((valY + adjustment.getY) / (updatedInnerBounds.getHeight - viewportBounds.getHeight))
   }
 }

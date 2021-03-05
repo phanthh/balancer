@@ -1,6 +1,6 @@
-package game.objects
+package balancer.objects
 
-import game.State
+import balancer.State
 
 sealed trait Command {
   def execute(): Command

@@ -1,27 +1,19 @@
-package game.gui
+package balancer.gui
 
-import game.Game
-import game.grid.Coord
-import game.grid.Grid.{EMPTY, LEFT}
-import game.gui.Constants.{CellHeight, CellWidth, Height, Width}
-import game.gui.MainGUI.{draw, gameLoopLogic, grid, setup}
-import game.objects.Command.placeWeight
-import game.objects.{Scale, Stack}
-import scalafx.geometry.Point2D
+import balancer.gui.Constants.{CellHeight, CellWidth, Height, Width}
+import balancer.gui.MainGUI._
+import balancer.objects.Command.placeWeight
+import balancer.objects.{Scale, Stack}
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.control.SplitPane
 import scalafx.scene.input.MouseButton
 
-class MidSplitPlane(val game: Game) extends SplitPane {
-
-  def state = game.state
+class MidSplitPane extends SplitPane {
   val canvas = new Canvas(Width, Height)
   val gc = canvas.graphicsContext2D
-  val infoPane = new InfoPane(gc, game)
+  val infoPane = new InfoPane
   var i = 0
   var j = 0
-  setup(gc)
-  draw(gc)
 
   val scrollPane = new ZoomableScrollPane(canvas)
   canvas.onMouseClicked = e => {
@@ -38,6 +30,7 @@ class MidSplitPlane(val game: Game) extends SplitPane {
   items.addAll(scrollPane, infoPane)
   setDividerPosition(0, 0.75)
 
+  // WHEN CLICK ON GRID TO PLACE WEIGHT
   def executeTurn(): Unit = {
     val chosenCoord = grid.gridToCoord(i, j)
     var chosenScale: Option[Scale] = None
@@ -83,8 +76,8 @@ class MidSplitPlane(val game: Game) extends SplitPane {
           ).execute()
         )
         gameLoopLogic()
-        infoPane.updateProperty()
-        draw(gc)
+        infoPane.updateGUI()
+        draw()
       case None =>
     }
   }

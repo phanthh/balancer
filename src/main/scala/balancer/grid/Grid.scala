@@ -1,8 +1,8 @@
-package game.grid
+package balancer.grid
 
-import game.Game
-import game.grid.Grid.{EMPTY, FULCRUM, LEFT, PADDER, RIGHT, WILD}
-import game.objects.{Player, Scale}
+import balancer.Game
+import balancer.grid.Grid.{EMPTY, FULCRUM, LEFT, PADDER, RIGHT, WILD}
+import balancer.objects.{Player, Scale}
 
 object Grid {
   val PADDER = '='

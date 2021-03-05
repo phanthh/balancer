@@ -1,6 +1,6 @@
-package game
+package balancer
 
-import game.objects._
+import balancer.objects._
 
 import scala.collection.mutable.ArrayBuffer
 

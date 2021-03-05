@@ -1,4 +1,4 @@
-package game.grid
+package balancer.grid
 
 class Coord(val x: Int, val y: Int) {
   def +(other: Coord) = Coord(x+other.x, y+other.y)

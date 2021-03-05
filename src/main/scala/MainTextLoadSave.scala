@@ -1,4 +1,4 @@
-import game.Game
+import balancer.Game
 
 object MainTextLoadSave extends App {
   val game = new Game()

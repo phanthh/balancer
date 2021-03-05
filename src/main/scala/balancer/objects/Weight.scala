@@ -1,6 +1,6 @@
-package game.objects
+package balancer.objects
 
-import game.State
+import balancer.State
 
 class Weight(val stack: Stack, val state: State, var owner: Option[Player] = None)
   extends GameObject with Owner with Mass {

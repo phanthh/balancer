@@ -1,8 +1,8 @@
-package game.objects
+package balancer.objects
 
-import game.State
-import game.gui.MainGUI.randomColor
-import game.objects.Command.placeWeight
+import balancer.State
+import balancer.gui.MainGUI.randomColor
+import balancer.objects.Command.placeWeight
 import scalafx.beans.property.IntegerProperty
 import scalafx.scene.paint.Color
 
@@ -20,10 +20,7 @@ sealed trait Player
   ///
 
   def playerCode: Char = name(0)
-  def score: Int = {
-    propScore.update(state.baseScale.score(this))
-    propScore.value
-  }
+  def score: Int = state.baseScale.score(this)
 
   def roundWon = propRoundWon.value
 

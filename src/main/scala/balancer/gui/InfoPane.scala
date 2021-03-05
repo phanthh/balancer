@@ -1,35 +1,20 @@
-package game.gui
+package balancer.gui
 
 
-import game.Game
-import game.objects.Command.placeWeight
-import game.objects.{Bot, Human, Player}
-import game.gui.MainGUI.{createSpacer, draw, gameLoopLogic}
-import scalafx.beans.property.{IntegerProperty, ObjectProperty, StringProperty}
-import scalafx.event.ActionEvent
+import balancer.objects.Command.placeWeight
+import balancer.objects.Player
+import balancer.gui.MainGUI.{createSpacer, draw, game, gameLoopLogic, state}
+import scalafx.beans.property.StringProperty
 import scalafx.geometry.Pos
-import scalafx.scene.canvas.GraphicsContext
-import scalafx.scene.control.{Alert, Button, ColorPicker, Label, Separator, TextField}
-import scalafx.scene.layout.{AnchorPane, BorderPane, HBox, Priority, VBox}
-import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control._
+import scalafx.scene.layout.{BorderPane, Priority, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
-import scala.util.Random
-
-class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
-  def state = game.state
+class InfoPane extends VBox {
 
   var inputScaleCode: StringProperty = StringProperty("")
   var inputPos: StringProperty = StringProperty("")
-
-  var propRound: IntegerProperty = IntegerProperty(state.currentRound) // IF ROUND CHANGE
-  var propTurnIdx: IntegerProperty = IntegerProperty(state.currentIdx) // IF TURN CHANGE
-
-  def updateProperty() = {
-    propRound.update(state.currentRound)
-    propTurnIdx.update(state.currentIdx)
-  }
 
   alignment = Pos.Center
   fillWidth = true
@@ -37,8 +22,7 @@ class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
   minWidth = 200
   spacing = 10
 
-  val playerBlocks = state.players.map(createPlayerBlock).toList
-
+  //////// UI ELEMENTS THAT CHANGE
   val turnLabel =
     new Label {
       font = new Font("Arial", 30)
@@ -51,6 +35,44 @@ class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
       alignment = Pos.Center
       style = toBackgroundCSS(state.currentTurn.propColor)
       children = turnLabel
+    }
+
+  val weightLeftLabel =
+    new Label(){
+      font = new Font("Arial", 18)
+      text = "Weights Left: " + state.weightLeftOfRound.toString
+    }
+
+  val roundFooter =
+    new Label {
+      hgrow = Priority.Always
+      font = new Font("Arial", 30)
+      text = "ROUND #" + state.currentRound.toString
+    }
+
+  // UPDATE FUNCTION
+  def updateGUI() = {
+    turnLabel.text = state.currentTurn.name.capitalize
+    turnInfo.style = toBackgroundCSS(state.currentTurn.propColor)
+    weightLeftLabel.text = "Weights Left: " + state.weightLeftOfRound.toString
+    roundFooter.text = "Round #" + state.currentRound.toString
+    state.players.foreach(p => p.propScore.update(p.score))
+  }
+  /////////////////////
+
+  /////// ELEMENTS THAT STATIC
+  val playerBlocks = state.players.map(createPlayerBlock).toList
+
+  val endTurnButton =
+    new Button {
+      text = "END TURN"
+      maxWidth = 200
+      minWidth = 150
+      onAction = _ => {
+        // DISABLE BUTTON WHEN GAME IS OVER
+        if (!(game.over))
+          executeTurn()
+      }
     }
 
   val inputFields = List(
@@ -67,14 +89,8 @@ class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
       maxWidth = 200
       text <==> inputPos
     },
-    endTurnButton(),
+    endTurnButton,
   )
-
-  val weightLeftLabel =
-    new Label(){
-      font = new Font("Arial", 18)
-      text = "Weights Left: " + state.weightLeftOfRound.toString
-    }
 
   val header =
     List(
@@ -98,24 +114,16 @@ class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
       new VBox {
         style = toBackgroundCSS(Color.LightGrey)
         alignment = Pos.Center
-        children =
-          new Label {
-            hgrow = Priority.Always
-            font = new Font("Arial", 30)
-            text <== StringProperty("ROUND #") + propRound.asString()
-          }
+        children = roundFooter
       }
     )
 
+  /// ADDING CHILDREN
   children = header ++ playerBlocks ++ inputFields ++ footer
 
-  // EVENT LISTENER: CHANGE WHEN A TURN COMPLETE
-  propTurnIdx.onChange((obs, o, n) => {
-    turnLabel.text = state.currentTurn.name.capitalize
-    turnInfo.style = toBackgroundCSS(state.currentTurn.propColor)
-    weightLeftLabel.text = "Weights Left: " + state.weightLeftOfRound.toString
-  })
-  //
+  // DONE
+
+  // HELPER FUNCTION
 
   def createPlayerBlock(player: Player) = {
 
@@ -135,11 +143,11 @@ class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
       children = List(
         new Label {
           font = new Font("Arial", 14)
-          text <== StringProperty("Score: ") + player.propScore.asString()
+          text <== player.propScore.asString()
         },
         new Label {
           font = new Font("Arial", 14)
-          text <== StringProperty("Round won: ") + player.propRoundWon.asString()
+          text <== player.propRoundWon.asString()
         }
       )
     }
@@ -151,7 +159,7 @@ class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
         block.style = toBackgroundCSS(newColor)
         player.propColor = newColor
         turnInfo.style = toBackgroundCSS(state.currentTurn.propColor)
-        draw(gc)
+        draw()
       }
     }
     block.left = new VBox {
@@ -172,18 +180,7 @@ class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
   def toBaseCSS(color: Color) =
     s"-fx-base: rgb(${color.getRed * 255}, ${color.getGreen * 255}, ${color.getBlue * 255});"
 
-  def endTurnButton() =
-    new Button {
-      text = "END TURN"
-      maxWidth = 200
-      minWidth = 150
-      onAction = _ => {
-        // DISABLE BUTTON WHEN GAME IS OVER
-        if (!(game.over))
-          executeTurn()
-      }
-    }
-
+  // FOR FORM BASED INPUT
   def executeTurn(): Unit = {
     // TODO: EXCEPTION HANDLING
     state.undoStack.append(
@@ -194,7 +191,7 @@ class InfoPane(val gc: GraphicsContext, val game: Game) extends VBox {
       ).execute()
     )
     gameLoopLogic()
-    updateProperty() // FORCE GUI UPDATE
-    draw(gc)
+    updateGUI() // FORCE GUI UPDATE
+    draw()
   }
 }

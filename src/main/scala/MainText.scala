@@ -1,6 +1,6 @@
-import game.Game
-import game.objects.Command.placeWeight
-import game.objects.{Bot, Human, Scale}
+import balancer.Game
+import balancer.objects.Command.placeWeight
+import balancer.objects.{Bot, Human, Scale}
 
 import java.io.IOException
 import scala.io.StdIn.{readChar, readInt, readLine}
@@ -91,7 +91,7 @@ object MainText extends App {
     state.currentRound += 1
   }
   println("================================================")
-  println(s"The winner of the game is: ${game.finalWinner}")
+  println(s"The winner of the balancer is: ${game.finalWinner}")
   println("================================================")
   println("========== !!!! Congratulation !!!! ============")
   println("================================================")

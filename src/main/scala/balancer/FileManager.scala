@@ -1,6 +1,6 @@
-package game
+package balancer
 
-import game.objects.{Bot, Human, Scale, Stack}
+import balancer.objects.{Bot, Human, Scale, Stack}
 
 import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter}
 import scala.collection.mutable.{Buffer, Map}

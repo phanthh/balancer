@@ -1,18 +1,18 @@
-package game.gui
+package balancer.gui
 
-import game.Game
-import game.grid.Grid._
-import game.gui.Constants.{CellHeight, CellWidth, Height, Width}
-import game.objects.{Bot, Human, Player}
+import balancer.Game
+import balancer.grid.Grid.{EMPTY, FULCRUM, GROUND, LEFT, PADDER, RIGHT, WILD}
+import balancer.gui.Constants.{CellHeight, CellWidth, Height, Width}
+import balancer.objects.{Bot, Human, Player}
 import scalafx.application.JFXApp
 import scalafx.geometry.VPos
 import scalafx.scene.Scene
 import scalafx.scene.canvas.GraphicsContext
-import scalafx.scene.control.Alert
+import scalafx.scene.control.{Alert, ButtonType}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.layout.{BorderPane, Priority, Region, VBox}
 import scalafx.scene.paint.Color
-import scalafx.scene.paint.Color._
+import scalafx.scene.paint.Color.{Brown, Gray, Grey, LightGrey, White}
 import scalafx.scene.text.{Font, TextAlignment}
 
 import scala.util.Random
@@ -26,13 +26,21 @@ object Constants {
 }
 
 object MainGUI extends JFXApp {
-  val game = new Game()
-  game.fileManager.loadGame("loadfile.txt")
+  lazy val game = new Game()
 
+  // Scene
+  val topMenuBar = new TopMenuBar
+  topMenuBar.load("loadfile.txt")
+
+  val midSplitPane = new MidSplitPane
+
+  ///
   def state = game.state
   def grid = game.grid
-  val midSplitPane = new MidSplitPlane(game)
-  val topMenuBar = new TopMenuBar
+  def gc = midSplitPane.gc
+  setup()
+  draw()
+  ///
 
   stage = new JFXApp.PrimaryStage {
     title = "Balancer !"
@@ -46,7 +54,8 @@ object MainGUI extends JFXApp {
     }
   }
 
-  def setup(gc: GraphicsContext): Unit = {
+
+  def setup(): Unit = {
     grid.update()
     gc.setTextAlign(TextAlignment.Center)
     gc.setTextBaseline(VPos.Center)
@@ -56,8 +65,8 @@ object MainGUI extends JFXApp {
     gc.fillRect(0, 0, gc.canvas.getWidth, gc.canvas.getHeight)
   }
 
-  def draw(gc: GraphicsContext): Unit = {
-    println("RENDERED") // TODO
+  def draw(): Unit = {
+    println("RENDERING") // TODO
     grid.update()
     gc.setFill(White)
     gc.canvas.setWidth(CellWidth * grid.width)
@@ -112,7 +121,7 @@ object MainGUI extends JFXApp {
         game.over = true
         (new Alert(AlertType.Information) {
           title = "Game Over !!"
-          headerText = s"The winner of the game is: ${game.finalWinner}"
+          headerText = s"The winner of the balancer is: ${game.finalWinner}"
           contentText =
             "================================================\n" +
               "========== !!!! Congratulation !!!! ============\n" +
