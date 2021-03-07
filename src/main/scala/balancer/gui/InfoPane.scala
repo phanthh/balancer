@@ -1,10 +1,12 @@
 package balancer.gui
 
-
 import balancer.Game
-import balancer.gui.MainGUI.{createVSpacer, draw, gameLoopLogic}
+import balancer.gui.MainGUI.{draw, endTurn}
 import balancer.objects.Command.placeWeight
 import balancer.objects.Player
+import balancer.utils.Helpers.{createVSpacer, toBackgroundCSS}
+import balancer.utils.Prompts.invalidDialog
+import balancer.utils.{InvalidInput, OccupiedPosition}
 import scalafx.beans.property.StringProperty
 import scalafx.geometry.Pos
 import scalafx.scene.control._
@@ -13,11 +15,12 @@ import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
 class InfoPane(private val game: Game) extends VBox {
-  def state = game.state
+  // For ease of reference
+  private def state = game.state
 
-  // PROPERTY LINKER FOR INPUT FIELDS
-  var inputScaleCode: StringProperty = StringProperty("")
-  var inputPos: StringProperty = StringProperty("")
+  // Binding points for form input
+  private var inputScaleCode: StringProperty = StringProperty("")
+  private var inputPos: StringProperty = StringProperty("")
 
   alignment = Pos.Center
   fillWidth = true
@@ -25,28 +28,28 @@ class InfoPane(private val game: Game) extends VBox {
   minWidth = 200
   spacing = 10
 
-  //////// UI ELEMENTS THAT CHANGE
-  val currentTurnLabel =
+  // UI elements that change
+  private val currentTurnLabel =
     new Label {
       font = new Font("Arial", 30)
       textFill = Color.White
       text = state.currentTurn.name.capitalize
     }
 
-  val currentTurnBox =
+  private val currentTurnBox =
     new VBox {
       alignment = Pos.Center
       style = toBackgroundCSS(state.currentTurn.propColor)
       children = currentTurnLabel
     }
 
-  val numberOfWeightLeftLabel =
+  private val numberOfWeightLeftLabel =
     new Label() {
       font = new Font("Arial", 18)
       text = "Weights Left: " + state.weightLeftOfRound.toString
     }
 
-  val currentRoundLabel =
+  private val currentRoundLabel =
     new Label {
       hgrow = Priority.Always
       font = new Font("Arial", 30)
@@ -54,25 +57,26 @@ class InfoPane(private val game: Game) extends VBox {
     }
 
 
-  val botDifficultySlider =
+  private val botDifficultySlider =
     new VBox {
       val difficultyLabel = new Label {
-        text = "Bot Difficulty: " + game.botDiffiiculty.toString
+        text = "Bot Difficulty: " + game.botDifficulty.toString
       }
       val difficultySlider = new ScrollBar {
         max = 1.0
         min = 0.0
         unitIncrement = 0.1
+        value = game.botDifficulty
         value.onChange((_, _, _) => {
-          game.botDiffiiculty = value()
-          difficultyLabel.text = "Bot Difficulty: " + ((game.botDiffiiculty * 10).toInt/ 10.0).toString
+          game.botDifficulty = value()
+          difficultyLabel.text = "Bot Difficulty: " + ((game.botDifficulty * 10).toInt / 10.0).toString
         })
       }
       alignment = Pos.Center
       children = List(difficultyLabel, difficultySlider)
     }
 
-  val undoRedoButtons =
+  private val undoRedoButtons =
     new HBox {
       alignment = Pos.Center
       spacing = 20
@@ -81,7 +85,7 @@ class InfoPane(private val game: Game) extends VBox {
           text = "Undo"
           onAction = _ => {
             state.undo()
-            updateGUI()
+            updateContent()
             draw()
           }
         },
@@ -89,27 +93,28 @@ class InfoPane(private val game: Game) extends VBox {
           text = "Redo"
           onAction = _ => {
             state.redo()
-            updateGUI()
+            updateContent()
             draw()
           }
         },
       )
     }
 
-  val endTurnButton =
+  private val endTurnButton =
     new Button {
       text = "END TURN"
       maxWidth = 200
       minWidth = 150
       onAction = _ => {
-        // DISABLE BUTTON WHEN GAME IS OVER
-        if (!(game.over))
-          executeTurn()
+        // Disable button when game is over
+        if (!(game.over)) executeTurn()
       }
     }
 
-  // UPDATE FUNCTION: UPDATE ALL ELEMENTS THAT CHANGES AND THEIR LOGICS
-  def updateGUI() = {
+  /*
+     Update all elements that need to be updated (above)
+   */
+  def updateContent() = {
     currentTurnLabel.text = state.currentTurn.name.capitalize
     currentTurnBox.style = toBackgroundCSS(state.currentTurn.propColor)
     numberOfWeightLeftLabel.text = "Weights Left: " + state.weightLeftOfRound.toString
@@ -117,10 +122,8 @@ class InfoPane(private val game: Game) extends VBox {
     state.players.foreach(p => p.propScore.update(p.score))
   }
 
-  /////////////////////
-
-  /////// ELEMENTS THAT STATIC
-  val allPlayersInfo = List(
+  // Static UI elements
+  private val allPlayersInfo = List(
     new VBox {
       style = toBackgroundCSS(Color.LightGrey)
       alignment = Pos.Center
@@ -128,7 +131,7 @@ class InfoPane(private val game: Game) extends VBox {
     }
   )
 
-  val inputFields = List(
+  private val inputFields = List(
     createVSpacer(),
     new Separator,
     botDifficultySlider,
@@ -149,7 +152,7 @@ class InfoPane(private val game: Game) extends VBox {
     endTurnButton,
   )
 
-  val header =
+  private val header =
     List(
       new VBox {
         style = toBackgroundCSS(Color.LightGrey)
@@ -165,7 +168,7 @@ class InfoPane(private val game: Game) extends VBox {
       new Separator
     )
 
-  val footer =
+  private val footer =
     List(
       new Separator,
       new VBox {
@@ -175,12 +178,10 @@ class InfoPane(private val game: Game) extends VBox {
       }
     )
 
-  /// ADDING CHILDREN
   children = header ++ allPlayersInfo ++ inputFields ++ footer
 
-  // HELPER FUNCTION
-
-  def createPlayerInfoBlock(player: Player) = {
+  // Helpers function
+  private def createPlayerInfoBlock(player: Player) = {
 
     val parentBlock = new BorderPane {
       style = toBackgroundCSS(player.propColor)
@@ -198,11 +199,11 @@ class InfoPane(private val game: Game) extends VBox {
       children = List(
         new Label {
           font = new Font("Arial", 14)
-          text <== player.propScore.asString()
+          text <== StringProperty("Score: ") + player.propScore.asString()
         },
         new Label {
           font = new Font("Arial", 14)
-          text <== player.propRoundWon.asString()
+          text <== StringProperty("Won: ") + player.propRoundWon.asString()
         }
       )
     }
@@ -217,6 +218,7 @@ class InfoPane(private val game: Game) extends VBox {
         draw()
       }
     }
+
     parentBlock.left = new VBox {
       alignment = Pos.Center
       minWidth = 80
@@ -229,24 +231,35 @@ class InfoPane(private val game: Game) extends VBox {
     parentBlock
   }
 
-  def toBackgroundCSS(color: Color) =
-    s"-fx-background-color: rgb(${color.getRed * 255}, ${color.getGreen * 255}, ${color.getBlue * 255});"
+  // Execute when end turn button is clicked
+  private def executeTurn(): Unit = {
+    try {
+      val pos = inputPos.value.toIntOption match {
+        case Some(pos: Int) =>
+          if(pos == 0) throw new InvalidInput("Position cannot be 0")
+          pos
+        case None => throw new InvalidInput("Invalid Position")
+      }
 
-  def toBaseCSS(color: Color) =
-    s"-fx-base: rgb(${color.getRed * 255}, ${color.getGreen * 255}, ${color.getBlue * 255});"
-
-  // FOR FORM BASED INPUT
-  def executeTurn(): Unit = {
-    // TODO: EXCEPTION HANDLING
-    state.execute(
-      placeWeight(state.currentTurn,
-        inputPos.value.toInt,
-        state.scaleWithCode(inputScaleCode.value(0)).get,
-        state
-      )
-    )
-    gameLoopLogic()
-    updateGUI() // FORCE GUI UPDATE
-    draw()
+      val scale = inputScaleCode.value.headOption match {
+        case Some(code: Char) =>
+          state.scaleWithCode(code).getOrElse(throw new InvalidInput(
+            s"Invalid scale code must be: ${state.scales.map(_.code).mkString(",")}"
+          ))
+        case None =>
+          throw new InvalidInput("Invalid scale code")
+      }
+      state.execute(placeWeight(state.currentTurn, pos, scale, state))
+      endTurn()
+      updateContent()
+      draw()
+    } catch {
+      case e: ArrayIndexOutOfBoundsException =>
+        invalidDialog(s"Position is off the scale")
+      case e: OccupiedPosition =>
+        invalidDialog("Position has already been occupied")
+      case e: InvalidInput =>
+        invalidDialog(e.getMessage)
+    }
   }
 }

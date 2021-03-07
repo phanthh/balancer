@@ -1,7 +1,7 @@
-package balancer.gui
+package balancer.utils
 
 import balancer.gui.MainGUI.stage
-import scalafx.Includes._
+import scalafx.Includes.observableList2ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, ButtonType, TextInputDialog}
 import scalafx.stage.FileChooser
@@ -9,7 +9,7 @@ import scalafx.stage.FileChooser.ExtensionFilter
 
 import java.io.File
 
-object PromptGUI {
+object Prompts {
 
   def uWannaSaveDialog(reason: String, yes: () => Unit, no: () => Unit) = {
     val yesButton = new ButtonType("Yes")
@@ -71,5 +71,14 @@ object PromptGUI {
       contentText = "Please enter the name:"
     }
     textInputDialog.showAndWait()
+  }
+
+  def invalidDialog(reason: String): Unit = {
+    val alert = new Alert(AlertType.Warning){
+      initOwner(stage)
+      title = "Invalid Input"
+      headerText = reason
+    }
+    alert.showAndWait()
   }
 }

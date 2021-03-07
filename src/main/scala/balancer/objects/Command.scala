@@ -23,7 +23,7 @@ case class PlaceWeightCommand(val player: Player, val pos: Int, val parentScale:
     parentScale(pos) match {
       case Some(scale: Scale) => throw new InvalidPosition(pos.toString)
       case _ =>
-        affectedStack = state.buildWeight(pos, parentScale, Some(player))._2
+        affectedStack = state.buildWeight(pos, parentScale, Some(player))
         undoOwnerList = affectedStack.updateOwner()
     }
     this

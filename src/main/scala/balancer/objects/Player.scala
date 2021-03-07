@@ -1,7 +1,7 @@
 package balancer.objects
 
-import balancer.{Game, State}
-import balancer.gui.MainGUI.randomColor
+import balancer.State
+import balancer.utils.Helpers.randomColor
 import balancer.objects.Command.placeWeight
 import scalafx.beans.property.IntegerProperty
 import scalafx.scene.paint.Color
@@ -13,11 +13,10 @@ sealed trait Player
 
   val name: String
 
-  // BINDING POINT FOR GUI PROPS
+  // For GUI
   var propScore: IntegerProperty = IntegerProperty(0)
   var propRoundWon: IntegerProperty = IntegerProperty(0)
   var propColor: Color = randomColor()
-  ///
 
   def playerCode: Char = name(0)
   def score: Int = state.baseScale.score(this)

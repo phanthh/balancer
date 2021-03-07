@@ -1,17 +1,16 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, midSplitPane, initScene}
+import MainGUI.{createScene, draw}
+import balancer.utils.Prompts
 import scalafx.scene.control._
 
-class TopMenuBar(private val game: Game) extends MenuBar {
-  def state = game.state
+class TopMenuBar(private val friend: MidSplitPane, private val game: Game) extends MenuBar {
+  private def state = game.state
 
-  def defaultFile = game.fileManager.defaultFile
+  private def fm = game.fileManager
 
-  def save(filePath: String) = game.fileManager.saveGame(filePath)
-
-  def load(filePath: String) = game.fileManager.loadGame(filePath)
+  private def updateInfoPane() = friend.updateInfoPane()
 
   menus = List(
     new Menu("File") {
@@ -19,18 +18,18 @@ class TopMenuBar(private val game: Game) extends MenuBar {
         new MenuItem("New") {
           onAction = _ => {
             game.reset()
-            load(defaultFile)
-            initScene()
+            fm.loadDefault()
+            createScene()
           }
 
         },
         new MenuItem("Open...") {
           onAction = _ => {
-            PromptGUI.openDialog(
+            Prompts.openDialog(
               success = (f) => {
                 game.reset()
-                load(f.getAbsolutePath)
-                initScene()
+                fm.loadGame(f.getAbsolutePath)
+                createScene()
               },
               failed = () => {}
             )
@@ -39,9 +38,9 @@ class TopMenuBar(private val game: Game) extends MenuBar {
         new SeparatorMenuItem(),
         new MenuItem("Save...") {
           onAction = _ =>
-            PromptGUI.saveDialog(
+            Prompts.saveDialog(
               success = (f) => {
-                save(f.getAbsolutePath)
+                fm.saveGame(f.getAbsolutePath)
               },
               failed = () => {}
             )
@@ -49,12 +48,12 @@ class TopMenuBar(private val game: Game) extends MenuBar {
         new SeparatorMenuItem(),
         new MenuItem("Exit") {
           onAction = _ =>
-            PromptGUI.uWannaSaveDialog(
+            Prompts.uWannaSaveDialog(
               reason = "Exiting Confirmation",
               yes = () => {
-                PromptGUI.saveDialog(
+                Prompts.saveDialog(
                   success = (f) => {
-                    save(f.getAbsolutePath)
+                    fm.saveGame(f.getAbsolutePath)
                   },
                   failed = () => {}
                 )
@@ -69,20 +68,20 @@ class TopMenuBar(private val game: Game) extends MenuBar {
       items = List(
         new MenuItem("Add Human") {
           onAction = _ =>
-            PromptGUI.askNameDialog("Adding Human Player") match {
+            Prompts.askNameDialog("Adding Human Player") match {
               case Some(name) => {
                 state.buildHuman(name)
-                initScene()
+                createScene()
               }
               case None =>
             }
         },
         new MenuItem("Add Bot") {
           onAction = _ =>
-            PromptGUI.askNameDialog("Adding Bot Player") match {
+            Prompts.askNameDialog("Adding Bot Player") match {
               case Some(name) => {
                 state.buildBot(name)
-                initScene()
+                createScene()
               }
               case None =>
             }
@@ -91,19 +90,18 @@ class TopMenuBar(private val game: Game) extends MenuBar {
         new MenuItem("Undo") {
           onAction = _ => {
             state.undo()
-            midSplitPane.infoPane.updateGUI()
+            updateInfoPane()
             draw()
           }
         },
         new MenuItem("Redo") {
           onAction = _ => {
             state.redo()
-            midSplitPane.infoPane.updateGUI()
+            updateInfoPane()
             draw()
           }
         },
       )
     },
   )
-
 }

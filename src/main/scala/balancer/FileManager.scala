@@ -1,56 +1,71 @@
 package balancer
 
-import balancer.objects.{Bot, Human, Scale, Stack}
+import balancer.objects.{Scale, Stack}
+import balancer.utils.Constants.{DefaultFile, Version}
+import balancer.utils.ParseError
 
 import java.io.{BufferedReader, BufferedWriter, FileNotFoundException, FileReader, FileWriter}
 import scala.collection.mutable.{Buffer, Map}
 
-final case class ParseError(private val message: String = "",
-                            private val cause: Throwable = None.orNull)
-  extends Exception(message, cause)
 
 class FileManager(private val game: Game) {
-  val defaultFile = "defaultfile.txt" // HARCCODE
+  private val blocks = Array[String]("meta", "scale", "setting")
   private def state = game.state
-  var saved = false
-  var savedFilePath = ""
 
-  def loadDefault() = loadGame(defaultFile)
+  /*
+    Load default map and settings
+   */
+  def loadDefault() = loadGame(DefaultFile)
 
+  /*
+    Save the game state into file
+   */
   def saveGame(filePath: String): Unit = {
-    saved = true
-    savedFilePath = filePath
+    val lw = try {
+      new BufferedWriter(new FileWriter(filePath))
+    } catch {
+      case e: FileNotFoundException =>
+        println(s"'$filePath': File not found"); return
+    }
 
-    val lw = new BufferedWriter(new FileWriter(filePath))
-
-    lw.write("BALANCER 1.3 SAVE FILE\n")
+    lw.write(s"BALANCER $Version SAVE FILE\n")
 
     lw.write("# Setting\n")
     lw.write("WeightPerRound: " + game.weightsPerRound + "\n")
     lw.write("NumberOfRound: " + game.numRounds + "\n")
-
-    val humans = state.players.flatMap { case p: Human => Some(p) case _ => None }
-    val bots = state.players.flatMap { case p: Bot => Some(p) case _ => None }
-
+    lw.write("BotDifficulty: " + game.botDifficulty + "\n")
 
     lw.write("# Meta\n")
-    if(humans.nonEmpty) lw.write("Human: " + humans.map(_.name).mkString(",") + "\n")
-    if(bots.nonEmpty) lw.write("Bot: " + bots.map(_.name).mkString(",") + "\n")
+
+    lw.write("Human: ")
+    if (state.humans.nonEmpty) {
+      lw.write(state.humans.map(_.name).mkString(","))
+    }
+    lw.write("\n")
+
+    lw.write("Bot: ")
+    if (state.bots.nonEmpty) {
+      lw.write(state.bots.map(_.name).mkString(",") + "\n")
+    }
     lw.write("Round: " + state.currentRound + "\n")
     lw.write("Turn: " + state.players(state.currentTurnIdx).name + "\n")
 
     lw.write("# Scale\n")
-
     for (scale <- state.scales.sortBy(_.code)) {
-      if (scale == state.baseScale)
+      if (scale == state.baseScale) {
         lw.write("_,0")
-      else
+      } else {
         lw.write(s"${scale.parentScale.code},${scale.pos}")
+      }
+
       lw.write(s",${scale.radius},${scale.code} : ")
+
       val buf = Buffer[String]()
       scale.boardVector.flatten.foreach {
         case stack: Stack =>
-          buf.append(stack.weightsVector.flatMap(_.owner).map(_.playerCode).prepended(stack.pos.toString).mkString(","))
+          buf.append(stack.weightsVector.flatMap(_.owner).map(_.playerCode)
+             .prepended(stack.pos.toString)
+             .mkString(","))
         case scale: Scale =>
       }
       lw.write(buf.mkString(" | "))
@@ -62,66 +77,68 @@ class FileManager(private val game: Game) {
   }
 
   def loadGame(filePath: String): Unit = {
-    saved = true
-    savedFilePath = filePath
-
-    val fileReader = try {
-      new FileReader(filePath)
+    val lr = try {
+      new BufferedReader(new FileReader(filePath))
     } catch {
       case e: FileNotFoundException =>
         println(s"'$filePath': File not found"); return
     }
+    // Begin parsing
 
-    val lineReader = new BufferedReader(fileReader)
-
-    // BEGIN PARSING
-
-    // KEEP A BACKUP OF GAME SETTING
-    var numRoundsBak: Int = game.numRounds
-    var weightPerRoundBak: Int = game.weightsPerRound
-    var baseScaleRadiusBak: Int = game.baseScaleRadius
+    // Keep a backup of current state (in case parsing gone wrong)
+    var baseScaleRadiusBak = game.baseScaleRadius
 
     try {
-      var line = lineReader.readLine().trim.toLowerCase
+      var line = lr.readLine().trim.toLowerCase
 
       if (!((line.startsWith("balancer")) && (line.endsWith("save file")))) {
-        throw new ParseError("Unknown file type / identifiers ")
+        throw new ParseError("Unknown file type or wrong identifiers ")
       }
 
-      // SETTING DATA
-      var weightPerRound: Int = 0
-      var numRounds: Int = 0
+      // Initializing defaults
+      // Setting data
+      var weightPerRound = game.weightsPerRound
+      var numRounds = game.weightsPerRound
+      var botDifficulty = game.botDifficulty
 
-      // META DATA
+      // Meta data
       var round: Int = 0
       var turn: String = ""
       var humanNames = Array[String]()
       var botNames = Array[String]()
 
+      // State to parse from file
       var newState: State = null
 
-      // BLOCKS TO PARSE
-      val blocksToProcess = Map[String, Boolean]("meta" -> false, "scale" -> false, "setting" -> false)
+      // Blocks to parse
+      val blocksToProcess = Map.from(blocks.map((_,false)))
       var block = ""
 
       do {
-        line = lineReader.readLine().trim
+        line = lr.readLine().trim
         if (line.nonEmpty) {
-          if (line == "END")
+          if (line == "END") {
             line = null
-          else if (line(0) == '#') {
+          } else if (line(0) == '#') {
             block = line.substring(1).trim.toLowerCase
-            if (blocksToProcess.contains(block) && !blocksToProcess(block))
+            if (blocks.contains(block) && !blocksToProcess(block)) {
               blocksToProcess(block) = true
-          } else if (blocksToProcess.contains(block)) {
-            val trimmedLine = line.split(':').map(_.trim)
-            if (trimmedLine.length > 2 || trimmedLine.length == 0) {
-              throw new ParseError(line + "\n=> Must be 'key:value' pair")
             }
-            var key: String = trimmedLine(0).toLowerCase
-            var value: String = if (trimmedLine.length == 1) "" else trimmedLine(1)
+          } else if (blocks.contains(block)) {
+            // Ex:        WeightPerRound: 20
+            val keyValuePair = line.split(':').map(_.trim)
+
+            if (keyValuePair.length != 1 && keyValuePair.length != 2) {
+              throw new ParseError(line + "\n=> Must be 'key:value' pair or 'key:  '")
+            }
+
+            // Extract
+            var key = keyValuePair(0).toLowerCase
+            var value = if (keyValuePair.length == 1) "" else keyValuePair(1)
+
+            // Parse the block
             block match {
-              case "setting" =>
+              case "setting" if(value != "") =>
                 key match {
                   case "weightperround" =>
                     weightPerRound = value.toIntOption.getOrElse(
@@ -129,18 +146,24 @@ class FileManager(private val game: Game) {
                   case "numberofround" =>
                     numRounds = value.toIntOption.getOrElse(
                       throw new ParseError(line + "\n=> Number of Round must be an integer"))
+                  case "botdifficulty" =>
+                    botDifficulty = value.toDoubleOption.getOrElse(
+                      throw new ParseError(line + "\n=> Bot Difficulty must be between 0 and 1")
+                    )
+                    if(botDifficulty < 0 || botDifficulty > 1){
+                      throw new ParseError(line + "\n=> Bot Difficulty must be between 0 and 1")
+                    }
                   case _ =>
                 }
-              case "meta" =>
+              case "meta" if(value != "") =>
                 key match {
                   case "human" =>
-                    humanNames = if(value != "") value.split(",").map(_.trim) else Array.empty[String]
+                    humanNames = value.split(",").map(_.trim)
                   case "bot" =>
-                    botNames = if(value != "") value.split(",").map(_.trim) else Array.empty[String]
+                    botNames =  value.split(",").map(_.trim)
                   case "round" =>
-                    round = if(value != "")
-                      value.toIntOption.getOrElse(throw new ParseError(line + "\n=> Round number must be an integer"))
-                    else 0
+                    round = value.toIntOption.getOrElse(
+                      throw new ParseError(line + "\n=> Round number must be an integer"))
                   case "turn" =>
                     turn = value
                   case _ =>
@@ -150,6 +173,7 @@ class FileManager(private val game: Game) {
                 if (splittedKey.length != 4) {
                   throw new ParseError(line + "\n=> Must be 4 characters: 'parentScaleCode, positionOnParentScale, radius, code'")
                 }
+                // Extract
                 var parentScaleCode = splittedKey(0)(0)
                 val posOnParentScale = splittedKey(1).toIntOption.getOrElse(
                   throw new ParseError(line + "\n=> Position must be an interger")
@@ -158,32 +182,30 @@ class FileManager(private val game: Game) {
                   throw new ParseError(line + "\n=> Scale radius must be an interger")
                 )
                 val scaleCode = splittedKey(3)(0)
-                val splittedValue = if (value != "") value.split('|').map(_.trim) else Array.empty[String]
+                val splittedValue = if (value != "") value.split('|').map(_.trim) else Array[String]()
 
-                //// HELPER FUNCTION
+                // Helper function to parse the stacks of the scale
                 def parseStacks(parentScale: Scale) = {
                   for (stackString <- splittedValue) {
                     val stackStringSplitted = stackString.split(',').map(_.trim)
+
                     val pos = stackStringSplitted(0).toIntOption.getOrElse(
                       throw new ParseError(line + "\n=> Stack position must be an integer")
                     )
 
                     stackStringSplitted.drop(1).map(_ (0)).foreach(w_code => {
-                      val refs = newState.buildWeight(pos, parentScale, newState.players.find(_.playerCode == w_code))
+                      newState.buildWeight(pos, parentScale, newState.players.find(_.playerCode == w_code))
                     })
                   }
                 }
 
-                // BASE SCALE (PARENT SCALE IS JUST "_")
+                // Base scale (parent scale is just "_")
                 if (parentScaleCode == '_') {
-                  // APPLY SETTING
-                  game.numRounds = numRounds
-                  game.weightsPerRound = weightPerRound
+                  // Apply setting
                   game.baseScaleRadius = scaleRadius
 
                   newState = new State(game)
 
-                  // ADDING PLAYERS
                   humanNames.foreach(newState.buildHuman)
                   botNames.foreach(newState.buildBot)
 
@@ -193,7 +215,8 @@ class FileManager(private val game: Game) {
                     case Some(parentScale: Scale) =>
                       val newScale = newState.buildScale(posOnParentScale, scaleRadius, parentScale, Some(scaleCode))
                       parseStacks(newScale)
-                    case None => throw new ParseError(line + "\n=> Invalid parent scale code")
+                    case None =>
+                      throw new ParseError(line + "\n=> Invalid parent scale code")
                   }
                 }
               case _ =>
@@ -202,30 +225,31 @@ class FileManager(private val game: Game) {
         }
       } while (line != null)
 
-      lineReader.close()
+      lr.close()
 
       if (blocksToProcess.valuesIterator.contains(false)) {
         throw new ParseError("Missing blocks entry in file: " + blocksToProcess.filter(!_._2).keys.mkString(","))
       }
 
-      // END PARSING
+      // End parsing
       println(s"Successfully load '$filePath'")
 
-      // APPLY CURRENT ROUND AND TURN
       newState.currentRound = round
-      newState.currentTurnIdx = if(turn == "") 0 else newState.players.indexWhere(_.name == turn)
+      newState.currentTurnIdx = if (turn == "") 0 else newState.players.indexWhere(_.name == turn)
+      game.botDifficulty = botDifficulty
+      game.weightsPerRound = weightPerRound
+      game.numRounds = numRounds
 
-      // FINALLY UPDATE STATE
+      // Finally, update state
       game.state = newState
 
     } catch {
       case e: ParseError =>
         println(e.getMessage)
-        // RESTORE WHEN FAILED
-        game.numRounds = numRoundsBak
-        game.weightsPerRound = weightPerRoundBak
+        // Restore when failed
         game.baseScaleRadius = baseScaleRadiusBak
     }
 
   }
 }
+
