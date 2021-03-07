@@ -8,7 +8,7 @@ import balancer.utils.Helpers.{createVSpacer, toBackgroundCSS}
 import balancer.utils.Prompts.invalidDialog
 import balancer.utils.{InvalidInput, OccupiedPosition}
 import scalafx.beans.property.StringProperty
-import scalafx.geometry.Pos
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
 import scalafx.scene.layout.{BorderPane, HBox, Priority, VBox}
 import scalafx.scene.paint.Color
@@ -111,6 +111,13 @@ class InfoPane(private val game: Game) extends VBox {
       }
     }
 
+  private val allPlayersInfo =
+    new VBox {
+      style = toBackgroundCSS(Color.LightGrey)
+      alignment = Pos.Center
+      children = state.players.map(createPlayerInfoBlock).toList
+    }
+
   /*
      Update all elements that need to be updated (above)
    */
@@ -122,14 +129,10 @@ class InfoPane(private val game: Game) extends VBox {
     state.players.foreach(p => p.propScore.update(p.score))
   }
 
+  def updatePlayerList() = {
+    allPlayersInfo.children = state.players.map(createPlayerInfoBlock).toList
+  }
   // Static UI elements
-  private val allPlayersInfo = List(
-    new VBox {
-      style = toBackgroundCSS(Color.LightGrey)
-      alignment = Pos.Center
-      children = state.players.map(createPlayerInfoBlock).toList
-    }
-  )
 
   private val inputFields = List(
     createVSpacer(),
@@ -178,11 +181,10 @@ class InfoPane(private val game: Game) extends VBox {
       }
     )
 
-  children = header ++ allPlayersInfo ++ inputFields ++ footer
+  children = header ++ List(allPlayersInfo) ++ inputFields ++ footer
 
   // Helpers function
-  private def createPlayerInfoBlock(player: Player) = {
-
+  private def createPlayerInfoBlock(player: Player): BorderPane = {
     val parentBlock = new BorderPane {
       style = toBackgroundCSS(player.propColor)
     }
@@ -219,6 +221,19 @@ class InfoPane(private val game: Game) extends VBox {
       }
     }
 
+    val deleteButton = new VBox {
+      alignment = Pos.Center
+      padding = Insets(10,10,10,10)
+      children = new Button {
+        text = "X"
+        onAction = _ => {
+          state.removePlayer(player)
+          updatePlayerList()
+          draw()
+        }
+      }
+    }
+
     parentBlock.left = new VBox {
       alignment = Pos.Center
       minWidth = 80
@@ -227,7 +242,8 @@ class InfoPane(private val game: Game) extends VBox {
         colorPicker
       )
     }
-    parentBlock.right = playerStats
+    parentBlock.center = playerStats
+    parentBlock.right = deleteButton
     parentBlock
   }
 

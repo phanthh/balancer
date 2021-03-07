@@ -82,7 +82,18 @@ class State(val game: Game) {
 
   def scales = _scales(baseScale)
 
-  // UNDO PLAYER MOVE
+  def removePlayer(player: Player) = {
+    for(scale <- scales){
+      for(stack <- scale.stacksVector){
+        stack.filterOut(player)
+      }
+    }
+    players.remove(players.indexOf(player))
+  }
+
+
+
+  // Undo player move
   private val undoStack = scala.collection.mutable.Stack[Command]()
   private val redoStack = scala.collection.mutable.Stack[Command]()
 

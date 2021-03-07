@@ -157,6 +157,9 @@ case class Stack(val parentScale: Scale, val pos: Int, protected val state: Stat
     last
   }
   def append(it: Weight) = stack.append(it)
+  def filterOut(player: Player) = {
+    stack = stack.filterNot(_.owner == Some(player))
+  }
 
   // RENDERING
   override def height = stack.length
