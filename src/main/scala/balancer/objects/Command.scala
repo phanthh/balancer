@@ -16,26 +16,25 @@ object Command {
 case class PlaceWeightCommand(val player: Player, val pos: Int, val parentScale: Scale, val state: State)
   extends Command with GameObject {
 
-  private var undoStack: Stack = _
+  private var affectedStack: Stack = _
   private var undoOwnerList: Array[Option[Player]] = _
 
   override def execute() = {
     parentScale(pos) match {
       case Some(scale: Scale) => throw new InvalidPosition(pos.toString)
       case _ =>
-        undoStack = state.buildWeight(pos, parentScale, Some(player))._2
-        undoOwnerList = undoStack.updateOwner()
+        affectedStack = state.buildWeight(pos, parentScale, Some(player))._2
+        undoOwnerList = affectedStack.updateOwner()
     }
-//    state.update() // TODO: SCALE DISAPPEAR WHEN FLIPPED
     this
   }
 
   override def undo() = {
-    undoStack.pop()
-    if(undoStack.isEmpty)
+    affectedStack.pop()
+    if(affectedStack.isEmpty)
       parentScale.remove(pos)
     else
-      undoStack.zipWithIndex.foreach(p => p._1.owner = undoOwnerList(p._2)) // Restore
+      affectedStack.zipWithIndex.foreach(p => p._1.owner = undoOwnerList(p._2)) // Restore
     this
   }
 }

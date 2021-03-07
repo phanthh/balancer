@@ -52,14 +52,19 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
 
   override def owner = {
     val top2 = state.players.map(p => (p, count(p))).sortBy(_._2).takeRight(2)
-    if(top2(1)._2 - top2(0)._2 > radius) Some(top2(1)._1) else None
+    if(top2.length == 1)
+      None
+    else if(top2(1)._2 - top2(0)._2 > radius)
+      Some(top2(1)._1)
+    else
+      None
   }
 
   def leftTorque = {
     var torque = 0
     for(pos <- -radius to -1) {
       board(pos+radius) match {
-        case Some(p) => torque += scala.math.abs(pos)*p.mass
+        case Some(p) => torque += (-pos)*p.mass
         case None =>
       }
     }
@@ -113,7 +118,7 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
 case class Stack(val parentScale: Scale, val pos: Int, protected val state: State)
   extends Placable with Iterable[Weight]{
 
-  private var stack = scala.collection.mutable.Stack[Weight]()
+  private var stack = scala.collection.mutable.Buffer[Weight]()
 
   def weightsVector = stack.toVector
 
@@ -127,7 +132,7 @@ case class Stack(val parentScale: Scale, val pos: Int, protected val state: Stat
 
   def updateOwner() = {
     val prevOwnerStack = stack.map(_.owner).clone().toArray
-    stack.last.owner match {
+    owner match {
       case Some(newOwner: Player) =>
         parentScale.owner match {
           case Some(scaleOwner: Player) =>
@@ -146,7 +151,11 @@ case class Stack(val parentScale: Scale, val pos: Int, protected val state: Stat
   def iterator = stack.iterator
   def apply(pos: Int) = stack(pos)
   def update(pos: Int, weight: Weight) = { stack(pos) = weight }
-  def pop() = stack.pop()
+  def pop() = {
+    val last = stack.last
+    stack.dropRightInPlace(1)
+    last
+  }
   def append(it: Weight) = stack.append(it)
 
   // RENDERING

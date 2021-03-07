@@ -2,19 +2,20 @@ package balancer.gui
 
 
 import balancer.Game
-import balancer.gui.MainGUI.{createSpacer, draw, gameLoopLogic}
+import balancer.gui.MainGUI.{createVSpacer, draw, gameLoopLogic}
 import balancer.objects.Command.placeWeight
 import balancer.objects.Player
 import scalafx.beans.property.StringProperty
 import scalafx.geometry.Pos
 import scalafx.scene.control._
-import scalafx.scene.layout.{BorderPane, Priority, VBox}
+import scalafx.scene.layout.{BorderPane, HBox, Priority, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
 class InfoPane(private val game: Game) extends VBox {
   def state = game.state
 
+  // PROPERTY LINKER FOR INPUT FIELDS
   var inputScaleCode: StringProperty = StringProperty("")
   var inputPos: StringProperty = StringProperty("")
 
@@ -25,45 +26,75 @@ class InfoPane(private val game: Game) extends VBox {
   spacing = 10
 
   //////// UI ELEMENTS THAT CHANGE
-  val turnLabel =
+  val currentTurnLabel =
     new Label {
       font = new Font("Arial", 30)
       textFill = Color.White
       text = state.currentTurn.name.capitalize
     }
 
-  val turnInfo =
+  val currentTurnBox =
     new VBox {
       alignment = Pos.Center
       style = toBackgroundCSS(state.currentTurn.propColor)
-      children = turnLabel
+      children = currentTurnLabel
     }
 
-  val weightLeftLabel =
-    new Label(){
+  val numberOfWeightLeftLabel =
+    new Label() {
       font = new Font("Arial", 18)
       text = "Weights Left: " + state.weightLeftOfRound.toString
     }
 
-  val roundFooter =
+  val currentRoundLabel =
     new Label {
       hgrow = Priority.Always
       font = new Font("Arial", 30)
       text = "ROUND #" + state.currentRound.toString
     }
 
-  // UPDATE FUNCTION
-  def updateGUI() = {
-    turnLabel.text = state.currentTurn.name.capitalize
-    turnInfo.style = toBackgroundCSS(state.currentTurn.propColor)
-    weightLeftLabel.text = "Weights Left: " + state.weightLeftOfRound.toString
-    roundFooter.text = "Round #" + state.currentRound.toString
-    state.players.foreach(p => p.propScore.update(p.score))
-  }
-  /////////////////////
 
-  /////// ELEMENTS THAT STATIC
-  val playerBlocks = state.players.map(createPlayerBlock).toList
+  val botDifficultySlider =
+    new VBox {
+      val difficultyLabel = new Label {
+        text = "Bot Difficulty: " + game.botDiffiiculty.toString
+      }
+      val difficultySlider = new ScrollBar {
+        max = 1.0
+        min = 0.0
+        unitIncrement = 0.1
+        value.onChange((_, _, _) => {
+          game.botDiffiiculty = value()
+          difficultyLabel.text = "Bot Difficulty: " + ((game.botDiffiiculty * 10).toInt/ 10.0).toString
+        })
+      }
+      alignment = Pos.Center
+      children = List(difficultyLabel, difficultySlider)
+    }
+
+  val undoRedoButtons =
+    new HBox {
+      alignment = Pos.Center
+      spacing = 20
+      children = List(
+        new Button {
+          text = "Undo"
+          onAction = _ => {
+            state.undo()
+            updateGUI()
+            draw()
+          }
+        },
+        new Button {
+          text = "Redo"
+          onAction = _ => {
+            state.redo()
+            updateGUI()
+            draw()
+          }
+        },
+      )
+    }
 
   val endTurnButton =
     new Button {
@@ -77,10 +108,34 @@ class InfoPane(private val game: Game) extends VBox {
       }
     }
 
+  // UPDATE FUNCTION: UPDATE ALL ELEMENTS THAT CHANGES AND THEIR LOGICS
+  def updateGUI() = {
+    currentTurnLabel.text = state.currentTurn.name.capitalize
+    currentTurnBox.style = toBackgroundCSS(state.currentTurn.propColor)
+    numberOfWeightLeftLabel.text = "Weights Left: " + state.weightLeftOfRound.toString
+    currentRoundLabel.text = "Round #" + state.currentRound.toString
+    state.players.foreach(p => p.propScore.update(p.score))
+  }
+
+  /////////////////////
+
+  /////// ELEMENTS THAT STATIC
+  val allPlayersInfo = List(
+    new VBox {
+      style = toBackgroundCSS(Color.LightGrey)
+      alignment = Pos.Center
+      children = state.players.map(createPlayerInfoBlock).toList
+    }
+  )
+
   val inputFields = List(
-    createSpacer(),
+    createVSpacer(),
     new Separator,
-    turnInfo,
+    botDifficultySlider,
+    new Separator,
+    undoRedoButtons,
+    new Separator,
+    currentTurnBox,
     new TextField {
       promptText = "Enter the scale code"
       maxWidth = 200
@@ -103,7 +158,7 @@ class InfoPane(private val game: Game) extends VBox {
           new Label("SCOREBOARD") {
             font = new Font("Arial", 24)
           },
-          weightLeftLabel
+          numberOfWeightLeftLabel
         )
 
       },
@@ -116,20 +171,18 @@ class InfoPane(private val game: Game) extends VBox {
       new VBox {
         style = toBackgroundCSS(Color.LightGrey)
         alignment = Pos.Center
-        children = roundFooter
+        children = currentRoundLabel
       }
     )
 
   /// ADDING CHILDREN
-  children = header ++ playerBlocks ++ inputFields ++ footer
-
-  // DONE
+  children = header ++ allPlayersInfo ++ inputFields ++ footer
 
   // HELPER FUNCTION
 
-  def createPlayerBlock(player: Player) = {
+  def createPlayerInfoBlock(player: Player) = {
 
-    val block = new BorderPane {
+    val parentBlock = new BorderPane {
       style = toBackgroundCSS(player.propColor)
     }
     val playerName = new Label {
@@ -158,13 +211,13 @@ class InfoPane(private val game: Game) extends VBox {
       maxWidth = 30
       onAction = (e) => {
         val newColor = new Color(value())
-        block.style = toBackgroundCSS(newColor)
+        parentBlock.style = toBackgroundCSS(newColor)
         player.propColor = newColor
-        turnInfo.style = toBackgroundCSS(state.currentTurn.propColor)
+        currentTurnBox.style = toBackgroundCSS(state.currentTurn.propColor)
         draw()
       }
     }
-    block.left = new VBox {
+    parentBlock.left = new VBox {
       alignment = Pos.Center
       minWidth = 80
       children = List(
@@ -172,8 +225,8 @@ class InfoPane(private val game: Game) extends VBox {
         colorPicker
       )
     }
-    block.right = playerStats
-    block
+    parentBlock.right = playerStats
+    parentBlock
   }
 
   def toBackgroundCSS(color: Color) =
@@ -185,12 +238,12 @@ class InfoPane(private val game: Game) extends VBox {
   // FOR FORM BASED INPUT
   def executeTurn(): Unit = {
     // TODO: EXCEPTION HANDLING
-    state.undoStack.append(
+    state.execute(
       placeWeight(state.currentTurn,
         inputPos.value.toInt,
         state.scaleWithCode(inputScaleCode.value(0)).get,
         state
-      ).execute()
+      )
     )
     gameLoopLogic()
     updateGUI() // FORCE GUI UPDATE

@@ -15,6 +15,8 @@ class FileManager(private val game: Game) {
   var saved = false
   var savedFilePath = ""
 
+  def loadDefault() = loadGame(defaultFile)
+
   def saveGame(filePath: String): Unit = {
     saved = true
     savedFilePath = filePath
@@ -35,7 +37,7 @@ class FileManager(private val game: Game) {
     if(humans.nonEmpty) lw.write("Human: " + humans.map(_.name).mkString(",") + "\n")
     if(bots.nonEmpty) lw.write("Bot: " + bots.map(_.name).mkString(",") + "\n")
     lw.write("Round: " + state.currentRound + "\n")
-    lw.write("Turn: " + state.players(state.currentIdx).name + "\n")
+    lw.write("Turn: " + state.players(state.currentTurnIdx).name + "\n")
 
     lw.write("# Scale\n")
 
@@ -168,7 +170,6 @@ class FileManager(private val game: Game) {
 
                     stackStringSplitted.drop(1).map(_ (0)).foreach(w_code => {
                       val refs = newState.buildWeight(pos, parentScale, newState.players.find(_.playerCode == w_code))
-                      refs._2.updateOwner()
                     })
                   }
                 }
@@ -212,7 +213,7 @@ class FileManager(private val game: Game) {
 
       // APPLY CURRENT ROUND AND TURN
       newState.currentRound = round
-      newState.currentIdx = if(turn == "") 0 else newState.players.indexWhere(_.name == turn)
+      newState.currentTurnIdx = if(turn == "") 0 else newState.players.indexWhere(_.name == turn)
 
       // FINALLY UPDATE STATE
       game.state = newState

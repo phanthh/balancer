@@ -25,14 +25,14 @@ object MainText extends App {
   while(state.currentRound <= game.numRounds && !(game.over)){
     var players = state.players
     state.weightLeftOfRound = game.weightsPerRound
-    state.currentIdx = 0
+    state.currentTurnIdx = 0
     println(f"============ ROUND ${state.currentRound}%2s ============")
     while(state.weightLeftOfRound > 0 && !(game.over)) {
-      players(state.currentIdx) match {
+      players(state.currentTurnIdx) match {
         case h: Human =>
           // TODO: Refracting, Exception handling
           printGameState()
-          println(f">>>>>>>>> ${players(state.currentIdx).name.toUpperCase}%-5s TURN <<<<<<<<<")
+          println(f">>>>>>>>> ${players(state.currentTurnIdx).name.toUpperCase}%-5s TURN <<<<<<<<<")
 
           var parentScale: Scale = null
           var pos: Int = 0
@@ -82,12 +82,13 @@ object MainText extends App {
           }
       }
       state.weightLeftOfRound -= 1
-      state.currentIdx += 1
-      if(state.currentIdx >= players.length) state.currentIdx = 0
+      state.currentTurnIdx += 1
+      if(state.currentTurnIdx >= players.length) state.currentTurnIdx = 0
+      state.deleteFlippedScale()
     }
     println("End of round !!")
     println(s"The winner of this rounds is: ${game.winner}")
-    game.winner.win()
+    game.winner.incRoundWon()
     state.currentRound += 1
   }
   println("================================================")
@@ -99,7 +100,7 @@ object MainText extends App {
 
   private def printGameState() = {
     printScoreBoard()
-    //    state.scales.foreach(printScale)
+    state.scales.foreach(printScale)
     printGrid()
   }
 

@@ -24,7 +24,7 @@ sealed trait Player
 
   def roundWon = propRoundWon.value
 
-  def win() = propRoundWon.update(propRoundWon.value + 1)
+  def incRoundWon() = propRoundWon.update(propRoundWon.value + 1)
 
   override def toString: String = name
 }
@@ -34,13 +34,16 @@ case class Human(val name: String, val state: State) extends Player
 case class Bot(val name: String, val state: State)
   extends Player {
 
+  private val MAXRANDOMFIND = 100
+
   def random(): Unit = {
     val scales = state.scales
     var pos = 0
     var scale: Scale = null
     var command: Command = null
+    var randomFindCount = 0
 
-    while(pos == 0){
+    while(pos == 0 && randomFindCount < MAXRANDOMFIND){
       scale = scales(Random.nextInt(scales.length))
       pos = Random.between(-scale.radius, scale.radius)
       if(pos != 0) {
@@ -49,14 +52,15 @@ case class Bot(val name: String, val state: State)
           case Some(s: Scale) => pos = 0
           case _ =>
             command.execute()
-            if (!scale.isBalanced) {
+            if (state.flippedScales.nonEmpty){
               pos = 0
-              command.undo()
             }
+            command.undo()
         }
       }
+      randomFindCount += 1
     }
-    state.undoStack.append(command)
+    state.execute(command)
   }
 
   def bestMove(): Unit = {
@@ -82,13 +86,17 @@ case class Bot(val name: String, val state: State)
             case _ =>
               val command = placeWeight(this, pos, scale, state)
               command.execute()
-              update(scale, pos)
+              if(state.flippedScales.isEmpty) update(scale, pos)
               command.undo()
           }
         }
       }
     }
-    state.execute(placeWeight(this, best_pos, best_scale, state))
+    if(best_pos == 0 || best_scale == null || best_score == -1) {
+      println("SWITCH TO RANDOME")
+      random()
+    } else
+      state.execute(placeWeight(this, best_pos, best_scale, state))
   }
 }
 

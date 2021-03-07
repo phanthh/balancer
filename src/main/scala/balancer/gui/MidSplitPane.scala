@@ -15,31 +15,34 @@ class MidSplitPane(private val game: Game) extends SplitPane {
   val canvas = new Canvas(Width, Height)
   val gc = canvas.graphicsContext2D
   var infoPane = new InfoPane(game)
-  var i = 0
-  var j = 0
+  var clickedIPos = 0
+  var clickedJPos = 0
 
   val scrollPane = new ZoomableScrollPane(canvas)
-  canvas.onMouseClicked = e => {
-    // DISABLE ACTION WHEN GAME IS OVER
-    if(!(game.over)){
-      if(MouseButton(e.getButton) == MouseButton.Primary){
-        i = (e.getY/CellHeight).toInt
-        j = (e.getX/CellWidth).toInt
-        executeTurn()
-      }
-    }
-  }
 
   items.addAll(scrollPane, infoPane)
   setDividerPosition(0, 0.75)
 
   // WHEN CLICK ON GRID TO PLACE WEIGHT
+  canvas.onMouseClicked = e => {
+    // DISABLE ACTION WHEN GAME IS OVER
+    if(!(game.over)){
+      if(MouseButton(e.getButton) == MouseButton.Primary){
+        clickedIPos = (e.getY/CellHeight).toInt
+        clickedJPos = (e.getX/CellWidth).toInt
+        executeTurn()
+      }
+    }
+  }
+
+  // WHEN CLICK ON GRID TO PLACE WEIGHT
   def executeTurn(): Unit = {
-    val chosenCoord = grid.gridToCoord(i, j)
+    val chosenCoord = grid.gridToCoord(clickedIPos, clickedJPos)
     var chosenScale: Option[Scale] = None
     var chosenPos = 0
 
-    def findScale(): Unit = {
+    // HELPER FUNCTION
+    def findStack(): Unit = {
       for (scale <- state.scales) {
         val offset = chosenCoord - scale.boardCenter
         if (offset.x >= -scale.radius * 2 && offset.x <= scale.radius * 2) {
@@ -67,16 +70,16 @@ class MidSplitPane(private val game: Game) extends SplitPane {
         }
       }
     }
-    findScale()
+    findStack()
     chosenScale match {
       case Some(scale: Scale) =>
-        state.undoStack.append(
+        state.execute(
           placeWeight(
             state.currentTurn,
             chosenPos,
             scale,
             state
-          ).execute()
+          )
         )
         gameLoopLogic()
         infoPane.updateGUI()

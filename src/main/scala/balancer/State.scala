@@ -4,30 +4,39 @@ import balancer.objects._
 
 import scala.collection.mutable.ArrayBuffer
 
-class State(private val game: Game) {
+class State(val game: Game) {
+
+  private val MAXUNDO = 20
 
   // CREATE NEW OBJECT
   private var scaleIndex: Char = 96
-  def nextScaleCode(): Char = {scaleIndex = (scaleIndex.toInt + 1).toChar; scaleIndex }
+
+  def nextScaleCode(): Char = {
+    scaleIndex = (scaleIndex.toInt + 1).toChar; scaleIndex
+  }
 
   // STATE
   var currentRound = 1
-  var currentIdx = 0
-  def currentTurn = players(currentIdx)
-  var weightLeftOfRound = game.weightsPerRound
+  var currentTurnIdx = 0
+  def currentTurn = players(currentTurnIdx)
 
+  var weightLeftOfRound = game.weightsPerRound
   //
   var baseScale = new Scale(null, 0, game.baseScaleRadius, nextScaleCode(), this)
-  val players = ArrayBuffer[Player]()
+  var players = ArrayBuffer[Player]()
+
   def scaleWithCode(code: Char) = scales.find(_.code == code)
-  def update() = scales.foreach(scale => {
-    if(!scale.isBalanced) {
-      if(scale == baseScale)
+
+  def flippedScales = scales.filterNot(_.isBalanced)
+
+  def deleteFlippedScale(): Unit = {
+    flippedScales.foreach(s => {
+      if(s == baseScale){
         game.over = true
-      else
-        scale.parentScale.remove(scale.pos)
-    }
-  })
+        return
+      } else s.parentScale.remove(s.pos)
+    })
+  }
 
   def buildWeight(pos: Int, parentScale: Scale, owner: Option[Player] = None): (Weight, Stack) = {
     if (pos == 0) throw new Exception("Position must not be 0")
@@ -67,12 +76,30 @@ class State(private val game: Game) {
   // Recursive function to get all scalesVector
   private def _scales(root_scale: Scale): Vector[Scale] =
     root_scale.scalesVector.map(_scales).flatMap(_.toList).appended(root_scale)
+
   def scales = _scales(baseScale)
 
   // UNDO PLAYER MOVE
   val undoStack = scala.collection.mutable.Stack[Command]()
-  def execute(command: Command) = undoStack.append(command.execute())
-  def undo(): Command = undoStack.pop().undo()
+  val redoStack = scala.collection.mutable.Stack[Command]()
+
+  def execute(command: Command) = {
+    if (redoStack.nonEmpty) redoStack.clear()
+    undoStack.push(command.execute())
+    if (undoStack.length >= MAXUNDO) undoStack.dropRightInPlace(1)
+  }
+
+  def undo(): Unit = {
+    if (undoStack.nonEmpty) {
+      redoStack.push(undoStack.pop().undo())
+    }
+  }
+
+  def redo(): Unit = {
+    if (redoStack.nonEmpty) {
+      redoStack.pop().execute()
+    }
+  }
 }
 
 

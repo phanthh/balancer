@@ -13,7 +13,7 @@ libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
 lazy val osName = System.getProperty("os.name") match {
 case n if n.startsWith("Linux") => "linux"
 case n if n.startsWith("Mac") => "mac"
-case n if n.startsWith("Windows") => "win"
+case n if n.startsWith("Windows") => "incRoundWon"
 case _ => throw new Exception("Unknown platform!")
 }
 
