@@ -1,31 +1,39 @@
 package balancer
 
+import balancer.objects.Command.placeWeight
 import balancer.objects._
-import balancer.utils.Constants.MaxUndo
+import balancer.utils.Constants.{MAXRANDOMFIND, MaxUndo}
 import balancer.utils.OccupiedPosition
+import scalafx.scene.AccessibleRole.RadioButton
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 class State(val game: Game) {
 
 
   // CREATE NEW OBJECT
   private var scaleIndex: Char = 96
+  def setScaleIndex(code: Char) = scaleIndex = code
 
   def nextScaleCode(): Char = {
-    scaleIndex = (scaleIndex.toInt + 1).toChar; scaleIndex
+    scaleIndex = (scaleIndex.toInt + 1).toChar;
+    scaleIndex
   }
 
   // STATE
   var currentRound = 1
   var currentTurnIdx = 0
+
   def currentTurn = players(currentTurnIdx)
 
   var weightLeftOfRound = game.weightsPerRound
   //
   val baseScale = new Scale(null, 0, game.baseScaleRadius, nextScaleCode(), this)
   val players = ArrayBuffer[Player]()
+
   def humans = players.flatMap { case p: Human => Some(p) case _ => None }
+
   def bots = players.flatMap { case p: Bot => Some(p) case _ => None }
 
   def scaleWithCode(code: Char) = scales.find(_.code == code)
@@ -34,7 +42,7 @@ class State(val game: Game) {
 
   def deleteFlippedScale(): Unit = {
     flippedScales.foreach(s => {
-      if(s == baseScale){
+      if (s == baseScale) {
         game.over = true
         return
       } else s.parentScale.remove(s.pos)
@@ -64,6 +72,63 @@ class State(val game: Game) {
     newScale
   }
 
+  def buildWildScale(): Unit = {
+    val scaleCode = nextScaleCode()
+
+    // Picking parent scales at level i, prioritize lower level scales
+    // We are trying to place scale at level i+1
+    var founded = false
+    val maxLevel = maxScaleLevel
+    for (i <- 0 to maxLevel) {
+      var randomFindCount = 0
+      val scalesAtLevelI = scalesAtLevel(i)
+      val scalesAtLevelI1 = scalesAtLevel(i + 1)
+      def findScale(): Unit = {
+        while(randomFindCount <= MAXRANDOMFIND){
+          val parentScale = scalesAtLevelI(Random.nextInt(scalesAtLevelI.length))
+          val pos = parentScale.openPos(Random.nextInt(parentScale.openPos.length))
+          val aRadius = Random.between(1, baseScale.radius+1)
+          val newScale = new Scale(parentScale, pos, aRadius, scaleCode, this)
+          if(!(scalesAtLevelI1.exists(_.isOverLapWith(newScale)))) {
+            parentScale(pos) = newScale
+            founded = true
+            return
+          }
+          randomFindCount += 1
+        }
+      }
+
+      findScale()
+      if(founded) return
+    }
+  }
+
+  def buildWildWeight(): Unit = {
+    val cachedScales = scales
+    var pos = 0
+    var scale: Scale = null
+    var command: Command = null
+    var randomFindCount = 0
+
+    while(pos == 0 && randomFindCount < MAXRANDOMFIND){
+      scale = cachedScales(Random.nextInt(cachedScales.length))
+      pos = Random.between(-scale.radius, scale.radius)
+      if(pos != 0) {
+        scale(pos) match {
+          case Some(s: Scale) => pos = 0
+          case _ =>
+            val stack = buildWeight(pos, scale, None)
+            if (flippedScales.nonEmpty){
+              stack.pop()
+              pos = 0
+            }
+        }
+      }
+      randomFindCount += 1
+    }
+  }
+
+
   def buildBot(name: String) = {
     val newBot = new Bot(name, this)
     players.append(newBot)
@@ -82,16 +147,19 @@ class State(val game: Game) {
 
   def scales = _scales(baseScale)
 
+  // Note: inefficient but easy to understand
+  def scalesAtLevel(level: Int) = scales.filter(_.level == level)
+
+  def maxScaleLevel = scales.map(_.level).max
+
   def removePlayer(player: Player) = {
-    for(scale <- scales){
-      for(stack <- scale.stacksVector){
+    for (scale <- scales) {
+      for (stack <- scale.stacksVector) {
         stack.filterOut(player)
       }
     }
     players.remove(players.indexOf(player))
   }
-
-
 
   // Undo player move
   private val undoStack = scala.collection.mutable.Stack[Command]()
@@ -100,6 +168,12 @@ class State(val game: Game) {
   def execute(command: Command) = {
     if (redoStack.nonEmpty) redoStack.clear()
     undoStack.push(command.execute())
+    if (undoStack.length >= MaxUndo) undoStack.dropRightInPlace(1)
+  }
+
+  def addExecuted(command: Command) = {
+    if (redoStack.nonEmpty) redoStack.clear()
+    undoStack.push(command)
     if (undoStack.length >= MaxUndo) undoStack.dropRightInPlace(1)
   }
 

@@ -236,6 +236,7 @@ class FileManager(private val game: Game) {
 
       newState.currentRound = round
       newState.currentTurnIdx = if (turn == "") 0 else newState.players.indexWhere(_.name == turn)
+      newState.setScaleIndex(newState.scales.map(_.code).max)
       game.botDifficulty = botDifficulty
       game.weightsPerRound = weightPerRound
       game.numRounds = numRounds

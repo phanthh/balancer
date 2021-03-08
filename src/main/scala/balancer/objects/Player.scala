@@ -3,6 +3,7 @@ package balancer.objects
 import balancer.State
 import balancer.utils.Helpers.randomColor
 import balancer.objects.Command.placeWeight
+import balancer.utils.Constants.MAXRANDOMFIND
 import scalafx.beans.property.IntegerProperty
 import scalafx.scene.paint.Color
 
@@ -33,7 +34,6 @@ case class Human(val name: String, val state: State) extends Player
 case class Bot(val name: String, val state: State)
   extends Player {
 
-  private val MAXRANDOMFIND = 100
 
   def random(): Unit = {
     val scales = state.scales
@@ -52,14 +52,14 @@ case class Bot(val name: String, val state: State)
           case _ =>
             command.execute()
             if (state.flippedScales.nonEmpty){
+              command.undo()
               pos = 0
             }
-            command.undo()
         }
       }
       randomFindCount += 1
     }
-    state.execute(command)
+    state.addExecuted(command)
   }
 
   def bestMove(): Unit = {

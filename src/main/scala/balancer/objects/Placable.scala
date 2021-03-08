@@ -26,6 +26,7 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
     case _ => None
   }.toVector
 
+  def openPos = board.zipWithIndex.filter(p => p._1.isEmpty && p._2 != radius).map(_._2-radius)
 
   override def mass = board.flatten.map(_.mass).sum
 
@@ -94,12 +95,18 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
 
   // RENDERING
 
+  def level: Int = if(this == state.baseScale) 0 else parentScale.level + 1
+
   def uHeight = stacksVector.map(_.height).maxOption match {
     case Some(i: Int) => i
     case None => 0
   }
 
-  def lHeight = if(parentScale == null) 4 else scala.math.max(parentScale.uHeight + 2, 4)
+  def lHeight = {
+    if(this == state.baseScale) 4 else {
+      Math.max(state.scalesAtLevel(level-1).map(_.uHeight).max + 2, 4)
+    }
+  }
   override def height = uHeight + lHeight
 
   override def coord =
@@ -111,6 +118,17 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
   def boardCenter = coord + Coord(0, lHeight-1)
 
   def span = (coord - Coord(2*radius+1,0), coord + Coord(2*radius+1,0))
+
+  def isOverLapWith(other: Scale) = {
+    // Here assume that they are on the same level
+    if(level == other.level){
+      val left = span._1
+      val right = span._2
+      val otherLeft = other.span._1
+      val otherRight = other.span._2
+      right.x >= otherLeft.x && left.x <= otherRight.x
+    } else false
+  }
 
   override def toString: String = s"<$code,$mass>"
 }

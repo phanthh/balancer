@@ -76,6 +76,31 @@ class InfoPane(private val game: Game) extends VBox {
       children = List(difficultyLabel, difficultySlider)
     }
 
+  private val addingScaleWeight =
+    new HBox {
+      alignment = Pos.Center
+      spacing = 20
+      children = List(
+        new Button {
+          text = "Weight"
+          onAction = _ => {
+            state.buildWildWeight()
+            println("DONE PLACING")
+            updateContent()
+            draw()
+          }
+        },
+        new Button {
+          text = "Scale"
+          onAction = _ => {
+            state.buildWildScale()
+            updateContent()
+            draw()
+          }
+        },
+      )
+    }
+
   private val undoRedoButtons =
     new HBox {
       alignment = Pos.Center
@@ -125,7 +150,7 @@ class InfoPane(private val game: Game) extends VBox {
     currentTurnLabel.text = state.currentTurn.name.capitalize
     currentTurnBox.style = toBackgroundCSS(state.currentTurn.propColor)
     numberOfWeightLeftLabel.text = "Weights Left: " + state.weightLeftOfRound.toString
-    currentRoundLabel.text = "Round #" + state.currentRound.toString
+    currentRoundLabel.text = "ROUND #" + state.currentRound.toString
     state.players.foreach(p => p.propScore.update(p.score))
   }
 
@@ -136,6 +161,8 @@ class InfoPane(private val game: Game) extends VBox {
 
   private val inputFields = List(
     createVSpacer(),
+    new Separator,
+    addingScaleWeight,
     new Separator,
     botDifficultySlider,
     new Separator,

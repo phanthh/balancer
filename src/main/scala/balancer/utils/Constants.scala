@@ -8,5 +8,6 @@ object Constants {
   val DefaultFile = "defaultfile.txt"
   val MaxUndo = 20
   val Version = 1.0
+  val MAXRANDOMFIND = 100
 }
 
