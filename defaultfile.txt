@@ -1,7 +1,7 @@
 BALANCER 1.3 SAVE FILE
 # Setting
-WeightPerRound: 50
-NumberOfRound: 2
+WeightPerRound: 10
+NumberOfRound: 10
 BotDifficulty: 0.5
 # Meta
 Human: Jack

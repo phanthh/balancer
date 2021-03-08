@@ -1,5 +1,6 @@
 package balancer.utils
 
+import balancer.State
 import scalafx.scene.layout.{HBox, Priority, Region, VBox}
 import scalafx.scene.paint.Color
 
@@ -27,4 +28,16 @@ object Helpers {
   }
 
   def randomColor(): Color = Color.hsb(Random.nextInt(255), 1, 1)
+
+  def placeSomeWildWeight(state: State, amount: Int) = {
+    for(i <- 0 until amount){
+      state.buildWildWeight()
+    }
+  }
+
+  def placeSomeWildScale(state: State, amount: Int) = {
+    for(i <- 0 until amount){
+      state.buildWildScale()
+    }
+  }
 }

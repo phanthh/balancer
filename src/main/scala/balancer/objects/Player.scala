@@ -19,7 +19,7 @@ sealed trait Player
   var propRoundWon: IntegerProperty = IntegerProperty(0)
   var propColor: Color = randomColor()
 
-  def playerCode: Char = name(0)
+  def playerCode: Char = name(0).toUpper
   def score: Int = state.baseScale.score(this)
 
   def roundWon = propRoundWon.value

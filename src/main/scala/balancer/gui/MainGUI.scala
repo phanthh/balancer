@@ -4,6 +4,7 @@ import balancer.Game
 import balancer.grid.Grid._
 import balancer.objects.{Bot, Human, Player, Scale}
 import balancer.utils.Constants.{CellHeight, CellWidth, ScreenHeight, ScreenWidth}
+import balancer.utils.Helpers.{placeSomeWildScale, placeSomeWildWeight}
 import balancer.utils.Prompts
 import scalafx.application.JFXApp
 import scalafx.geometry.VPos
@@ -203,6 +204,7 @@ object MainGUI extends JFXApp {
       game.winner.incRoundWon()
       state.currentRound += 1
 
+      // Place some wild weight and scale
 
       // if it is also the final round
       if (state.currentRound > game.numRounds || game.over) {
@@ -221,6 +223,9 @@ object MainGUI extends JFXApp {
         // If the game continue => start new round
         state.weightLeftOfRound = game.weightsPerRound
         state.currentTurnIdx = 0
+
+        placeSomeWildScale(state, amount=1)
+        placeSomeWildWeight(state, amount=5)
 
         //
         (new Alert(AlertType.Information) {

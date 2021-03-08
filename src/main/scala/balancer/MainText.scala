@@ -1,7 +1,9 @@
 package balancer
 
+import balancer.gui.MainGUI.state
 import balancer.objects.Command.placeWeight
 import balancer.objects.{Bot, Human, Scale}
+import balancer.utils.Helpers.{placeSomeWildScale, placeSomeWildWeight}
 import balancer.utils.{InvalidInput, OccupiedPosition}
 
 import java.io.IOException
@@ -27,6 +29,8 @@ object MainText extends App {
     while(state.currentRound <= game.numRounds){
       state.weightLeftOfRound = game.weightsPerRound
       state.currentTurnIdx = 0
+      placeSomeWildScale(state, amount=1)
+      placeSomeWildWeight(state, amount=5)
       println(f"============ ROUND ${state.currentRound}%2s ============")
       while(state.weightLeftOfRound > 0) {
         state.players(state.currentTurnIdx) match {

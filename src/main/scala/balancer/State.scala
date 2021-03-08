@@ -74,32 +74,33 @@ class State(val game: Game) {
 
   def buildWildScale(): Unit = {
     val scaleCode = nextScaleCode()
-
     // Picking parent scales at level i, prioritize lower level scales
     // We are trying to place scale at level i+1
-    var founded = false
-    val maxLevel = maxScaleLevel
-    for (i <- 0 to maxLevel) {
+    var found = false
+    for (i <- 0 to maxScaleLevel) {
       var randomFindCount = 0
       val scalesAtLevelI = scalesAtLevel(i)
       val scalesAtLevelI1 = scalesAtLevel(i + 1)
       def findScale(): Unit = {
         while(randomFindCount <= MAXRANDOMFIND){
           val parentScale = scalesAtLevelI(Random.nextInt(scalesAtLevelI.length))
-          val pos = parentScale.openPos(Random.nextInt(parentScale.openPos.length))
-          val aRadius = Random.between(1, baseScale.radius+1)
-          val newScale = new Scale(parentScale, pos, aRadius, scaleCode, this)
-          if(!(scalesAtLevelI1.exists(_.isOverLapWith(newScale)))) {
-            parentScale(pos) = newScale
-            founded = true
-            return
+          val openPos = parentScale.openPos
+          if(openPos.length > 0){
+            val pos = openPos(Random.nextInt(openPos.length))
+            val aRadius = Random.between(1, baseScale.radius+1)
+            val newScale = new Scale(parentScale, pos, aRadius, scaleCode, this)
+            if(!(scalesAtLevelI1.exists(_.isOverLapWith(newScale)))) {
+              parentScale(pos) = newScale
+              found = true
+              return
+            }
+            randomFindCount += 1
           }
-          randomFindCount += 1
         }
       }
 
       findScale()
-      if(founded) return
+      if(found) return
     }
   }
 
