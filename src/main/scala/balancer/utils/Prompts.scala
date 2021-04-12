@@ -11,7 +11,7 @@ import java.io.File
 
 object Prompts {
 
-  def uWannaSaveDialog(reason: String, yes: () => Unit, no: () => Unit) = {
+  def askSavingDialog(reason: String, yes: () => Unit, no: () => Unit) = {
     val yesButton = new ButtonType("Yes")
     val noButton = new ButtonType("No")
 
@@ -30,7 +30,7 @@ object Prompts {
     }
   }
 
-  def openDialog(success: (File) => Unit, failed: () => Unit) = {
+  def openFileDialog(success: (File) => Unit, failed: () => Unit) = {
     val fileChooser = new FileChooser {
       title = "Open File"
       extensionFilters ++= Seq(
@@ -47,7 +47,7 @@ object Prompts {
     }
   }
 
-  def saveDialog(success: (File) => Unit, failed: () => Unit) = {
+  def saveFileDialog(success: (File) => Unit, failed: () => Unit) = {
     val fileChooser = new FileChooser {
       title = "Save File"
       extensionFilters ++= Seq(
@@ -65,7 +65,7 @@ object Prompts {
   }
 
   def askNameDialog(header: String): Option[String] = {
-    val textInputDialog = new TextInputDialog("Aalto") {
+    val textInputDialog = new TextInputDialog("James") {
       initOwner(stage)
       headerText = header
       contentText = "Please enter the name:"
@@ -78,6 +78,16 @@ object Prompts {
       initOwner(stage)
       title = "Invalid Input"
       headerText = reason
+    }
+    alert.showAndWait()
+  }
+
+  def showInfoDialog(titleText: String, header: String, content: String): Unit = {
+    val alert = new Alert(AlertType.Information){
+      initOwner(stage)
+      title = titleText
+      headerText = header
+      contentText = content
     }
     alert.showAndWait()
   }

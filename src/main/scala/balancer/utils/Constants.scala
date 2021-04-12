@@ -8,6 +8,9 @@ object Constants {
   val DefaultFile = "defaultfile.txt"
   val MaxUndo = 20
   val Version = 1.0
-  val MAXRANDOMFIND = 100
+  val MaxRandomFind = 100
+  val Rules = "TO BE IMPLEMENTED"  // TODO: Add rules
+  val GithubURL = "https://github.com/phanthh/balancer"
+  val GitlabURL = "https://version.aalto.fi/gitlab/phanh7/balancer"
 }
 

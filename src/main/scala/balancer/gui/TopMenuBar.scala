@@ -2,7 +2,10 @@ package balancer.gui
 
 import balancer.Game
 import MainGUI.{createScene, draw}
+import balancer.utils.Constants.{GithubURL, GitlabURL, Rules, Version}
+import balancer.utils.Helpers.openURL
 import balancer.utils.Prompts
+import balancer.utils.Prompts.showInfoDialog
 import scalafx.scene.control._
 
 class TopMenuBar(private val friend: MidSplitPane, private val game: Game) extends MenuBar {
@@ -25,7 +28,7 @@ class TopMenuBar(private val friend: MidSplitPane, private val game: Game) exten
         },
         new MenuItem("Open...") {
           onAction = _ => {
-            Prompts.openDialog(
+            Prompts.openFileDialog(
               success = (f) => {
                 game.reset()
                 fm.loadGame(f.getAbsolutePath)
@@ -38,7 +41,7 @@ class TopMenuBar(private val friend: MidSplitPane, private val game: Game) exten
         new SeparatorMenuItem(),
         new MenuItem("Save...") {
           onAction = _ =>
-            Prompts.saveDialog(
+            Prompts.saveFileDialog(
               success = (f) => {
                 fm.saveGame(f.getAbsolutePath)
               },
@@ -48,10 +51,10 @@ class TopMenuBar(private val friend: MidSplitPane, private val game: Game) exten
         new SeparatorMenuItem(),
         new MenuItem("Exit") {
           onAction = _ =>
-            Prompts.uWannaSaveDialog(
+            Prompts.askSavingDialog(
               reason = "Exiting Confirmation",
               yes = () => {
-                Prompts.saveDialog(
+                Prompts.saveFileDialog(
                   success = (f) => {
                     fm.saveGame(f.getAbsolutePath)
                   },
@@ -103,5 +106,35 @@ class TopMenuBar(private val friend: MidSplitPane, private val game: Game) exten
         },
       )
     },
+    new Menu("Help") {
+      items = List(
+        new MenuItem("Rules") {
+          onAction = _ => {
+            showInfoDialog(
+              titleText = "Rules",
+              header = s"Balancer version $Version",
+              content = Rules
+            )
+          }
+        },
+        new SeparatorMenuItem,
+        new MenuItem("Github") {
+          onAction = _ => {
+            openURL(GithubURL)
+          }
+        },
+        new MenuItem("Gitlab") {
+          onAction = _ => {
+            openURL(GitlabURL)
+          }
+        },
+        new SeparatorMenuItem,
+        new MenuItem("About...") {
+          onAction = _ => {
+            // TODO: Add about
+          }
+        }
+      )
+    }
   )
 }

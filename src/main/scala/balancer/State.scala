@@ -1,10 +1,8 @@
 package balancer
 
-import balancer.objects.Command.placeWeight
 import balancer.objects._
-import balancer.utils.Constants.{MAXRANDOMFIND, MaxUndo}
+import balancer.utils.Constants.{MaxRandomFind, MaxUndo}
 import balancer.utils.OccupiedPosition
-import scalafx.scene.AccessibleRole.RadioButton
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -17,7 +15,7 @@ class State(val game: Game) {
   def setScaleIndex(code: Char) = scaleIndex = code
 
   def nextScaleCode(): Char = {
-    scaleIndex = (scaleIndex.toInt + 1).toChar;
+    scaleIndex = (scaleIndex.toInt + 1).toChar
     scaleIndex
   }
 
@@ -82,7 +80,7 @@ class State(val game: Game) {
       val scalesAtLevelI = scalesAtLevel(i)
       val scalesAtLevelI1 = scalesAtLevel(i + 1)
       def findScale(): Unit = {
-        while(randomFindCount <= MAXRANDOMFIND){
+        while(randomFindCount <= MaxRandomFind){
           val parentScale = scalesAtLevelI(Random.nextInt(scalesAtLevelI.length))
           val openPos = parentScale.openPos
           if(openPos.length > 0){
@@ -111,7 +109,7 @@ class State(val game: Game) {
     var command: Command = null
     var randomFindCount = 0
 
-    while(pos == 0 && randomFindCount < MAXRANDOMFIND){
+    while(pos == 0 && randomFindCount < MaxRandomFind){
       scale = cachedScales(Random.nextInt(cachedScales.length))
       pos = Random.between(-scale.radius, scale.radius)
       if(pos != 0) {

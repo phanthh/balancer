@@ -4,13 +4,12 @@ import balancer.Game
 import balancer.grid.Grid._
 import balancer.objects.{Bot, Human, Player, Scale}
 import balancer.utils.Constants.{CellHeight, CellWidth, ScreenHeight, ScreenWidth}
-import balancer.utils.Helpers.{placeSomeWildScale, placeSomeWildWeight}
+import balancer.utils.Helpers.{getTextColorFitBG, placeSomeWildScale, placeSomeWildWeight}
 import balancer.utils.Prompts
+import balancer.utils.Prompts.showInfoDialog
 import scalafx.application.JFXApp
 import scalafx.geometry.VPos
 import scalafx.scene.Scene
-import scalafx.scene.control.Alert
-import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.layout.BorderPane
 import scalafx.scene.paint.Color
 import scalafx.scene.text.{Font, TextAlignment}
@@ -67,7 +66,7 @@ object MainGUI extends JFXApp {
     midSplitPane = new MidSplitPane(game)
     topMenuBar = new TopMenuBar(midSplitPane, game)
     // Preserver ScreenWidth and ScreenHeight
-    this.stage.setScene(
+    stage.setScene(
       new Scene(stage.getWidth, stage.getHeight) {
         root = {
           new BorderPane {
@@ -115,9 +114,9 @@ object MainGUI extends JFXApp {
     // Rendering the grid
     for (i <- 0 until grid.height) {
       for (j <- 0 until grid.width) {
-        grid(i, j) match {
-          case GROUND => gc.setFill(Color.Brown)
-          case FULCRUM => gc.setFill(Color.Grey)
+        val cellColor = grid(i, j) match {
+          case GROUND => Color.Brown
+          case FULCRUM => Color.Grey
           case PADDER => {
             // This will draw the torque indicator, showing how close is the scale to flipping
             val padderCoord = grid.gridToCoord(i, j)
@@ -136,41 +135,41 @@ object MainGUI extends JFXApp {
 
             findScale()
 
-
             // Translate the padder position to where the scale center is at the origin
             val offset = padderCoord - parentScale.boardCenter
 
             val torqueDiff = parentScale.rightTorque - parentScale.leftTorque
             if (offset.x < 0 && (offset.x - 1) / 2 >= torqueDiff) {
-              gc.setFill(Color.Red) // On the left side
+              Color.Red // On the left side
             } else if (offset.x > 0 && (offset.x + 1) / 2 <= torqueDiff) {
-              gc.setFill(Color.Red) // On the right side
+              Color.Red // On the right side
             } else
-              gc.setFill(Color.LightGrey)
+              Color.LightGrey
           }
           case LEFT | RIGHT | EMPTY =>
-            gc.setFill(Color.White)
+            Color.White
           case WILD =>
-            gc.setFill(Color.Gray)
+            Color.Gray
           case c: Char if (c.isDigit) =>
-            gc.setFill(Color.Grey) // If it is a number indicating the distance from the center
+            Color.Grey // If it is a number indicating the distance from the center
           case c: Char =>
             // If it is a letter -> player's weight
-            gc.setFill(state.players.find(_.playerCode == c) match {
+            state.players.find(_.playerCode == c) match {
               case Some(player: Player) => player.propColor
               case None => Color.Gray
-            })
+            }
         }
+        gc.setFill(cellColor)
         gc.fillRect(j * CellWidth, i * CellHeight, CellWidth, CellHeight)
 
-        // Drawing the letter and number indicator
-        gc.setStroke(Color.LightGrey)
+        // Drawing the letter and number indicatorg
+        gc.setFill(getTextColorFitBG(cellColor))
         grid(i, j) match {
           case FULCRUM | PADDER | LEFT | RIGHT =>
-          case _ => gc.strokeText(grid(i, j).toString, (j + 0.5) * CellWidth, (i + 0.5) * CellHeight)
+          case _ => gc.fillText(grid(i, j).toString, (j + 0.5) * CellWidth, (i + 0.5) * CellHeight)
         }
-
         // Drawing the checker pattern over
+        gc.setStroke(Color.LightGrey)
         gc.strokeRect(j * CellWidth, i * CellHeight, CellWidth, CellHeight)
       }
     }
@@ -194,44 +193,37 @@ object MainGUI extends JFXApp {
 
     // If the round ends
     if (state.weightLeftOfRound <= 0 || game.over) {
-
-      //
-      (new Alert(AlertType.Information) {
-        title = "End of Round !!"
-        headerText = s"The winner of this round is: ${game.winner}"
-      }).showAndWait()
-
+      showInfoDialog(
+        titleText = "End of Round",
+        header = s"The winner of this round is: ${game.winner}",
+        content = ""
+      )
       game.winner.incRoundWon()
       state.currentRound += 1
 
-      // Place some wild weight and scale
-
-      // if it is also the final round
+      // If it is also the final round
       if (state.currentRound > game.numRounds || game.over) {
-
         // GUARANTEE game.over = true
         game.over = true
-
-        //
-        (new Alert(AlertType.Information) {
-          title = "Game Over !!"
-          headerText = s"The winner of the game is: ${game.finalWinner}"
-          contentText = "!!!! Congratulation !!!!"
-        }).showAndWait()
-
+        showInfoDialog(
+          titleText = "Game Over!!!",
+          header = s"The winner of the game is: ${game.finalWinner}",
+          content = "!!!! Congratulation !!!!"
+        )
       } else {
         // If the game continue => start new round
         state.weightLeftOfRound = game.weightsPerRound
         state.currentTurnIdx = 0
 
+        // Place some wild weight and scale
         placeSomeWildScale(state, amount=1)
         placeSomeWildWeight(state, amount=5)
 
-        //
-        (new Alert(AlertType.Information) {
-          title = "New round begin !!!"
-          headerText = s"ROUND: ${state.currentRound}"
-        }).showAndWait()
+//        showInfoDialog(
+//          titleText = "New round begin !!!",
+//          header = s"ROUND: ${state.currentRound}",
+//          content = ""
+//        )
       }
     } else {
       // The round continue -> move on to next player
@@ -252,7 +244,7 @@ object MainGUI extends JFXApp {
           endTurn()
         case human: Human =>
         /*
-          Human turn will be determined by clicking on the
+          Human turn will be conducted by clicking on the
           canvas or entering the position and scale into the
           form. These is handled in MidSplitPane and InfoPane
           respectively.

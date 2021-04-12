@@ -3,7 +3,7 @@ package balancer.objects
 import balancer.State
 import balancer.utils.Helpers.randomColor
 import balancer.objects.Command.placeWeight
-import balancer.utils.Constants.MAXRANDOMFIND
+import balancer.utils.Constants.MaxRandomFind
 import scalafx.beans.property.IntegerProperty
 import scalafx.scene.paint.Color
 
@@ -42,7 +42,7 @@ case class Bot(val name: String, val state: State)
     var command: Command = null
     var randomFindCount = 0
 
-    while(pos == 0 && randomFindCount < MAXRANDOMFIND){
+    while(pos == 0 && randomFindCount < MaxRandomFind){
       scale = scales(Random.nextInt(scales.length))
       pos = Random.between(-scale.radius, scale.radius)
       if(pos != 0) {
