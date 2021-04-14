@@ -1,16 +1,16 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, endTurn}
+import balancer.gui.MainGUI.{draw, endTurn, select}
 import balancer.objects.Command.placeWeight
 import balancer.objects.Player
-import balancer.utils.Helpers.{createVSpacer, getTextColorFitBG, toBackgroundCSS, toTextFillCSS}
+import balancer.utils.Helpers.{getTextColorFitBG, toBackgroundCSS}
 import balancer.utils.Prompts.invalidDialog
 import balancer.utils.{InvalidInput, OccupiedPosition}
 import scalafx.beans.property.StringProperty
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
-import scalafx.scene.layout.{Background, BorderPane, HBox, Priority, VBox}
+import scalafx.scene.layout.{BorderPane, HBox, Priority, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
@@ -19,8 +19,8 @@ class InfoPane(private val game: Game) extends VBox {
   private def state = game.state
 
   // Binding points for form input
-  private var inputScaleCode: StringProperty = StringProperty("")
-  private var inputPos: StringProperty = StringProperty("")
+//  private var inputScaleCode: StringProperty = StringProperty("")
+//  private var inputPos: StringProperty = StringProperty("")
 
   alignment = Pos.Center
   fillWidth = true
@@ -28,55 +28,55 @@ class InfoPane(private val game: Game) extends VBox {
   minWidth = 200
   spacing = 10
 
-  // UI elements that change
-  private val currentTurnLabel =
-    new Label {
-      font = new Font("Arial", 30)
-      textFill = getTextColorFitBG(state.currentTurn.propColor)
-      text = state.currentTurn.name.capitalize
+  private val allPlayersInfo =
+    new VBox {
+      vgrow = Priority.Always
+      spacing = 10
+      alignment = Pos.TopCenter
+      children = state.players.map(createPlayerInfoBlock).toList
     }
 
-  private val currentTurnBox =
+  /*
+     Methods to update elements
+   */
+  def updateContent() = {
+    select("turnLabel").asInstanceOf[javafx.scene.control.Label].setText(state.currentTurn.name.capitalize)
+    select("turnLabel").asInstanceOf[javafx.scene.control.Label].setTextFill(getTextColorFitBG(state.currentTurn.propColor))
+    select("turnBox").setStyle(toBackgroundCSS(state.currentTurn.propColor))
+    select("weightsLeftLabel").asInstanceOf[javafx.scene.control.Label].setText("Weights Left: " + state.weightLeftOfRound.toString)
+    select("roundLabel").asInstanceOf[javafx.scene.control.Label].setText("ROUND #" + state.currentRound.toString)
+    state.players.foreach(p => p.propScore.update(p.score))
+  }
+
+  def updatePlayerList() = {
+    allPlayersInfo.children = state.players.map(createPlayerInfoBlock).toList
+  }
+
+  // Layouts (header, body, footer)
+
+  children = List(
+    // Header
     new VBox {
       alignment = Pos.Center
-      style = toBackgroundCSS(state.currentTurn.propColor)
-      children = currentTurnLabel
-    }
+      children = List(
+        new Label("SCOREBOARD") {
+          font = new Font("Arial", 24)
+        },
 
-  private val numberOfWeightLeftLabel =
-    new Label() {
-      font = new Font("Arial", 18)
-      text = "Weights Left: " + state.weightLeftOfRound.toString
-    }
+        new Label() {
+          id = "weightsLeftLabel"
+          font = new Font("Arial", 18)
+          text = "Weights Left: " + state.weightLeftOfRound.toString
+        }
 
-  private val currentRoundLabel =
-    new Label {
-      hgrow = Priority.Always
-      font = new Font("Arial", 24)
-      text = "Round #" + state.currentRound.toString
-    }
+      )
 
-
-  private val botDifficultySlider =
-    new VBox {
-      val difficultyLabel = new Label {
-        text = "Bot Difficulty: " + game.botDifficulty.toString
-      }
-      val difficultySlider = new ScrollBar {
-        max = 1.0
-        min = 0.0
-        unitIncrement = 0.1
-        value = game.botDifficulty
-        value.onChange((_, _, _) => {
-          game.botDifficulty = value()
-          difficultyLabel.text = "Bot Difficulty: " + ((game.botDifficulty * 10).toInt / 10.0).toString
-        })
-      }
-      alignment = Pos.Center
-      children = List(difficultyLabel, difficultySlider)
-    }
-
-  private val addingScaleWeight =
+    },
+    new Separator,
+    // Body
+    // Players' scores, colors, ...
+    allPlayersInfo,
+    // Adding random weight and scale buttons
     new HBox {
       alignment = Pos.Center
       spacing = 20
@@ -102,9 +102,29 @@ class InfoPane(private val game: Game) extends VBox {
           }
         },
       )
+    },
+    new Separator,
+    // Bot difficulty sliders
+    new VBox {
+      val difficultyLabel = new Label {
+        text = "Bot Difficulty: " + game.botDifficulty.toString
+      }
+      val difficultySlider = new ScrollBar {
+        max = 1.0
+        min = 0.0
+        unitIncrement = 0.1
+        value = game.botDifficulty
+        value.onChange((_, _, _) => {
+          game.botDifficulty = value()
+          difficultyLabel.text = "Bot Difficulty: " + ((game.botDifficulty * 10).toInt / 10.0).toString
+        })
+      }
+      alignment = Pos.Center
+      children = List(difficultyLabel, difficultySlider)
     }
-
-  private val undoRedoButtons =
+    ,
+    new Separator,
+    // Undo Redo Button
     new HBox {
       alignment = Pos.Center
       spacing = 20
@@ -130,95 +150,55 @@ class InfoPane(private val game: Game) extends VBox {
           }
         },
       )
-    }
-
-  private val endTurnButton =
-    new Button {
-      text = "END TURN"
-      maxWidth = 200
-      minWidth = 150
-      onAction = _ => {
-        // Disable button when game is over
-        if (!(game.over)) executeTurn()
-      }
-    }
-
-  private val allPlayersInfo =
+    },
+    new Separator,
+    // Current turn label/indicator
     new VBox {
-      vgrow = Priority.Always
-      spacing = 10
-      alignment = Pos.TopCenter
-      children = state.players.map(createPlayerInfoBlock).toList
+      id = "turnBox"
+      alignment = Pos.Center
+      style = toBackgroundCSS(state.currentTurn.propColor)
+      children =
+        new Label {
+          id = "turnLabel"
+          font = new Font("Arial", 30)
+          textFill = getTextColorFitBG(state.currentTurn.propColor)
+          text = state.currentTurn.name.capitalize
+        }
+    },
+    // Input fields for adding scale manually (DEBUG)
+//    new TextField {
+//      promptText = "Enter the scale code"
+//      maxWidth = 200
+//      text <==> inputScaleCode
+//    },
+//    new TextField {
+//      promptText = "Enter the position"
+//      maxWidth = 200
+//      text <==> inputPos
+//    },
+//    // End turn button to submit turn
+//    new Button {
+//      text = "END TURN"
+//      maxWidth = 200
+//      minWidth = 150
+//      onAction = _ => {
+//        // Disable button when game is over
+//        if (!(game.over)) executeTurn()
+//      }
+//    },
+//    new Separator,
+    new VBox {
+      alignment = Pos.Center
+      children =
+        new Label {
+          id = "roundLabel"
+          hgrow = Priority.Always
+          font = new Font("Arial", 24)
+          text = "Round #" + state.currentRound.toString
+        }
+
     }
-
-  /*
-     Methods to update elements
-   */
-  def updateContent() = {
-
-    currentTurnLabel.text = state.currentTurn.name.capitalize
-    currentTurnLabel.textFill = getTextColorFitBG(state.currentTurn.propColor)
-    currentTurnBox.style = toBackgroundCSS(state.currentTurn.propColor)
-
-    numberOfWeightLeftLabel.text = "Weights Left: " + state.weightLeftOfRound.toString
-    currentRoundLabel.text = "ROUND #" + state.currentRound.toString
-    state.players.foreach(p => p.propScore.update(p.score))
-  }
-
-  def updatePlayerList() = {
-    allPlayersInfo.children = state.players.map(createPlayerInfoBlock).toList
-  }
-
-  // Layouts (header, body, footer)
-
-  private val body = List(
-    allPlayersInfo,
-    new Separator,
-    addingScaleWeight,
-    new Separator,
-    botDifficultySlider,
-    new Separator,
-    undoRedoButtons,
-    new Separator,
-    currentTurnBox,
-    new TextField {
-      promptText = "Enter the scale code"
-      maxWidth = 200
-      text <==> inputScaleCode
-    },
-    new TextField {
-      promptText = "Enter the position"
-      maxWidth = 200
-      text <==> inputPos
-    },
-    endTurnButton,
   )
-
-  private val header =
-    List(
-      new VBox {
-        alignment = Pos.Center
-        children = List(
-          new Label("SCOREBOARD") {
-            font = new Font("Arial", 24)
-          },
-          numberOfWeightLeftLabel
-        )
-
-      },
-      new Separator
-    )
-
-  private val footer =
-    List(
-      new Separator,
-      new VBox {
-        alignment = Pos.Center
-        children = currentRoundLabel
-      }
-    )
-
-  children = header ++ body ++ footer
 
   // Helpers function
   private def createPlayerInfoBlock(player: Player): BorderPane = {
@@ -254,8 +234,7 @@ class InfoPane(private val game: Game) extends VBox {
         playerName.textFill = getTextColorFitBG(newColor)
         playerScore.textFill = getTextColorFitBG(newColor)
         playerRoundWon.textFill = getTextColorFitBG(newColor)
-        currentTurnBox.style = toBackgroundCSS(state.currentTurn.propColor)
-        currentTurnLabel.textFill = getTextColorFitBG(state.currentTurn.propColor)
+        updateContent()
         draw()
       }
     }
@@ -293,34 +272,34 @@ class InfoPane(private val game: Game) extends VBox {
   }
 
   // Execute when end turn button is clicked
-  private def executeTurn(): Unit = {
-    try {
-      val pos = inputPos.value.toIntOption match {
-        case Some(pos: Int) =>
-          if (pos == 0) throw new InvalidInput("Position cannot be 0")
-          pos
-        case None => throw new InvalidInput("Invalid Position")
-      }
-
-      val scale = inputScaleCode.value.headOption match {
-        case Some(code: Char) =>
-          state.scaleWithCode(code).getOrElse(throw new InvalidInput(
-            s"Invalid scale code must be: ${state.scales.map(_.code).mkString(",")}"
-          ))
-        case None =>
-          throw new InvalidInput("Invalid scale code")
-      }
-      state.execute(placeWeight(state.currentTurn, pos, scale, state))
-      endTurn()
-      updateContent()
-      draw()
-    } catch {
-      case e: ArrayIndexOutOfBoundsException =>
-        invalidDialog(s"Position is off the scale")
-      case e: OccupiedPosition =>
-        invalidDialog("Position has already been occupied")
-      case e: InvalidInput =>
-        invalidDialog(e.getMessage)
-    }
-  }
+//  private def executeTurn(): Unit = {
+//    try {
+//      val pos = inputPos.value.toIntOption match {
+//        case Some(pos: Int) =>
+//          if (pos == 0) throw new InvalidInput("Position cannot be 0")
+//          pos
+//        case None => throw new InvalidInput("Invalid Position")
+//      }
+//
+//      val scale = inputScaleCode.value.headOption match {
+//        case Some(code: Char) =>
+//          state.scaleWithCode(code).getOrElse(throw new InvalidInput(
+//            s"Invalid scale code must be: ${state.scales.map(_.code).mkString(",")}"
+//          ))
+//        case None =>
+//          throw new InvalidInput("Invalid scale code")
+//      }
+//      state.execute(placeWeight(state.currentTurn, pos, scale, state))
+//      endTurn()
+//      updateContent()
+//      draw()
+//    } catch {
+//      case e: ArrayIndexOutOfBoundsException =>
+//        invalidDialog(s"Position is off the scale")
+//      case e: OccupiedPosition =>
+//        invalidDialog("Position has already been occupied")
+//      case e: InvalidInput =>
+//        invalidDialog(e.getMessage)
+//    }
+//  }
 }

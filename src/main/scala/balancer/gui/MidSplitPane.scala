@@ -14,6 +14,7 @@ class MidSplitPane(private val game: Game) extends SplitPane {
   def gc = scrollPane.gc
 
   def updateInfoPane() = infoPane.updateContent()
+  def drawCanvas() = scrollPane.draw()
 
   items.addAll(scrollPane, infoPane)
   setDividerPosition(0, 0.75)
