@@ -159,9 +159,12 @@ class State(val game: Game) {
     players.remove(players.indexOf(player))
   }
 
-  // Undo player move
+  // Undo/Redo
   private val undoStack = scala.collection.mutable.Stack[Command]()
   private val redoStack = scala.collection.mutable.Stack[Command]()
+
+  def undoable = undoStack.nonEmpty
+  def redoable = redoStack.nonEmpty
 
   def execute(command: Command) = {
     if (redoStack.nonEmpty) redoStack.clear()

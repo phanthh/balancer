@@ -2,18 +2,18 @@ package balancer.gui
 
 import balancer.Game
 import balancer.gui.MainGUI.{draw, setScene}
-import balancer.utils.Constants.{GithubURL, GitlabURL, Rules, Version}
+import balancer.utils.Constants.{Abouts, GithubURL, GitlabURL, Rules, Version}
 import balancer.utils.Helpers.openURL
 import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
 import scalafx.scene.control._
 
-class TopMenuBar(private val friend: MainPane, private val game: Game) extends MenuBar {
+class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends MenuBar {
   private def state = game.state
 
   private def fm = game.fileManager
 
-  private def updateInfoPane() = friend.updateInfoPane()
+  private def updateInfoPane() = mainPane.updateInfoPane()
 
   menus = List(
     new Menu("File") {
@@ -92,15 +92,25 @@ class TopMenuBar(private val friend: MainPane, private val game: Game) extends M
         new SeparatorMenuItem,
         new MenuItem("Undo") {
           onAction = _ => {
-            state.undo()
-            updateInfoPane()
-            draw()
+            if(!(game.over) && state.undoable){
+              state.undo()
+              updateInfoPane()
+              draw()
+            }
           }
         },
         new MenuItem("Redo") {
           onAction = _ => {
-            state.redo()
-            updateInfoPane()
+            if(!(game.over) && state.redoable) {
+              state.redo()
+              updateInfoPane()
+              draw()
+            }
+          }
+        },
+        new MenuItem("Toggle Grid") {
+          onAction = _ => {
+            mainPane.toggleGrid()
             draw()
           }
         },
@@ -131,7 +141,11 @@ class TopMenuBar(private val friend: MainPane, private val game: Game) extends M
         new SeparatorMenuItem,
         new MenuItem("About...") {
           onAction = _ => {
-            // TODO: Add about
+            showInfoDialog(
+              titleText = "About",
+              header = s"Balancer version $Version",
+              content = Abouts
+            )
           }
         }
       )

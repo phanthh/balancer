@@ -10,6 +10,7 @@ object Constants {
   val Version = 1.0
   val MaxRandomFind = 100
   val Rules = "TO BE IMPLEMENTED"  // TODO: Add rules
+  val Abouts = "TO BE IMPLEMENTED" // TODO: Add about
   val GithubURL = "https://github.com/phanthh/balancer"
   val GitlabURL = "https://version.aalto.fi/gitlab/phanh7/balancer"
 }

@@ -12,12 +12,11 @@ import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
 class InfoPane(private val game: Game) extends VBox {
-  // For ease of reference
   private def state = game.state
 
-  // Binding points for form input
-//  private var inputScaleCode: StringProperty = StringProperty("")
-//  private var inputPos: StringProperty = StringProperty("")
+  // Binding points for form input (For manual input - debugging)
+  // private var inputScaleCode: StringProperty = StringProperty("")
+  // private var inputPos: StringProperty = StringProperty("")
 
   alignment = Pos.Center
   fillWidth = true
@@ -33,8 +32,8 @@ class InfoPane(private val game: Game) extends VBox {
       children = state.players.map(createPlayerInfoBlock).toList
     }
 
-  /*
-     Methods to update elements
+  /**
+   * Updating UI elements when the state changes.
    */
   def updateContent() = {
     select("turnLabel").asInstanceOf[javafx.scene.control.Label].setText(state.currentTurn.name.capitalize)
@@ -46,8 +45,6 @@ class InfoPane(private val game: Game) extends VBox {
     allPlayersInfo.children = state.players.sortBy(-_.propScore.value).map(createPlayerInfoBlock).toList
   }
 
-  // Layouts (header, body, footer)
-
   children = List(
     // Header
     new VBox {
@@ -56,15 +53,12 @@ class InfoPane(private val game: Game) extends VBox {
         new Label("SCOREBOARD") {
           font = new Font("Arial", 24)
         },
-
         new Label() {
           id = "weightsLeftLabel"
           font = new Font("Arial", 18)
           text = "Weights Left: " + state.weightLeftOfRound.toString
         }
-
       )
-
     },
     new Separator,
     // Body
@@ -76,7 +70,7 @@ class InfoPane(private val game: Game) extends VBox {
       spacing = 20
       children = List(
         new Button {
-          text = "Weight"
+          text = "Add weight"
           onAction = _ => {
             if (!(game.over)) {
               state.buildWildWeight()
@@ -86,7 +80,7 @@ class InfoPane(private val game: Game) extends VBox {
           }
         },
         new Button {
-          text = "Scale"
+          text = "Add scale"
           onAction = _ => {
             if (!(game.over)) {
               state.buildWildScale()
@@ -115,8 +109,7 @@ class InfoPane(private val game: Game) extends VBox {
       }
       alignment = Pos.Center
       children = List(difficultyLabel, difficultySlider)
-    }
-    ,
+    },
     new Separator,
     // Undo Redo Button
     new HBox {
@@ -126,7 +119,7 @@ class InfoPane(private val game: Game) extends VBox {
         new Button {
           text = "Undo"
           onAction = _ => {
-            if (!(game.over)) {
+            if (!(game.over) && state.undoable) {
               state.undo()
               updateContent()
               draw()
@@ -136,7 +129,7 @@ class InfoPane(private val game: Game) extends VBox {
         new Button {
           text = "Redo"
           onAction = _ => {
-            if (!(game.over)) {
+            if (!(game.over) && state.redoable) {
               state.redo()
               updateContent()
               draw()
@@ -223,13 +216,15 @@ class InfoPane(private val game: Game) extends VBox {
       maxWidth = 30
       onAction = (e) => {
         val newColor = new Color(value())
-        player.propColor = newColor
-        parentBlock.style = toBackgroundCSS(newColor)
-        playerName.textFill = getTextColorFitBG(newColor)
-        playerScore.textFill = getTextColorFitBG(newColor)
-        playerRoundWon.textFill = getTextColorFitBG(newColor)
-        updateContent()
-        draw()
+        if(newColor != player.propColor){
+          player.propColor = newColor
+          parentBlock.style = toBackgroundCSS(newColor)
+          playerName.textFill = getTextColorFitBG(newColor)
+          playerScore.textFill = getTextColorFitBG(newColor)
+          playerRoundWon.textFill = getTextColorFitBG(newColor)
+          updateContent()
+          draw()
+        }
       }
     }
 
@@ -267,7 +262,7 @@ class InfoPane(private val game: Game) extends VBox {
     parentBlock
   }
 
-  // Execute when end turn button is clicked
+  // Execute when end turn button is clicked (For Debuging)
 //  private def executeTurn(): Unit = {
 //    try {
 //      val pos = inputPos.value.toIntOption match {
@@ -286,7 +281,7 @@ class InfoPane(private val game: Game) extends VBox {
 //          throw new InvalidInput("Invalid scale code")
 //      }
 //      state.execute(placeWeight(state.currentTurn, pos, scale, state))
-//      endTurn()
+//      endTurnHook()
 //      updateContent()
 //      draw()
 //    } catch {

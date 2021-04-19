@@ -82,7 +82,7 @@ object MainGUI extends JFXApp {
   }
 
   // This is run after a move is finished (end of a turn)
-  def endTurn(): Unit = {
+  def endTurnHook(): Unit = {
 
     state.deleteFlippedScale()
     state.weightLeftOfRound -= 1
@@ -140,8 +140,8 @@ object MainGUI extends JFXApp {
             bot.bestMove()
           }
 
-          // End of move, calling again endTurn()
-          endTurn()
+          // End of move, calling again endTurnHook()
+          endTurnHook()
         case human: Human =>
         /*
           Human turn will be conducted by clicking on the
