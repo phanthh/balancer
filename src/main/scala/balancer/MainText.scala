@@ -1,6 +1,5 @@
 package balancer
 
-import balancer.gui.MainGUI.state
 import balancer.objects.Command.placeWeight
 import balancer.objects.{Bot, Human, Scale}
 import balancer.utils.Helpers.{placeSomeWildScale, placeSomeWildWeight}
@@ -82,7 +81,7 @@ object MainText extends App {
 
   private def printGameState() = {
     printScoreBoard()
-//    state.scales.foreach(printScale)
+//    state.scalesVector.foreach(printScale)
     printGrid()
   }
 
@@ -124,9 +123,9 @@ object MainText extends App {
     var scale: Scale = null
     while(scale == null){
       try {
-        print(s"Which scale ? (${state.scales.map(_.code).mkString(",")}): ")
+        print(s"Which scale ? (${state.scalesVector.map(_.code).mkString(",")}): ")
         scale = state.scaleWithCode(readChar()).getOrElse(
-          throw new InvalidInput(s"Invalid scale code must be: ${state.scales.map(_.code).mkString(",")}")
+          throw new InvalidInput(s"Invalid scale code must be: ${state.scalesVector.map(_.code).mkString(",")}")
         )
       } catch {
         case e: IOException =>

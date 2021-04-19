@@ -40,8 +40,8 @@ object MainGUI extends JFXApp {
 
   // Components of the main scene
   var topMenuBar: TopMenuBar = _
-  var midSplitPane: MidSplitPane = _
-  createScene()
+  var midSplitPane: MainPane = _
+  setScene()
 
   // For ease of references
   def state = game.state
@@ -57,8 +57,8 @@ object MainGUI extends JFXApp {
     be updated dynamically (i.e adding a new VBox,
     a new Label, etc,...). An entire new scene will be built.
    */
-  def createScene() = {
-    midSplitPane = new MidSplitPane(game)
+  def setScene() = {
+    midSplitPane = new MainPane(game)
     topMenuBar = new TopMenuBar(midSplitPane, game)
     // Preserver ScreenWidth and ScreenHeight
     stage.scene =
@@ -146,7 +146,7 @@ object MainGUI extends JFXApp {
         /*
           Human turn will be conducted by clicking on the
           canvas or entering the position and scale into the
-          form. These is handled in MidSplitPane and InfoPane
+          form. These is handled in MainPane and InfoPane
           respectively.
          */
       }

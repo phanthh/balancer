@@ -51,7 +51,7 @@ class FileManager(private val game: Game) {
     lw.write("Turn: " + state.players(state.currentTurnIdx).name + "\n")
 
     lw.write("# Scale\n")
-    for (scale <- state.scales.sortBy(_.code)) {
+    for (scale <- state.scalesVector.sortBy(_.code)) {
       if (scale == state.baseScale) {
         lw.write("_,0")
       } else {
@@ -236,7 +236,7 @@ class FileManager(private val game: Game) {
 
       newState.currentRound = round
       newState.currentTurnIdx = if (turn == "") 0 else newState.players.indexWhere(_.name == turn)
-      newState.setScaleIndex(newState.scales.map(_.code).max)
+      newState.setScaleIndex(newState.scalesVector.map(_.code).max)
       game.botDifficulty = botDifficulty
       game.weightsPerRound = weightPerRound
       game.numRounds = numRounds

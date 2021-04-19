@@ -36,7 +36,7 @@ case class Bot(val name: String, val state: State)
 
 
   def random(): Unit = {
-    val scales = state.scales
+    val scales = state.scalesVector
     var pos = 0
     var scale: Scale = null
     var command: Command = null
@@ -76,7 +76,7 @@ case class Bot(val name: String, val state: State)
       }
     }
 
-    for(scale <- state.scales){
+    for(scale <- state.scalesVector){
       for(idx <- 0 until 2*scale.radius+1){
         val pos = idx - scale.radius
         if(pos != 0){

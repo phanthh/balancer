@@ -28,15 +28,20 @@ class State(val game: Game) {
   var weightLeftOfRound = game.weightsPerRound
   //
   val baseScale = new Scale(null, 0, game.baseScaleRadius, nextScaleCode(), this)
+
+  private val scales = ArrayBuffer[Scale](baseScale)
+
+  def scalesVector = scales.toVector
+
   val players = ArrayBuffer[Player]()
 
   def humans = players.flatMap { case p: Human => Some(p) case _ => None }
 
   def bots = players.flatMap { case p: Bot => Some(p) case _ => None }
 
-  def scaleWithCode(code: Char) = scales.find(_.code == code)
+  def scaleWithCode(code: Char) = scalesVector.find(_.code == code)
 
-  def flippedScales = scales.filterNot(_.isBalanced)
+  def flippedScales = scalesVector.filterNot(_.isBalanced)
 
   def deleteFlippedScale(): Unit = {
     flippedScales.foreach(s => {
@@ -67,33 +72,35 @@ class State(val game: Game) {
   def buildScale(pos: Int, radius: Int, parentScale: Scale, scaleCode: Option[Char] = None) = {
     val newScale = new Scale(parentScale, pos, radius, scaleCode.getOrElse(nextScaleCode()), this)
     parentScale(pos) = newScale
+    scales.append(newScale)
     newScale
   }
 
   def buildWildScale(): Unit = {
     val scaleCode = nextScaleCode()
-    // Picking parent scales at level i, prioritize lower level scales
+    // Picking parent scalesVector at level i, prioritize lower level scalesVector
     // We are trying to place scale at level i+1
     var found = false
     for (i <- 0 to maxScaleLevel) {
-      var randomFindCount = 0
       val scalesAtLevelI = scalesAtLevel(i)
       val scalesAtLevelI1 = scalesAtLevel(i + 1)
       def findScale(): Unit = {
+        var randomFindCount = 0
         while(randomFindCount <= MaxRandomFind){
           val parentScale = scalesAtLevelI(Random.nextInt(scalesAtLevelI.length))
           val openPos = parentScale.openPos
-          if(openPos.length > 0){
+          if(openPos.nonEmpty){
             val pos = openPos(Random.nextInt(openPos.length))
             val aRadius = Random.between(1, baseScale.radius+1)
             val newScale = new Scale(parentScale, pos, aRadius, scaleCode, this)
             if(!(scalesAtLevelI1.exists(_.isOverLapWith(newScale)))) {
+              scales.append(newScale)
               parentScale(pos) = newScale
               found = true
               return
             }
-            randomFindCount += 1
           }
+          randomFindCount += 1
         }
       }
 
@@ -103,14 +110,13 @@ class State(val game: Game) {
   }
 
   def buildWildWeight(): Unit = {
-    val cachedScales = scales
     var pos = 0
     var scale: Scale = null
     var command: Command = null
     var randomFindCount = 0
 
     while(pos == 0 && randomFindCount < MaxRandomFind){
-      scale = cachedScales(Random.nextInt(cachedScales.length))
+      scale = scalesVector(Random.nextInt(scalesVector.length))
       pos = Random.between(-scale.radius, scale.radius)
       if(pos != 0) {
         scale(pos) match {
@@ -127,7 +133,6 @@ class State(val game: Game) {
     }
   }
 
-
   def buildBot(name: String) = {
     val newBot = new Bot(name, this)
     players.append(newBot)
@@ -140,19 +145,13 @@ class State(val game: Game) {
     newHuman
   }
 
-  // Recursive function to get all scalesVector
-  private def _scales(root_scale: Scale): Vector[Scale] =
-    root_scale.scalesVector.map(_scales).flatMap(_.toList).appended(root_scale)
-
-  def scales = _scales(baseScale)
-
   // Note: inefficient but easy to understand
-  def scalesAtLevel(level: Int) = scales.filter(_.level == level)
+  def scalesAtLevel(level: Int) = scalesVector.filter(_.level == level)
 
-  def maxScaleLevel = scales.map(_.level).max
+  def maxScaleLevel = scalesVector.map(_.level).max
 
   def removePlayer(player: Player) = {
-    for (scale <- scales) {
+    for (scale <- scalesVector) {
       for (stack <- scale.stacksVector) {
         stack.filterOut(player)
       }

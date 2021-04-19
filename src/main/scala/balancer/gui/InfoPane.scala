@@ -1,12 +1,9 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, endTurn, select}
-import balancer.objects.Command.placeWeight
+import balancer.gui.MainGUI.{draw, select}
 import balancer.objects.Player
 import balancer.utils.Helpers.{getTextColorFitBG, toBackgroundCSS}
-import balancer.utils.Prompts.invalidDialog
-import balancer.utils.{InvalidInput, OccupiedPosition}
 import scalafx.beans.property.StringProperty
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
@@ -46,10 +43,7 @@ class InfoPane(private val game: Game) extends VBox {
     select("weightsLeftLabel").asInstanceOf[javafx.scene.control.Label].setText("Weights Left: " + state.weightLeftOfRound.toString)
     select("roundLabel").asInstanceOf[javafx.scene.control.Label].setText("ROUND #" + state.currentRound.toString)
     state.players.foreach(p => p.propScore.update(p.score))
-  }
-
-  def updatePlayerList() = {
-    allPlayersInfo.children = state.players.map(createPlayerInfoBlock).toList
+    allPlayersInfo.children = state.players.sortBy(-_.propScore.value).map(createPlayerInfoBlock).toList
   }
 
   // Layouts (header, body, footer)
@@ -245,9 +239,11 @@ class InfoPane(private val game: Game) extends VBox {
       children = new Button {
         text = "X"
         onAction = _ => {
-          state.removePlayer(player)
-          updatePlayerList()
-          draw()
+          if(state.players.length > 1){
+            state.removePlayer(player)
+            updateContent()
+            draw()
+          }
         }
       }
     }
@@ -284,7 +280,7 @@ class InfoPane(private val game: Game) extends VBox {
 //      val scale = inputScaleCode.value.headOption match {
 //        case Some(code: Char) =>
 //          state.scaleWithCode(code).getOrElse(throw new InvalidInput(
-//            s"Invalid scale code must be: ${state.scales.map(_.code).mkString(",")}"
+//            s"Invalid scale code must be: ${state.scalesVector.map(_.code).mkString(",")}"
 //          ))
 //        case None =>
 //          throw new InvalidInput("Invalid scale code")

@@ -1,14 +1,14 @@
 package balancer.gui
 
 import balancer.Game
-import MainGUI.{createScene, draw}
+import balancer.gui.MainGUI.{draw, setScene}
 import balancer.utils.Constants.{GithubURL, GitlabURL, Rules, Version}
 import balancer.utils.Helpers.openURL
 import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
 import scalafx.scene.control._
 
-class TopMenuBar(private val friend: MidSplitPane, private val game: Game) extends MenuBar {
+class TopMenuBar(private val friend: MainPane, private val game: Game) extends MenuBar {
   private def state = game.state
 
   private def fm = game.fileManager
@@ -22,7 +22,7 @@ class TopMenuBar(private val friend: MidSplitPane, private val game: Game) exten
           onAction = _ => {
             game.reset()
             fm.loadDefault()
-            createScene()
+            setScene()
           }
 
         },
@@ -32,7 +32,7 @@ class TopMenuBar(private val friend: MidSplitPane, private val game: Game) exten
               success = (f) => {
                 game.reset()
                 fm.loadGame(f.getAbsolutePath)
-                createScene()
+                setScene()
               },
               failed = () => {}
             )
@@ -74,7 +74,7 @@ class TopMenuBar(private val friend: MidSplitPane, private val game: Game) exten
             Prompts.askNameDialog("Adding Human Player") match {
               case Some(name) => {
                 state.buildHuman(name)
-                createScene()
+                setScene()
               }
               case None =>
             }
@@ -84,7 +84,7 @@ class TopMenuBar(private val friend: MidSplitPane, private val game: Game) exten
             Prompts.askNameDialog("Adding Bot Player") match {
               case Some(name) => {
                 state.buildBot(name)
-                createScene()
+                setScene()
               }
               case None =>
             }

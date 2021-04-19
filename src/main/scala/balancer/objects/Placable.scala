@@ -3,6 +3,8 @@ package balancer.objects
 import balancer.State
 import balancer.grid.Coord
 
+import scala.collection.mutable.ArrayBuffer
+
 sealed trait Placable
   extends GameObject with Owner with Mass with Renderable {
   val pos: Int
@@ -12,7 +14,7 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
                  protected val state: State)
   extends Placable with Iterable[Option[Placable]]{
 
-  private var board = Array.fill[Option[Placable]](2*radius+1)(None)
+  private var board = ArrayBuffer.fill[Option[Placable]](2*radius+1)(None)
 
   def boardVector = board.toVector
 
