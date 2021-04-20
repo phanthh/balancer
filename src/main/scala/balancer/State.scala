@@ -29,7 +29,7 @@ class State(val game: Game) {
   //
   val baseScale = new Scale(null, 0, game.baseScaleRadius, nextScaleCode(), this)
 
-  private val scales = ArrayBuffer[Scale](baseScale)
+  private val scales = scala.collection.mutable.LinkedHashSet[Scale](baseScale)
 
   def scalesVector = scales.toVector
 
@@ -48,8 +48,16 @@ class State(val game: Game) {
       if (s == baseScale) {
         game.over = true
         return
-      } else s.parentScale.remove(s.pos)
+      } else {
+        removeScale(s)
+      }
     })
+  }
+
+  def removeScale(s: Scale): Unit = {
+    scales.remove(s)
+    s.parentScale.remove(s.pos)
+    s.scalesVector.foreach(removeScale(_))
   }
 
   def buildWeight(pos: Int, parentScale: Scale, owner: Option[Player] = None) = {
@@ -72,7 +80,7 @@ class State(val game: Game) {
   def buildScale(pos: Int, radius: Int, parentScale: Scale, scaleCode: Option[Char] = None) = {
     val newScale = new Scale(parentScale, pos, radius, scaleCode.getOrElse(nextScaleCode()), this)
     parentScale(pos) = newScale
-    scales.append(newScale)
+    scales.add(newScale)
     newScale
   }
 
@@ -94,7 +102,7 @@ class State(val game: Game) {
             val aRadius = Random.between(1, baseScale.radius+1)
             val newScale = new Scale(parentScale, pos, aRadius, scaleCode, this)
             if(!(scalesAtLevelI1.exists(_.isOverLapWith(newScale)))) {
-              scales.append(newScale)
+              scales.add(newScale)
               parentScale(pos) = newScale
               found = true
               return
@@ -182,6 +190,7 @@ class State(val game: Game) {
     if (undoStack.nonEmpty) {
       redoStack.push(undoStack.pop().undo())
     }
+    currentTurnIdx -= 1
   }
 
   def redo(): Unit = {

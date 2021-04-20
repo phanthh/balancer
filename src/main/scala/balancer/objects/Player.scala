@@ -4,7 +4,7 @@ import balancer.State
 import balancer.utils.Helpers.randomColor
 import balancer.objects.Command.placeWeight
 import balancer.utils.Constants.MaxRandomFind
-import scalafx.beans.property.IntegerProperty
+import scalafx.beans.property.{DoubleProperty, IntegerProperty}
 import scalafx.scene.paint.Color
 
 import scala.util.Random
@@ -15,8 +15,8 @@ sealed trait Player
   val name: String
 
   // For GUI
-  var propScore: IntegerProperty = IntegerProperty(0)
-  var propRoundWon: IntegerProperty = IntegerProperty(0)
+  val propScore: IntegerProperty = IntegerProperty(0)
+  val propRoundWon: IntegerProperty = IntegerProperty(0)
   var propColor: Color = randomColor()
 
   def playerCode: Char = name(0).toUpper
@@ -34,6 +34,8 @@ case class Human(val name: String, val state: State) extends Player
 case class Bot(val name: String, val state: State)
   extends Player {
 
+  val difficultyProp = DoubleProperty(state.game.botDifficulty)
+  def difficulty = difficultyProp.value
 
   def random(): Unit = {
     val scales = state.scalesVector

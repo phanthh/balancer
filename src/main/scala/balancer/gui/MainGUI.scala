@@ -8,7 +8,9 @@ import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
+import scalafx.scene.control.SplitPane
 import scalafx.scene.layout.BorderPane
+import scalafx.scene.text.Font
 
 import scala.util.Random
 
@@ -18,10 +20,15 @@ import scala.util.Random
  */
 object MainGUI extends JFXApp {
   private val game = new Game()
+  private val fontFile = "file:fonts/cyber.otf"
+  // Components of the main scene
+  var topMenuBar: TopMenuBar = _
+
   game.fileManager.loadDefault()
 
   // Setup a basic stage
   stage = new JFXApp.PrimaryStage {
+    title = "Balancer"
     width = ScreenWidth
     height = ScreenHeight
     title = "Balancer !"
@@ -37,11 +44,10 @@ object MainGUI extends JFXApp {
     }
     game.fileManager.loadDefault()
   }
-
-  // Components of the main scene
-  var topMenuBar: TopMenuBar = _
   var midSplitPane: MainPane = _
-  setScene()
+
+  def getDefaultFont(size: Int) = Font.loadFont(fontFile, size)
+  setGameScene()
 
   // For ease of references
   def state = game.state
@@ -57,12 +63,18 @@ object MainGUI extends JFXApp {
     be updated dynamically (i.e adding a new VBox,
     a new Label, etc,...). An entire new scene will be built.
    */
-  def setScene() = {
+  def setGameScene() = {
     midSplitPane = new MainPane(game)
     topMenuBar = new TopMenuBar(midSplitPane, game)
     // Preserver ScreenWidth and ScreenHeight
+    val (w, h) =
+      if (stage.getScene == null)
+        (ScreenWidth, ScreenHeight)
+      else
+        (stage.getScene.getWidth.toInt, stage.getScene.getHeight.toInt)
+
     stage.scene =
-      new Scene(stage.getWidth, stage.getHeight) {
+      new Scene(w, h) {
         root = {
           new BorderPane {
             top = topMenuBar
@@ -75,9 +87,25 @@ object MainGUI extends JFXApp {
     draw()
   }
 
+  def setMenuScene() = {
+    // Preserver ScreenWidth and ScreenHeight
+    val (w, h) =
+      if (stage.getScene == null)
+        (ScreenWidth, ScreenHeight)
+      else
+        (stage.getScene.getWidth.toInt, stage.getScene.getHeight.toInt)
+
+    stage.scene =
+      new Scene(w, h) { thisScene =>
+        root = new MenuCanvas
+      }
+    stage.sizeToScene()
+    draw()
+  }
+
   def draw() = midSplitPane.drawCanvas()
 
-  def select(id: String)= {
+  def select(id: String) = {
     stage.getScene.lookup("#" + id)
   }
 
@@ -119,11 +147,11 @@ object MainGUI extends JFXApp {
         placeSomeWildScale(state, amount=1)
         placeSomeWildWeight(state, amount=5)
 
-//        showInfoDialog(
-//          titleText = "New round begin !!!",
-//          header = s"ROUND: ${state.currentRound}",
-//          content = ""
-//        )
+        //        showInfoDialog(
+        //          titleText = "New round begin !!!",
+        //          header = s"ROUND: ${state.currentRound}",
+        //          content = ""
+        //        )
       }
     } else {
       // The round continue -> move on to next player
@@ -134,13 +162,13 @@ object MainGUI extends JFXApp {
            Higher value of game.botDifficulty -> higher chance
            of the bot just placing weight randomly.
            */
-          if (Random.nextFloat() > game.botDifficulty) {
+          if (Random.nextFloat() > bot.difficulty) {
             bot.random()
           } else {
             bot.bestMove()
           }
 
-          // End of move, calling again endTurnHook()
+          // End of bot move, calling again endTurnHook()
           endTurnHook()
         case human: Human =>
         /*

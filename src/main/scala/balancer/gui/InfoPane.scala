@@ -1,9 +1,10 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, select}
-import balancer.objects.Player
+import balancer.gui.MainGUI.{draw, getDefaultFont, select}
+import balancer.objects.{Bot, Player}
 import balancer.utils.Helpers.{getTextColorFitBG, toBackgroundCSS}
+import scalafx.beans.binding.Bindings
 import scalafx.beans.property.StringProperty
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
@@ -51,11 +52,11 @@ class InfoPane(private val game: Game) extends VBox {
       alignment = Pos.Center
       children = List(
         new Label("SCOREBOARD") {
-          font = new Font("Arial", 24)
+          font = getDefaultFont(18)
         },
         new Label() {
           id = "weightsLeftLabel"
-          font = new Font("Arial", 18)
+          font = getDefaultFont(18)
           text = "Weights Left: " + state.weightLeftOfRound.toString
         }
       )
@@ -71,6 +72,7 @@ class InfoPane(private val game: Game) extends VBox {
       children = List(
         new Button {
           text = "Add weight"
+          font = getDefaultFont(14)
           onAction = _ => {
             if (!(game.over)) {
               state.buildWildWeight()
@@ -92,25 +94,6 @@ class InfoPane(private val game: Game) extends VBox {
       )
     },
     new Separator,
-    // Bot difficulty sliders
-    new VBox {
-      val difficultyLabel = new Label {
-        text = "Bot Difficulty: " + game.botDifficulty.toString
-      }
-      val difficultySlider = new ScrollBar {
-        max = 1.0
-        min = 0.0
-        unitIncrement = 0.1
-        value = game.botDifficulty
-        value.onChange((_, _, _) => {
-          game.botDifficulty = value()
-          difficultyLabel.text = "Bot Difficulty: " + ((game.botDifficulty * 10).toInt / 10.0).toString
-        })
-      }
-      alignment = Pos.Center
-      children = List(difficultyLabel, difficultySlider)
-    },
-    new Separator,
     // Undo Redo Button
     new HBox {
       alignment = Pos.Center
@@ -118,6 +101,7 @@ class InfoPane(private val game: Game) extends VBox {
       children = List(
         new Button {
           text = "Undo"
+          font = getDefaultFont(14)
           onAction = _ => {
             if (!(game.over) && state.undoable) {
               state.undo()
@@ -128,6 +112,7 @@ class InfoPane(private val game: Game) extends VBox {
         },
         new Button {
           text = "Redo"
+          font = getDefaultFont(14)
           onAction = _ => {
             if (!(game.over) && state.redoable) {
               state.redo()
@@ -180,10 +165,9 @@ class InfoPane(private val game: Game) extends VBox {
         new Label {
           id = "roundLabel"
           hgrow = Priority.Always
-          font = new Font("Arial", 24)
+          font = getDefaultFont(24)
           text = "Round #" + state.currentRound.toString
         }
-
     }
   )
 
@@ -191,48 +175,36 @@ class InfoPane(private val game: Game) extends VBox {
   private def createPlayerInfoBlock(player: Player): BorderPane = {
     val parentBlock = new BorderPane {
       style = toBackgroundCSS(player.propColor)
+      padding = Insets(5)
     }
+
     val playerName =
       new Label {
         text = player.name.capitalize + "(" + player.playerCode + ")"
         textFill = getTextColorFitBG(player.propColor)
-        font = new Font("Arial", 18)
+        font = getDefaultFont(24)
       }
     val playerScore =
       new Label {
-        font = new Font("Arial", 14)
+        font = getDefaultFont(14)
         textFill = getTextColorFitBG(player.propColor)
         text <== StringProperty("Score: ") + player.propScore.asString()
       }
 
     val playerRoundWon =
       new Label {
-        font = new Font("Arial", 14)
+        font = getDefaultFont(14)
         textFill = getTextColorFitBG(player.propColor)
         text <== StringProperty("Won: ") + player.propRoundWon.asString()
       }
 
-    val colorPicker = new ColorPicker(player.propColor) {
-      maxWidth = 30
-      onAction = (e) => {
-        val newColor = new Color(value())
-        if(newColor != player.propColor){
-          player.propColor = newColor
-          parentBlock.style = toBackgroundCSS(newColor)
-          playerName.textFill = getTextColorFitBG(newColor)
-          playerScore.textFill = getTextColorFitBG(newColor)
-          playerRoundWon.textFill = getTextColorFitBG(newColor)
-          updateContent()
-          draw()
-        }
-      }
-    }
 
     val deleteButton = new VBox {
       alignment = Pos.Center
       padding = Insets(10, 10, 10, 10)
       children = new Button {
         text = "X"
+        font = getDefaultFont(14)
         onAction = _ => {
           if(state.players.length > 1){
             state.removePlayer(player)
@@ -259,6 +231,66 @@ class InfoPane(private val game: Game) extends VBox {
       children = List(playerScore, playerRoundWon)
     }
     parentBlock.right = deleteButton
+
+    // Bot difficulty sliders
+    var difficultyLabel: Label = null
+    player match {
+      case bot: Bot =>
+        val diff = new HBox {
+          difficultyLabel = new Label {
+            text <== Bindings.createStringBinding(
+              () => "Difficulty: " + (bot.difficultyProp.value * 10.0).toInt / 10.0,
+              bot.difficultyProp
+            )
+            textFill = getTextColorFitBG(bot.propColor)
+            margin = Insets(5, 5, 0, 5)
+            font = getDefaultFont(14)
+          }
+          alignment = Pos.Center
+          margin = Insets(5, 5, 0, 5)
+          children = List(difficultyLabel,
+            new ScrollBar {
+              max = 1.0
+              min = 0.0
+              unitIncrement = 0.1
+              value <==> bot.difficultyProp
+              hgrow = Priority.Always
+              vgrow = Priority.Always
+            }
+          )
+        }
+        parentBlock.bottom = diff
+      case _ =>
+    }
+
+    val colorPicker = new ColorPicker(player.propColor) {
+      maxWidth = 30
+      onAction = (e) => {
+        val newColor = new Color(value())
+        val textFillColor = getTextColorFitBG(newColor)
+        if (newColor != player.propColor) {
+          player.propColor = newColor
+          parentBlock.style = toBackgroundCSS(newColor)
+          playerName.textFill = textFillColor
+          playerScore.textFill = textFillColor
+          playerRoundWon.textFill = textFillColor
+          if(player.isInstanceOf[Bot]){
+            difficultyLabel.textFill = textFillColor
+          }
+          updateContent()
+          draw()
+        }
+      }
+    }
+
+    parentBlock.left = new VBox {
+      alignment = Pos.Center
+      minWidth = 80
+      children = List(
+        playerName,
+        colorPicker
+      )
+    }
     parentBlock
   }
 

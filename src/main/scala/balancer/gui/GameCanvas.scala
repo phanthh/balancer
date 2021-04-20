@@ -2,7 +2,7 @@ package balancer.gui
 
 import balancer.Game
 import balancer.grid.Grid._
-import balancer.gui.MainGUI.endTurnHook
+import balancer.gui.MainGUI.{endTurnHook, getDefaultFont}
 import balancer.objects.Command.placeWeight
 import balancer.objects.{Player, Scale, Stack}
 import balancer.utils.Constants._
@@ -14,7 +14,7 @@ import scalafx.scene.image.Image
 import scalafx.scene.input.MouseButton
 import scalafx.scene.layout.VBox
 import scalafx.scene.paint.Color
-import scalafx.scene.text.{Font, TextAlignment}
+import scalafx.scene.text.TextAlignment
 
 
 /**
@@ -38,7 +38,7 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
   // Canvas's graphic context settings
   gc.setTextAlign(TextAlignment.Center)
   gc.setTextBaseline(VPos.Center)
-  gc.setFont(Font.loadFont("file:fonts/cyber.otf", 35))
+  gc.setFont(getDefaultFont(35))
   grid.update()
   private val zoomNode = new Group(canvas)
   /**
@@ -186,6 +186,11 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
   private var gridOn = false
   def toggleGrid() = {
     gridOn = !gridOn
+  }
+
+  private var showLogo = false
+  def toggleLogo() = {
+    showLogo = !showLogo
   }
 
   /**

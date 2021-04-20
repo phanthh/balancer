@@ -14,7 +14,7 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
                  protected val state: State)
   extends Placable with Iterable[Option[Placable]]{
 
-  private var board = ArrayBuffer.fill[Option[Placable]](2*radius+1)(None)
+  private val board = ArrayBuffer.fill[Option[Placable]](2*radius+1)(None)
 
   def boardVector = board.toVector
 
@@ -63,27 +63,13 @@ case class Scale(val parentScale: Scale, val pos: Int, val radius: Int, val code
       None
   }
 
-  def leftTorque = {
-    var torque = 0
-    for(pos <- -radius to -1) {
-      board(pos+radius) match {
-        case Some(p) => torque += (-pos)*p.mass
-        case None =>
-      }
-    }
-    torque
-  }
+  def leftTorque =
+    Range(-radius, 0).flatMap(pos => board(pos+radius)).foldLeft(0)(
+      (acc, p) => acc + (-p.pos)*p.mass)
 
-  def rightTorque = {
-    var torque = 0
-    for(pos <- 1 to radius) {
-      board(pos+radius) match {
-        case Some(p) => torque += pos*p.mass
-        case None =>
-      }
-    }
-    torque
-  }
+  def rightTorque =
+    Range(1, radius+1).flatMap(pos => board(pos+radius)).foldLeft(0)(
+      (acc, p) => acc + (p.pos)*p.mass)
 
   def isBalanced = scala.math.abs(leftTorque-rightTorque) <= radius
 

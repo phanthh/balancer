@@ -22,9 +22,8 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
           onAction = _ => {
             game.reset()
             fm.loadDefault()
-            setScene()
+            setGameScene()
           }
-
         },
         new MenuItem("Open...") {
           onAction = _ => {
@@ -32,7 +31,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
               success = (f) => {
                 game.reset()
                 fm.loadGame(f.getAbsolutePath)
-                setScene()
+                setGameScene()
               },
               failed = () => {}
             )
@@ -47,6 +46,13 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
               },
               failed = () => {}
             )
+        },
+        new SeparatorMenuItem(),
+        new MenuItem("Back To Menu") {
+          onAction = _ => {
+            game.over = true
+            setMenuScene()
+          }
         },
         new SeparatorMenuItem(),
         new MenuItem("Exit") {
@@ -74,7 +80,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
             Prompts.askNameDialog("Adding Human Player") match {
               case Some(name) => {
                 state.buildHuman(name)
-                setScene()
+                setGameScene()
               }
               case None =>
             }
@@ -84,7 +90,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
             Prompts.askNameDialog("Adding Bot Player") match {
               case Some(name) => {
                 state.buildBot(name)
-                setScene()
+                setGameScene()
               }
               case None =>
             }

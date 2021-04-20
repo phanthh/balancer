@@ -8,8 +8,9 @@ import scalafx.scene.control.SplitPane
   and the right side pane (InfoPane)
  */
 class MainPane(private val game: Game) extends SplitPane {
-  private var infoPane = new InfoPane(game)
+  var infoPane = new InfoPane(game)
   private val gameCanvas = new GameCanvas(this, game)
+  def getGameCanvas = gameCanvas
 
   def gc = gameCanvas.gc
 
