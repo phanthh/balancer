@@ -3,6 +3,8 @@ package balancer
 import balancer.objects._
 import balancer.utils.Constants.{MaxRandomFind, MaxUndo}
 import balancer.utils.OccupiedPosition
+import scalafx.beans.binding.Bindings
+import scalafx.beans.property.{IntegerProperty, ObjectProperty}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random

@@ -13,7 +13,13 @@ import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
 class InfoPane(private val game: Game) extends VBox {
-  private def state = game.state
+  private val allPlayersInfo =
+    new VBox {
+      vgrow = Priority.Always
+      spacing = 10
+      alignment = Pos.TopCenter
+      children = state.players.map(createPlayerInfoBlock).toList
+    }
 
   // Binding points for form input (For manual input - debugging)
   // private var inputScaleCode: StringProperty = StringProperty("")
@@ -24,14 +30,6 @@ class InfoPane(private val game: Game) extends VBox {
   maxWidth = 300
   minWidth = 200
   spacing = 10
-
-  private val allPlayersInfo =
-    new VBox {
-      vgrow = Priority.Always
-      spacing = 10
-      alignment = Pos.TopCenter
-      children = state.players.map(createPlayerInfoBlock).toList
-    }
 
   /**
    * Updating UI elements when the state changes.
@@ -45,6 +43,8 @@ class InfoPane(private val game: Game) extends VBox {
     state.players.foreach(p => p.propScore.update(p.score))
     allPlayersInfo.children = state.players.sortBy(-_.propScore.value).map(createPlayerInfoBlock).toList
   }
+
+  private def state = game.state
 
   children = List(
     // Header
@@ -83,6 +83,7 @@ class InfoPane(private val game: Game) extends VBox {
         },
         new Button {
           text = "Add scale"
+          font = getDefaultFont(14)
           onAction = _ => {
             if (!(game.over)) {
               state.buildWildScale()
@@ -132,33 +133,33 @@ class InfoPane(private val game: Game) extends VBox {
       children =
         new Label {
           id = "turnLabel"
-          font = new Font("Arial", 30)
+          font = getDefaultFont(30)
           textFill = getTextColorFitBG(state.currentTurn.propColor)
           text = state.currentTurn.name.capitalize
         }
     },
     // Input fields for adding scale manually (DEBUG)
-//    new TextField {
-//      promptText = "Enter the scale code"
-//      maxWidth = 200
-//      text <==> inputScaleCode
-//    },
-//    new TextField {
-//      promptText = "Enter the position"
-//      maxWidth = 200
-//      text <==> inputPos
-//    },
-//    // End turn button to submit turn
-//    new Button {
-//      text = "END TURN"
-//      maxWidth = 200
-//      minWidth = 150
-//      onAction = _ => {
-//        // Disable button when game is over
-//        if (!(game.over)) executeTurn()
-//      }
-//    },
-//    new Separator,
+    //    new TextField {
+    //      promptText = "Enter the scale code"
+    //      maxWidth = 200
+    //      text <==> inputScaleCode
+    //    },
+    //    new TextField {
+    //      promptText = "Enter the position"
+    //      maxWidth = 200
+    //      text <==> inputPos
+    //    },
+    //    // End turn button to submit turn
+    //    new Button {
+    //      text = "END TURN"
+    //      maxWidth = 200
+    //      minWidth = 150
+    //      onAction = _ => {
+    //        // Disable button when game is over
+    //        if (!(game.over)) executeTurn()
+    //      }
+    //    },
+    //    new Separator,
     new VBox {
       alignment = Pos.Center
       children =
@@ -206,7 +207,7 @@ class InfoPane(private val game: Game) extends VBox {
         text = "X"
         font = getDefaultFont(14)
         onAction = _ => {
-          if(state.players.length > 1){
+          if (state.players.length > 1) {
             state.removePlayer(player)
             updateContent()
             draw()
@@ -215,14 +216,6 @@ class InfoPane(private val game: Game) extends VBox {
       }
     }
 
-    parentBlock.left = new VBox {
-      alignment = Pos.Center
-      minWidth = 80
-      children = List(
-        playerName,
-        colorPicker
-      )
-    }
     parentBlock.center = new VBox {
       alignment = Pos.Center
       spacing = 10
@@ -295,34 +288,34 @@ class InfoPane(private val game: Game) extends VBox {
   }
 
   // Execute when end turn button is clicked (For Debuging)
-//  private def executeTurn(): Unit = {
-//    try {
-//      val pos = inputPos.value.toIntOption match {
-//        case Some(pos: Int) =>
-//          if (pos == 0) throw new InvalidInput("Position cannot be 0")
-//          pos
-//        case None => throw new InvalidInput("Invalid Position")
-//      }
-//
-//      val scale = inputScaleCode.value.headOption match {
-//        case Some(code: Char) =>
-//          state.scaleWithCode(code).getOrElse(throw new InvalidInput(
-//            s"Invalid scale code must be: ${state.scalesVector.map(_.code).mkString(",")}"
-//          ))
-//        case None =>
-//          throw new InvalidInput("Invalid scale code")
-//      }
-//      state.execute(placeWeight(state.currentTurn, pos, scale, state))
-//      endTurnHook()
-//      updateContent()
-//      draw()
-//    } catch {
-//      case e: ArrayIndexOutOfBoundsException =>
-//        invalidDialog(s"Position is off the scale")
-//      case e: OccupiedPosition =>
-//        invalidDialog("Position has already been occupied")
-//      case e: InvalidInput =>
-//        invalidDialog(e.getMessage)
-//    }
-//  }
+  //  private def executeTurn(): Unit = {
+  //    try {
+  //      val pos = inputPos.value.toIntOption match {
+  //        case Some(pos: Int) =>
+  //          if (pos == 0) throw new InvalidInput("Position cannot be 0")
+  //          pos
+  //        case None => throw new InvalidInput("Invalid Position")
+  //      }
+  //
+  //      val scale = inputScaleCode.value.headOption match {
+  //        case Some(code: Char) =>
+  //          state.scaleWithCode(code).getOrElse(throw new InvalidInput(
+  //            s"Invalid scale code must be: ${state.scalesVector.map(_.code).mkString(",")}"
+  //          ))
+  //        case None =>
+  //          throw new InvalidInput("Invalid scale code")
+  //      }
+  //      state.execute(placeWeight(state.currentTurn, pos, scale, state))
+  //      endTurnHook()
+  //      updateScoreBoard()
+  //      draw()
+  //    } catch {
+  //      case e: ArrayIndexOutOfBoundsException =>
+  //        invalidDialog(s"Position is off the scale")
+  //      case e: OccupiedPosition =>
+  //        invalidDialog("Position has already been occupied")
+  //      case e: InvalidInput =>
+  //        invalidDialog(e.getMessage)
+  //    }
+  //  }
 }

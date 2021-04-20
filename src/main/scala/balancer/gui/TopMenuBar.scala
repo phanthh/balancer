@@ -1,7 +1,7 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, setScene}
+import balancer.gui.MainGUI.{draw, setGameScene, setMenuScene}
 import balancer.utils.Constants.{Abouts, GithubURL, GitlabURL, Rules, Version}
 import balancer.utils.Helpers.openURL
 import balancer.utils.Prompts

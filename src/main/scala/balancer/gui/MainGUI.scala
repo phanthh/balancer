@@ -31,7 +31,6 @@ object MainGUI extends JFXApp {
     title = "Balancer"
     width = ScreenWidth
     height = ScreenHeight
-    title = "Balancer !"
   }
 
   // If there is no player in the default file -> prompt for name
