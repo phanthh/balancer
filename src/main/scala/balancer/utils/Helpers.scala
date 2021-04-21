@@ -1,8 +1,12 @@
 package balancer.utils
 
 import balancer.State
+import balancer.utils.Constants.FontFile
+import scalafx.concurrent.Task
+import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{HBox, Priority, Region, VBox}
 import scalafx.scene.paint.Color
+import scalafx.scene.text.Font
 
 import java.awt.Desktop
 import java.io.IOException
@@ -10,7 +14,6 @@ import java.net.{URI, URISyntaxException}
 import scala.util.Random
 
 object Helpers {
-
   def toBackgroundCSS(color: Color) =
     s"-fx-background-color: rgb(${color.getRed * 255}, ${color.getGreen * 255}, ${color.getBlue * 255});"
 
@@ -23,18 +26,6 @@ object Helpers {
       0.691*(bgColor.getGreen) * (bgColor.getGreen) +
       0.068*(bgColor.getBlue) * (bgColor.getBlue))
     if(brightness > 0.5) Color.Black else Color.White
-  }
-
-  def createVSpacer(): Region = {
-    val spacer = new Region
-    VBox.setVgrow(spacer, Priority.Always)
-    spacer
-  }
-
-  def createHSpacer(): Region = {
-    val spacer = new Region
-    HBox.setHgrow(spacer, Priority.Always)
-    spacer
   }
 
   def openURL(url: String) = {
@@ -69,4 +60,14 @@ object Helpers {
       state.buildWildScale()
     }
   }
+
+  def scaleImage(source: Image, targetWidth: Int, targetHeight: Int, preserveRatio: Boolean) = {
+    val imageView = new ImageView(source)
+    imageView.setPreserveRatio(preserveRatio)
+    imageView.setFitWidth(targetWidth)
+    imageView.setFitHeight(targetHeight)
+    imageView.snapshot(null, null)
+  }
+
+  def getDefaultFont(size: Int) = Font.loadFont(FontFile, size)
 }

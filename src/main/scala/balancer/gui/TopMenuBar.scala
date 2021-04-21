@@ -1,7 +1,7 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, setGameScene, setMenuScene}
+import balancer.gui.MainGUI.{setGameScene, setMenuScene}
 import balancer.utils.Constants._
 import balancer.utils.Helpers.openURL
 import balancer.utils.Prompts
@@ -11,12 +11,9 @@ import scalafx.scene.control._
 class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends MenuBar {
   private def state = game.state
 
-  private def fm = game.fileManager
-
-  private def updateInfoPane() = mainPane.updateSidePane()
   private def newGame(f: String = null) = {
     game.reset()
-    if(f == null) {
+    if (f == null) {
       fm.loadDefault()
     } else {
       fm.loadGame(f)
@@ -24,10 +21,12 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
     setGameScene()
   }
 
+  private def fm = game.fileManager
 
-  menus = List(
+  menus = Seq(
     new Menu("File") {
-      items = List(
+      items = Seq(
+        // "New": Reset the game
         new MenuItem("New") {
           onAction = _ => {
             if (!(game.over)) {
@@ -50,6 +49,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
             }
           }
         },
+        // "Open": Load new game from file
         new MenuItem("Open...") {
           onAction = _ => {
             Prompts.openFileDialog(
@@ -61,6 +61,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
           }
         },
         new SeparatorMenuItem(),
+        // "Save": Save the game to file
         new MenuItem("Save...") {
           if (game.over) disable = true
           onAction = _ =>
@@ -72,6 +73,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
             )
         },
         new SeparatorMenuItem(),
+        // "Back to Menu": Go back to the menu splash screen
         new MenuItem("Back To Menu") {
           if (game.over) disable = true
           onAction = _ => {
@@ -93,6 +95,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
           }
         },
         new SeparatorMenuItem(),
+        // "Exit": Exit the game
         new MenuItem("Exit") {
           onAction = _ =>
             Prompts.askSavingDialog(
@@ -112,7 +115,8 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
       )
     },
     new Menu("Edit") {
-      items = List(
+      items = Seq(
+        // "Add Human": Add a new human player
         new MenuItem("Add Human") {
           if (game.over) disable = true
           onAction = _ =>
@@ -124,6 +128,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
               case None =>
             }
         },
+        // "Add Human": Add a new bot player
         new MenuItem("Add Bot") {
           if (game.over) disable = true
           onAction = _ =>
@@ -135,36 +140,40 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
               case None =>
             }
         },
+        // "Undo": Undo the previos moves
         new SeparatorMenuItem,
         new MenuItem("Undo") {
           onAction = _ => {
             if (!(game.over) && state.undoable) {
               state.undo()
-              updateInfoPane()
-              draw()
+              mainPane.updateSidePane()
+              mainPane.drawCanvas()
             }
           }
         },
+        // "Redo": Redo the previos undoed moves
         new MenuItem("Redo") {
           onAction = _ => {
             if (!(game.over) && state.redoable) {
               state.redo()
-              updateInfoPane()
-              draw()
+              mainPane.updateSidePane()
+              mainPane.drawCanvas()
             }
           }
         },
+        // "Toggle Grid": Toggling the grid on or off
         new MenuItem("Toggle Grid") {
           if (game.over) disable = true
           onAction = _ => {
             mainPane.toggleGrid()
-            draw()
+            mainPane.drawCanvas()
           }
         },
       )
     },
     new Menu("Help") {
-      items = List(
+      items = Seq(
+        // "Rules": Show the rules of the game
         new MenuItem("Rules") {
           onAction = _ => {
             showInfoDialog(
@@ -175,17 +184,20 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
           }
         },
         new SeparatorMenuItem,
+        // "Github": open the github link using the default browwer
         new MenuItem("Github") {
           onAction = _ => {
             openURL(GithubURL)
           }
         },
+        // "Gitlab": open the gitlab link using the default browwer
         new MenuItem("Gitlab") {
           onAction = _ => {
             openURL(GitlabURL)
           }
         },
         new SeparatorMenuItem,
+        // "About": showing the about page
         new MenuItem("About...") {
           onAction = _ => {
             showInfoDialog(

@@ -1,5 +1,6 @@
 package balancer
 
+import balancer.gui.MainGUI.state
 import balancer.objects._
 import balancer.utils.Constants.{MaxRandomFind, MaxUndo}
 import balancer.utils.OccupiedPosition
@@ -177,27 +178,42 @@ class State(val game: Game) {
   def redoable = redoStack.nonEmpty
 
   def execute(command: Command) = {
-    if (redoStack.nonEmpty) redoStack.clear()
+    if (redoStack.nonEmpty) {
+      redoStack.clear()
+    }
     undoStack.push(command.execute())
-    if (undoStack.length >= MaxUndo) undoStack.dropRightInPlace(1)
+    if (undoStack.length >= MaxUndo) {
+      undoStack.dropRightInPlace(1)
+    }
   }
 
   def addExecuted(command: Command) = {
-    if (redoStack.nonEmpty) redoStack.clear()
+    if (redoStack.nonEmpty) {
+      redoStack.clear()
+    }
     undoStack.push(command)
-    if (undoStack.length >= MaxUndo) undoStack.dropRightInPlace(1)
+    if (undoStack.length >= MaxUndo) {
+      undoStack.dropRightInPlace(1)
+    }
   }
 
   def undo(): Unit = {
-    if (undoStack.nonEmpty) {
+    if (undoable) {
       redoStack.push(undoStack.pop().undo())
+
+      currentTurnIdx -= 1
+      if (currentTurnIdx < 0) currentTurnIdx = players.length-1
+      weightLeftOfRound += 1
     }
-    currentTurnIdx -= 1
   }
 
   def redo(): Unit = {
-    if (redoStack.nonEmpty) {
-      redoStack.pop().execute()
+    if (redoable) {
+      undoStack.push(redoStack.pop().execute())
+
+      currentTurnIdx += 1
+      if (currentTurnIdx >= players.length) currentTurnIdx = 0
+      weightLeftOfRound -= 1
     }
   }
 }

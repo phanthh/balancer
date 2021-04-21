@@ -1,9 +1,9 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, getDefaultFont, select}
+import balancer.gui.MainGUI.selectElementWithId
 import balancer.objects.{Bot, Player}
-import balancer.utils.Helpers.{getTextColorFitBG, toBackgroundCSS}
+import balancer.utils.Helpers.{getDefaultFont, getTextColorFitBG, toBackgroundCSS}
 import scalafx.beans.binding.Bindings
 import scalafx.beans.property.StringProperty
 import scalafx.geometry.{Insets, Pos}
@@ -11,42 +11,43 @@ import scalafx.scene.control._
 import scalafx.scene.layout.{BorderPane, HBox, Priority, VBox}
 import scalafx.scene.paint.Color
 
-class InfoPane(private val game: Game) extends VBox {
-
-  private val scoreBoard =
-    new VBox {
-      vgrow = Priority.Always
-      spacing = 10
-      alignment = Pos.TopCenter
-      children = state.players.map(playerScoreEntry).toList
-    }
-
+class InfoPane(private val mainPane: MainPane, private val game: Game) extends VBox {
   alignment = Pos.Center
   fillWidth = true
   maxWidth = 300
   minWidth = 200
   spacing = 10
 
+  private val scoreBoard =
+    new VBox {
+      vgrow = Priority.Always
+      spacing = 10
+      alignment = Pos.TopCenter
+      children = state.players.map(playerScoreEntry).toSeq
+    }
+
   /**
    * Updating UI elements when the state changes.
    */
   def updateContent() = {
-    select("turnLabel").asInstanceOf[javafx.scene.control.Label].setText(state.currentTurn.name.capitalize)
-    select("turnLabel").asInstanceOf[javafx.scene.control.Label].setTextFill(getTextColorFitBG(state.currentTurn.propColor))
-    select("turnBox").setStyle(toBackgroundCSS(state.currentTurn.propColor))
-    select("weightsLeftLabel").asInstanceOf[javafx.scene.control.Label].setText("Weights Left: " + state.weightLeftOfRound.toString)
-    select("roundLabel").asInstanceOf[javafx.scene.control.Label].setText("ROUND #" + state.currentRound.toString)
+    selectElementWithId("turnLabel").asInstanceOf[javafx.scene.control.Label].setText(state.currentTurn.name.capitalize)
+    selectElementWithId("turnLabel").asInstanceOf[javafx.scene.control.Label].setTextFill(getTextColorFitBG(state.currentTurn.propColor))
+    selectElementWithId("turnBox").setStyle(toBackgroundCSS(state.currentTurn.propColor))
+    selectElementWithId("weightsLeftLabel").asInstanceOf[javafx.scene.control.Label].setText("Weights Left: " + state.weightLeftOfRound.toString)
+    selectElementWithId("roundLabel").asInstanceOf[javafx.scene.control.Label].setText("ROUND #" + state.currentRound.toString)
     state.players.foreach(p => p.propScore.update(p.score))
-    scoreBoard.children = state.players.sortBy(-_.propScore.value).map(playerScoreEntry).toList
+    scoreBoard.children = state.players.sortBy(-_.propScore.value).map(playerScoreEntry).toSeq
   }
+
+  private def draw() = mainPane.drawCanvas()
 
   private def state = game.state
 
-  children = List(
+  children = Seq(
     // Header
     new VBox {
       alignment = Pos.Center
-      children = List(
+      children = Seq(
         new Label("SCOREBOARD") {
           font = getDefaultFont(18)
         },
@@ -60,11 +61,11 @@ class InfoPane(private val game: Game) extends VBox {
     new Separator,
     // Body
     scoreBoard,
-    // Adding random weight and scale buttons
+    // Buttons to add random weight and scale
     new HBox {
       alignment = Pos.Center
       spacing = 20
-      children = List(
+      children = Seq(
         new Button {
           text = "Add weight"
           font = getDefaultFont(14)
@@ -88,11 +89,11 @@ class InfoPane(private val game: Game) extends VBox {
       )
     },
     new Separator,
-    // Undo Redo Button
+    // Undo-Redo Button
     new HBox {
       alignment = Pos.Center
       spacing = 20
-      children = List(
+      children = Seq(
         new Button {
           text = "Undo"
           font = getDefaultFont(14)
@@ -146,8 +147,8 @@ class InfoPane(private val game: Game) extends VBox {
   /**
    * Create score entry of each player
    *
-   * @param player player ref to produce info block
-   * @return
+   * @param player player to produce score entry
+   * @return a BorderPane with all the relevant information of the player
    */
   private def playerScoreEntry(player: Player): BorderPane = {
     val parentBlock = new BorderPane {
@@ -161,6 +162,7 @@ class InfoPane(private val game: Game) extends VBox {
         textFill = getTextColorFitBG(player.propColor)
         font = getDefaultFont(24)
       }
+
     val playerScore =
       new Label {
         font = getDefaultFont(14)
@@ -174,8 +176,6 @@ class InfoPane(private val game: Game) extends VBox {
         textFill = getTextColorFitBG(player.propColor)
         text <== StringProperty("Won: ") + player.propRoundWon.asString()
       }
-
-
     val deleteButton = new VBox {
       alignment = Pos.Center
       padding = Insets(10, 10, 10, 10)
@@ -197,12 +197,13 @@ class InfoPane(private val game: Game) extends VBox {
       spacing = 10
       minWidth = 100
       maxWidth = 200
-      children = List(playerScore, playerRoundWon)
+      children = Seq(playerScore, playerRoundWon)
     }
     parentBlock.right = deleteButton
 
     // Bot difficulty sliders
     var difficultyLabel: Label = null
+
     player match {
       case bot: Bot =>
         val diff = new HBox {
@@ -217,7 +218,7 @@ class InfoPane(private val game: Game) extends VBox {
           }
           alignment = Pos.Center
           margin = Insets(5, 5, 0, 5)
-          children = List(difficultyLabel,
+          children = Seq(difficultyLabel,
             new ScrollBar {
               max = 1.0
               min = 0.0
@@ -254,7 +255,7 @@ class InfoPane(private val game: Game) extends VBox {
     parentBlock.left = new VBox {
       alignment = Pos.Center
       minWidth = 80
-      children = List(
+      children = Seq(
         playerName,
         colorPicker
       )

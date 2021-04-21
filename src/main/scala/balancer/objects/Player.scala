@@ -94,7 +94,6 @@ case class Bot(val name: String, val state: State)
       }
     }
     if(best_pos == 0 || best_scale == null || best_score == -1) {
-      println("SWITCH TO RANDOME")
       random()
     } else
       state.execute(placeWeight(this, best_pos, best_scale, state))

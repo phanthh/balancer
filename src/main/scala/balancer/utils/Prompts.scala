@@ -4,6 +4,7 @@ import balancer.gui.MainGUI.stage
 import scalafx.Includes.observableList2ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, ButtonType, TextInputDialog}
+import scalafx.scene.layout.Region
 import scalafx.stage.FileChooser
 import scalafx.stage.FileChooser.ExtensionFilter
 
@@ -82,10 +83,12 @@ object Prompts {
 
   def showInfoDialog(titleText: String, header: String, content: String): Unit = {
     val alert = new Alert(AlertType.Information){
+      dialogPane().setMinHeight(Region.USE_PREF_SIZE)
       initOwner(stage)
       title = titleText
       headerText = header
       contentText = content
+      resizable = true
     }
     alert.showAndWait()
   }

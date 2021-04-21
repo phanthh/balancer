@@ -2,17 +2,17 @@ package balancer.gui
 
 import balancer.Game
 import balancer.grid.Grid._
-import balancer.gui.MainGUI.{endTurnHook, getDefaultFont}
+import balancer.gui.MainGUI.endTurnHook
 import balancer.objects.Command.placeWeight
-import balancer.objects.{Player, Scale, Stack}
+import balancer.objects.{Human, Player, Scale, Stack}
 import balancer.utils.Constants._
+import balancer.utils.Helpers.{getDefaultFont, scaleImage}
 import scalafx.geometry.{Point2D, Pos, VPos}
 import scalafx.scene.Group
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.control.ScrollPane
-import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.MouseButton
-import scalafx.scene.layout.{StackPane, VBox}
+import scalafx.scene.layout.VBox
 import scalafx.scene.paint.Color
 import scalafx.scene.text.TextAlignment
 
@@ -24,9 +24,33 @@ import scalafx.scene.text.TextAlignment
  * @param game     ref to the Game object
  */
 class GameCanvas(private val mainPane: MainPane, private val game: Game) extends ScrollPane {
-  private val canvas = new Canvas(ScreenWidth, ScreenHeight)
+  private val canvas = new Canvas(ScreenWidth, ScreenHeight) {
+    onMouseClicked = e => {
+      if (!(game.over)
+        && MouseButton(e.getButton) == MouseButton.Primary
+        && state.currentTurn.isInstanceOf[Human]) {
+        executeTurn(e.getX, e.getY)
+      }
+    }
+  }
   private val zoomIntensity = 0.02
-  def gc = canvas.graphicsContext2D
+  private val gc = canvas.graphicsContext2D
+  private val zoomNode = new Group(canvas)
+  private val viewPortContent = new VBox(zoomNode) {
+    alignment = Pos.Center
+    onScroll = e => {
+      e.consume()
+      onZoomScroll(e.getTextDeltaY, new Point2D(e.getX, e.getY))
+    }
+  }
+  private var scaleValue: Double = 1.0
+
+  // Grid Toggling
+  private var gridOn = false
+
+  def toggleGrid() = gridOn = !gridOn
+
+  // Execute a turn when click on the canvas (if the move is valid)
 
   // ScrollPane settings
   pannable = true
@@ -34,34 +58,22 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
   vbarPolicy = ScrollPane.ScrollBarPolicy.Never
   fitToHeight = true
   fitToWidth = true
-
+  content = viewPortContent
   // Canvas's graphic context settings
   gc.setTextAlign(TextAlignment.Center)
   gc.setTextBaseline(VPos.Center)
   gc.setFont(getDefaultFont(35))
   grid.update()
-  private val zoomNode = new Group(canvas)
-  /**
-   * Zooming to the position of the mouse by scrolling the mouse wheel
-   */
-  val viewPortContent = new VBox(zoomNode) {
-    alignment = Pos.Center
-  }
-  private var scaleValue = 0.8
-
-  viewPortContent.setOnScroll(e => {
-    e.consume()
-    onScroll(e.getTextDeltaY, new Point2D(e.getX, e.getY))
-  })
+  updateScale()
 
   /**
    * Zooming the canvas and adjust the HValue and VValue of the ScrollPane
-   * to give the illusion of zooming to the mouse position.
+   * to zoom to the mouse position.
    *
    * @param wheelDelta the scrolling amount
    * @param mousePoint the position of the mouse
    */
-  private def onScroll(wheelDelta: Double, mousePoint: Point2D): Unit = {
+  private def onZoomScroll(wheelDelta: Double, mousePoint: Point2D): Unit = {
     val zoomFactor = Math.exp(wheelDelta * zoomIntensity)
     val innerBounds = zoomNode.getLayoutBounds
     val viewportBounds = this.getViewportBounds
@@ -85,16 +97,6 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
     this.setVvalue((valY + adjustment.getY) / (updatedInnerBounds.getHeight - viewportBounds.getHeight))
   }
 
-  // Execute a turn when click on the canvas (if the move is valid)
-  canvas.onMouseClicked = e => {
-    if (!(game.over) && MouseButton(e.getButton) == MouseButton.Primary) {
-      executeTurn(e.getX, e.getY)
-    }
-  }
-
-  content = viewPortContent
-  updateScale()
-
   /**
    * Scale the canvas according to scaleValue
    */
@@ -104,7 +106,6 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
   }
 
   protected def grid = game.grid
-  protected def state = game.state
 
   /**
    * Execute a turn
@@ -119,15 +120,12 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
     var chosenScale: Option[Scale] = None
     var chosenPos = 0
 
-    /*
-      Find the corresponding stack at the clicked grid position
-     */
-
+    // Find the corresponding stack at the clicked grid position
     def findStack(): Unit = {
       for (scale <- state.scalesVector) {
         // Move the origin to the center of the scale's board
         val offset = chosenCoord - scale.boardCenter
-        // Check if in the range
+        // Check if in the clicking range
         if (
           offset.x >= -scale.radius * 2 &&
             offset.x <= scale.radius * 2 &&
@@ -137,6 +135,7 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
           val xPos = offset.x / 2
           val height = offset.y
           scale(xPos) match {
+            // Check if in the clicking range
             case Some(stack: Stack) if (height >= 0 && height <= stack.height + 1) =>
               chosenScale = Some(scale)
               chosenPos = xPos
@@ -165,64 +164,46 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
   }
 
   /**
-   * @return The pixel width of the grid
-   */
-  def gridPixelWidth = CellWidth * grid.width
-
-  /**
-   * @return the pixel height of the grid
-   */
-  def gridPixelHeight = CellHeight * grid.height
-
-  // Loading all the sprite
-
-  def drawCell(cellType: String, i: Int, j: Int) = {
-    gc.drawImage(spriteMap(cellType), CellWidth * j, CellHeight * i)
-  }
-
-  private var gridOn = false
-  def toggleGrid() = {
-    gridOn = !gridOn
-  }
-
-  /**
    * Draw the game onto the canvas.
-   * This will only be called when needed, when there is a change to the game state
-   * (new weight added, scale flipped,...)
+   * This will only be called when needed, when there's a change to
+   * the game state (new weight added, scale flipped,...)
    */
   def draw(): Unit = {
-    // Update the grid representation of the gamestate before rendering
+    // Update the grid of the gamestate before rendering
     grid.update()
+
+    val gridPixelWidth = CellWidth * grid.width
+    val gridPixelHeight = CellHeight * grid.height
 
     // Resized the canvas
     gc.canvas.setWidth(gridPixelWidth)
     gc.canvas.setHeight(gridPixelHeight)
 
     // Draw the background image
+    val scaledImages = skylineImages.map(i => scaleImage(i, gridPixelWidth, gridPixelHeight, true))
     var w = 0.0
-    var skylineImages = List(
-      new Image("file:assets/backgrounds/skyline1.png", CellWidth * grid.width, CellHeight * grid.height, true, true),
-      new Image("file:assets/backgrounds/skyline2.png", CellWidth * grid.width, CellHeight * grid.height, true, true)
-    )
-    while (w < CellWidth * grid.width) {
-      gc.drawImage(skylineImages(scala.util.Random.nextInt(skylineImages.length)), w, 0)
-      w += skylineImages.head.getWidth
+    var imgWidth = scaledImages.head.getWidth
+    while (w < gridPixelWidth) {
+      gc.drawImage(scaledImages(scala.util.Random.nextInt(scaledImages.length)), w, 0)
+      w += scaledImages.head.getWidth - 2
     }
 
     // Rendering each cell on the grid
     for (i <- 0 until grid.height) {
       for (j <- 0 until grid.width) {
         grid(i, j) match {
-          case GROUND =>
-            drawCell("ground", i, j)
-          case FULCRUM =>
-            drawCell("fulcrum", i, j)
+          case EMPTY =>
+          case GROUND => drawCell("ground", i, j)
+          case FULCRUM => drawCell("fulcrum", i, j)
+          case LEFT => drawCell("left", i, j)
+          case RIGHT => drawCell("right", i, j)
+          case WILD => drawCell("weight", i, j)
           case PADDER => {
-            // This will draw the torque indicator, showing how close is the scale to flipping
+            // Drawing the torque indicator, showing how close is the scale to flipping
             val padderCoord = grid.gridToCoord(i, j)
             var parentScale: Scale = null
 
-            // A helper function using return to search which scale the padder belong to
+            // Helper function searching which scale the padder belong to
             def findScale(): Unit = {
               for (scale <- state.scalesVector) {
                 val offset = padderCoord - scale.boardCenter
@@ -234,14 +215,15 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
             }
 
             findScale()
-            // Translate the padder position to where the scale center is at the origin
             val offset = padderCoord - parentScale.boardCenter
             val torqueDiff = parentScale.rightTorque - parentScale.leftTorque
             if (offset.x < 0 && (offset.x - 1) / 2 >= torqueDiff) {
+              // The indicator is on the left
               drawCell("padder1", i, j)
               gc.setFill(Color.Red.opacity(0.4))
               gc.fillRect(j * CellWidth, i * CellHeight, CellWidth, CellHeight)
             } else if (offset.x > 0 && (offset.x + 1) / 2 <= torqueDiff) {
+              // The indicator is on the right
               drawCell("padder1", i, j)
               gc.setFill(Color.Red.opacity(0.4))
               gc.fillRect(j * CellWidth, i * CellHeight, CellWidth, CellHeight)
@@ -249,28 +231,15 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
               drawCell("padder0", i, j)
             }
           }
-          case LEFT =>
-            drawCell("left", i, j)
-          case RIGHT =>
-            drawCell("right", i, j)
-          case EMPTY =>
-          case WILD =>
-            drawCell("weight", i, j)
-          case c: Char if (c.isDigit) =>
-            drawCell("padder0", i, j)
+          case c: Char if (c.isDigit) => drawCell("padder0", i, j)
           case c: Char =>
-            // If it is a letter -> player's weight
             state.players.find(_.playerCode == c) match {
-              case Some(player: Player) => {
+              case Some(player: Player) =>
                 drawCell("weight", i, j)
-                // Overlay by the player color
                 gc.setFill(player.propColor.opacity(0.5))
                 gc.fillRect(j * CellWidth, i * CellHeight, CellWidth, CellHeight)
-              }
-              case None => {
-                // If it not any player's weight -> Just a scale code
+              case None =>
                 drawCell("fulcrum", i, j)
-              }
             }
         }
         // Drawing the letter and number indicator
@@ -279,17 +248,24 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
           case FULCRUM | PADDER | LEFT | RIGHT | GROUND =>
           case _ => gc.fillText(grid(i, j).toString, (j + 0.5) * CellWidth, (i + 0.5) * CellHeight)
         }
-        if(gridOn){
-          // Drawing the checker pattern over if grid is turnOn
+        // Drawing the checker pattern over if grid is on
+        if (gridOn) {
           gc.setStroke(Color.LightGrey.opacity(0.5))
           gc.strokeRect(j * CellWidth, i * CellHeight, CellWidth, CellHeight)
         }
       }
     }
-    // Grey out the canvas if game end or idle
+    // Dim the canvas if game is over
     if (game.over) {
       gc.setFill(Color.Black.opacity(0.5))
       gc.fillRect(0, 0, CellWidth * grid.width, CellHeight * grid.height)
     }
   }
+
+  // A helper function to draw the i-j cell
+  def drawCell(spriteName: String, i: Int, j: Int) = {
+    gc.drawImage(spriteMap(spriteName), CellWidth * j, CellHeight * i)
+  }
+
+  private def state = game.state
 }
