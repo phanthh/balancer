@@ -10,9 +10,10 @@ import scalafx.animation._
 import scalafx.application.JFXApp
 import scalafx.geometry.Pos
 import scalafx.scene.Scene
-import scalafx.scene.effect.BoxBlur
+import scalafx.scene.effect.{BoxBlur, DropShadow}
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{BorderPane, StackPane, VBox}
+import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 import scalafx.util.Duration
 
@@ -26,7 +27,7 @@ object MainGUI extends JFXApp {
   private val game = new Game()
   private val fontFile = "file:fonts/cyber.otf"
   // Components of the main scene
-  var topMenuBar: TopMenuBar = _
+  private var topMenuBar: TopMenuBar = _
 
   game.fileManager.loadDefault()
 
@@ -47,16 +48,13 @@ object MainGUI extends JFXApp {
     }
     game.fileManager.loadDefault()
   }
-  var midSplitPane: MainPane = _
+  private var midSplitPane: MainPane = _
 
   def getDefaultFont(size: Int) = Font.loadFont(fontFile, size)
 
 
-  // For ease of references
   def state = game.state
-
   def grid = game.grid
-
   def gc = midSplitPane.gc
 
   /*
@@ -69,62 +67,31 @@ object MainGUI extends JFXApp {
   def setGameScene() = {
     midSplitPane = new MainPane(game)
     topMenuBar = new TopMenuBar(midSplitPane, game)
-    // Preserver ScreenWidth and ScreenHeight
-    val (w, h) = getSceneDimension
-
-    stage.scene = new Scene(w, h) {
-      root = new BorderPane {
-        top = topMenuBar
-        center = midSplitPane
-      }
-    }
-
-    stage.sizeToScene()
+    resetScene()
     draw()
   }
-
-  private def getSceneDimension =
-    if (stage.getScene == null)
-      (ScreenWidth, ScreenHeight)
-    else
-      (stage.getScene.getWidth.toInt, stage.getScene.getHeight.toInt)
-
-  def draw() = midSplitPane.drawCanvas()
 
   def setMenuScene() = {
     if (midSplitPane == null) midSplitPane = new MainPane(game)
     if (topMenuBar == null) topMenuBar = new TopMenuBar(midSplitPane, game)
 
+    // Logo effects
     val imgView = new ImageView(logo)
+    val glow = new DropShadow(100, Color.Gold)
+    imgView.setEffect(glow)
 
-    val transition = new TranslateTransition {
+    // Logo Animation
+    (new TranslateTransition {
       duration = Duration(1500)
       fromY = -20
       toY = 20
       autoReverse = true
       cycleCount = Animation.Indefinite
       node = imgView
-    }
-    transition.play()
-    game.over = true
-    midSplitPane.items.clear()
-    midSplitPane.items.addAll(
-      new StackPane {
-        children = Seq(
-          midSplitPane.gameCanvas,
-          new VBox {
-            alignment = Pos.Center
-            midSplitPane.gameCanvas.setEffect(new BoxBlur(10, 10, 3))
-            children = Seq(
-              imgView,
-            )
-          },
-        )
-      }
-    )
+    }).play()
 
-    val timeline = new Timeline {
-      t =>
+    // Background animation
+    (new Timeline {
       cycleCount = Animation.Indefinite
       autoReverse = true
       keyFrames = Seq(
@@ -134,26 +101,33 @@ object MainGUI extends JFXApp {
             KeyValue(midSplitPane.gameCanvas.hvalue, 1)
           )
         ))
-    }
+    }).play()
 
-    timeline.play()
+    game.over = true
 
-    val (w, h) = getSceneDimension
-
-    stage.scene = new Scene(w, h) {
-      root = new BorderPane {
-        top = topMenuBar
-        center = midSplitPane
+    midSplitPane.items.clear()
+    midSplitPane.items.addAll(
+      new StackPane {
+        children = Seq(
+          midSplitPane.gameCanvas,
+          new VBox {
+            alignment = Pos.Center
+            midSplitPane.gameCanvas.setEffect(new BoxBlur(10, 10, 3))
+            children = imgView
+          },
+        )
       }
-    }
+    )
 
-    stage.sizeToScene()
+    // Retain scene dimension
+    resetScene()
     draw()
   }
 
-  setMenuScene()
-
+  def draw() = midSplitPane.drawCanvas()
   def select(id: String) = stage.getScene.lookup("#" + id)
+
+  setMenuScene()
 
   // This is run after a move is finished (end of a turn)
   def endTurnHook(): Unit = {
@@ -225,6 +199,20 @@ object MainGUI extends JFXApp {
          */
       }
     }
+  }
+
+  private def resetScene() = {
+    val (w, h) = if (stage.getScene == null)
+      (ScreenWidth, ScreenHeight)
+    else
+      (stage.getScene.getWidth.toInt, stage.getScene.getHeight.toInt)
+    stage.scene = new Scene(w, h) {
+      root = new BorderPane {
+        top = topMenuBar
+        center = midSplitPane
+      }
+    }
+    stage.sizeToScene()
   }
 }
 
