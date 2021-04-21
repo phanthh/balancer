@@ -1,8 +1,8 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, game, setGameScene, setMenuScene}
-import balancer.utils.Constants.{Abouts, GithubURL, GitlabURL, Rules, Version}
+import balancer.gui.MainGUI.{draw, setGameScene, setMenuScene}
+import balancer.utils.Constants._
 import balancer.utils.Helpers.openURL
 import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
@@ -14,24 +14,47 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
   private def fm = game.fileManager
 
   private def updateInfoPane() = mainPane.updateSidePane()
+  private def newGame(f: String = null) = {
+    game.reset()
+    if(f == null) {
+      fm.loadDefault()
+    } else {
+      fm.loadGame(f)
+    }
+    setGameScene()
+  }
+
 
   menus = List(
     new Menu("File") {
       items = List(
         new MenuItem("New") {
           onAction = _ => {
-            game.reset()
-            fm.loadDefault()
-            setGameScene()
+            if (!(game.over)) {
+              Prompts.askSavingDialog(
+                reason = "New game",
+                yes = () => {
+                  Prompts.saveFileDialog(
+                    success = (f) => {
+                      fm.saveGame(f.getAbsolutePath)
+                      newGame()
+                    },
+                    failed = () => {}
+                  )
+                },
+                no = () => {
+                  newGame()
+                })
+            } else {
+              newGame()
+            }
           }
         },
         new MenuItem("Open...") {
           onAction = _ => {
             Prompts.openFileDialog(
               success = (f) => {
-                game.reset()
-                fm.loadGame(f.getAbsolutePath)
-                setGameScene()
+                newGame(f.getAbsolutePath)
               },
               failed = () => {}
             )
@@ -39,6 +62,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
         },
         new SeparatorMenuItem(),
         new MenuItem("Save...") {
+          if (game.over) disable = true
           onAction = _ =>
             Prompts.saveFileDialog(
               success = (f) => {
@@ -49,9 +73,23 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
         },
         new SeparatorMenuItem(),
         new MenuItem("Back To Menu") {
+          if (game.over) disable = true
           onAction = _ => {
-            game.over = true
-            setMenuScene()
+            Prompts.askSavingDialog(
+              reason = "Back To Menu",
+              yes = () => {
+                Prompts.saveFileDialog(
+                  success = (f) => {
+                    fm.saveGame(f.getAbsolutePath)
+                    setMenuScene()
+                  },
+                  failed = () => {}
+                )
+              },
+              no = () => {
+                setMenuScene()
+              }
+            )
           }
         },
         new SeparatorMenuItem(),
@@ -62,11 +100,11 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
               yes = () => {
                 Prompts.saveFileDialog(
                   success = (f) => {
+                    sys.exit(0)
                     fm.saveGame(f.getAbsolutePath)
                   },
                   failed = () => {}
                 )
-                sys.exit(0)
               },
               no = () => sys.exit(0),
             )
@@ -76,6 +114,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
     new Menu("Edit") {
       items = List(
         new MenuItem("Add Human") {
+          if (game.over) disable = true
           onAction = _ =>
             Prompts.askNameDialog("Adding Human Player") match {
               case Some(name) => {
@@ -86,6 +125,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
             }
         },
         new MenuItem("Add Bot") {
+          if (game.over) disable = true
           onAction = _ =>
             Prompts.askNameDialog("Adding Bot Player") match {
               case Some(name) => {
@@ -98,7 +138,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
         new SeparatorMenuItem,
         new MenuItem("Undo") {
           onAction = _ => {
-            if(!(game.over) && state.undoable){
+            if (!(game.over) && state.undoable) {
               state.undo()
               updateInfoPane()
               draw()
@@ -107,7 +147,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
         },
         new MenuItem("Redo") {
           onAction = _ => {
-            if(!(game.over) && state.redoable) {
+            if (!(game.over) && state.redoable) {
               state.redo()
               updateInfoPane()
               draw()
@@ -115,6 +155,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
           }
         },
         new MenuItem("Toggle Grid") {
+          if (game.over) disable = true
           onAction = _ => {
             mainPane.toggleGrid()
             draw()

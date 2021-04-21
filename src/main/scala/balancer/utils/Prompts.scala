@@ -11,22 +11,20 @@ import java.io.File
 
 object Prompts {
 
-  def askSavingDialog(reason: String, yes: () => Unit, no: () => Unit) = {
-    val yesButton = new ButtonType("Yes")
-    val noButton = new ButtonType("No")
+  def askSavingDialog(reason: String, yes: () => Unit, no: () => Unit, cancel: () => Unit = () => {}) = {
 
     val alert = new Alert(AlertType.Confirmation) {
       initOwner(stage)
       title = reason
       headerText = "Do you want to save your current game ?"
       buttonTypes = Seq(
-        yesButton, noButton, ButtonType.Cancel)
+        ButtonType.Yes, ButtonType.No, ButtonType.Cancel)
     }
     val result = alert.showAndWait()
     result match {
-      case Some(yesButton) => yes()
-      case Some(noButton) => no()
-      case _ =>
+      case Some(ButtonType.Yes) => yes()
+      case Some(ButtonType.No) => no()
+      case Some(ButtonType.Cancel) => cancel()
     }
   }
 

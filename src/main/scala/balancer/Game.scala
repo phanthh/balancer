@@ -1,6 +1,7 @@
 package balancer
 
 import balancer.grid.Grid
+import scalafx.beans.property.BooleanProperty
 
 
 class Game (var numRounds: Int = 3, var weightsPerRound: Int = 10, var baseScaleRadius: Int = 5, var botDifficulty: Double = 0.3) {

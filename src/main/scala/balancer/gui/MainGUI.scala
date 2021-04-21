@@ -72,8 +72,9 @@ object MainGUI extends JFXApp {
   }
 
   def setMenuScene() = {
+    game.over = true
     if (midSplitPane == null) midSplitPane = new MainPane(game)
-    if (topMenuBar == null) topMenuBar = new TopMenuBar(midSplitPane, game)
+    topMenuBar = new TopMenuBar(midSplitPane, game)
 
     // Logo effects
     val imgView = new ImageView(logo)
@@ -103,7 +104,6 @@ object MainGUI extends JFXApp {
         ))
     }).play()
 
-    game.over = true
 
     midSplitPane.items.clear()
     midSplitPane.items.addAll(
