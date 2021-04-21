@@ -31,8 +31,8 @@ class InfoPane(private val mainPane: MainPane, private val game: Game) extends V
    */
   def updateContent() = {
     selectElementWithId("turnLabel").asInstanceOf[javafx.scene.control.Label].setText(state.currentTurn.name.capitalize)
-    selectElementWithId("turnLabel").asInstanceOf[javafx.scene.control.Label].setTextFill(getTextColorFitBG(state.currentTurn.propColor))
-    selectElementWithId("turnBox").setStyle(toBackgroundCSS(state.currentTurn.propColor))
+    selectElementWithId("turnLabel").asInstanceOf[javafx.scene.control.Label].setTextFill(getTextColorFitBG(state.currentTurn.color))
+    selectElementWithId("turnBox").setStyle(toBackgroundCSS(state.currentTurn.color))
     selectElementWithId("weightsLeftLabel").asInstanceOf[javafx.scene.control.Label].setText("Weights Left: " + state.weightLeftOfRound.toString)
     selectElementWithId("roundLabel").asInstanceOf[javafx.scene.control.Label].setText("ROUND #" + state.currentRound.toString)
     state.players.foreach(p => p.propScore.update(p.score))
@@ -71,7 +71,7 @@ class InfoPane(private val mainPane: MainPane, private val game: Game) extends V
           font = getDefaultFont(14)
           onAction = _ => {
             if (!(game.over)) {
-              state.buildWildWeight()
+              state.buildRandomWeight()
               draw()
             }
           }
@@ -81,7 +81,7 @@ class InfoPane(private val mainPane: MainPane, private val game: Game) extends V
           font = getDefaultFont(14)
           onAction = _ => {
             if (!(game.over)) {
-              state.buildWildScale()
+              state.buildRandomScale()
               draw()
             }
           }
@@ -123,12 +123,12 @@ class InfoPane(private val mainPane: MainPane, private val game: Game) extends V
     new VBox {
       id = "turnBox"
       alignment = Pos.Center
-      style = toBackgroundCSS(state.currentTurn.propColor)
+      style = toBackgroundCSS(state.currentTurn.color)
       children =
         new Label {
           id = "turnLabel"
           font = getDefaultFont(30)
-          textFill = getTextColorFitBG(state.currentTurn.propColor)
+          textFill = getTextColorFitBG(state.currentTurn.color)
           text = state.currentTurn.name.capitalize
         }
     },
@@ -152,28 +152,28 @@ class InfoPane(private val mainPane: MainPane, private val game: Game) extends V
    */
   private def playerScoreEntry(player: Player): BorderPane = {
     val parentBlock = new BorderPane {
-      style = toBackgroundCSS(player.propColor)
+      style = toBackgroundCSS(player.color)
       padding = Insets(5)
     }
 
     val playerName =
       new Label {
         text = player.name.capitalize + "(" + player.playerCode + ")"
-        textFill = getTextColorFitBG(player.propColor)
+        textFill = getTextColorFitBG(player.color)
         font = getDefaultFont(24)
       }
 
     val playerScore =
       new Label {
         font = getDefaultFont(14)
-        textFill = getTextColorFitBG(player.propColor)
+        textFill = getTextColorFitBG(player.color)
         text <== StringProperty("Score: ") + player.propScore.asString()
       }
 
     val playerRoundWon =
       new Label {
         font = getDefaultFont(14)
-        textFill = getTextColorFitBG(player.propColor)
+        textFill = getTextColorFitBG(player.color)
         text <== StringProperty("Won: ") + player.propRoundWon.asString()
       }
     val deleteButton = new VBox {
@@ -212,7 +212,7 @@ class InfoPane(private val mainPane: MainPane, private val game: Game) extends V
               () => "Difficulty: " + (bot.difficultyProp.value * 10.0).toInt / 10.0,
               bot.difficultyProp
             )
-            textFill = getTextColorFitBG(bot.propColor)
+            textFill = getTextColorFitBG(bot.color)
             margin = Insets(5, 5, 0, 5)
             font = getDefaultFont(14)
           }
@@ -233,13 +233,13 @@ class InfoPane(private val mainPane: MainPane, private val game: Game) extends V
       case _ =>
     }
 
-    val colorPicker = new ColorPicker(player.propColor) {
+    val colorPicker = new ColorPicker(player.color) {
       maxWidth = 30
       onAction = (e) => {
         val newColor = new Color(value())
         val textFillColor = getTextColorFitBG(newColor)
-        if (newColor != player.propColor) {
-          player.propColor = newColor
+        if (newColor != player.color) {
+          player.color = newColor
           parentBlock.style = toBackgroundCSS(newColor)
           playerName.textFill = textFillColor
           playerScore.textFill = textFillColor

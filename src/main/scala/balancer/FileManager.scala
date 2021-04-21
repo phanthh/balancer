@@ -1,5 +1,7 @@
 package balancer
 
+import balancer.FileManager.{BaseScaleIndicator, BlockIndicator, Blocks, EndIndicator}
+import balancer.grid.Grid.WILD
 import balancer.objects.{Player, Scale, Stack}
 import balancer.utils.Constants.{DefaultFile, Version}
 import balancer.utils.ParseError
@@ -8,15 +10,23 @@ import java.io._
 import scala.collection.mutable.{Buffer, Map}
 
 
-class FileManager(private val game: Game) {
-  private val blocks = Array[String]("meta", "scale", "setting")
+object FileManager {
+  val Blocks = Array[String]("meta", "scale", "setting")
+  val BlockIndicator = '#'
+  val EndIndicator = "END"
+  val BaseScaleIndicator = '_'
+}
 
-  /*
-    Load default map and settings
-   */
+class FileManager(private val game: Game) {
   def loadDefault() = loadGame(DefaultFile)
 
+  /**
+   * Load the save file from path
+   *
+   * @param filePath the path to the save file
+   */
   def loadGame(filePath: String): Unit = {
+
     val lr = try {
       new BufferedReader(new FileReader(filePath))
     } catch {
@@ -25,7 +35,7 @@ class FileManager(private val game: Game) {
     }
     // Begin parsing
 
-    // Keep a backup of current state (in case parsing gone wrong)
+    // Keep a backup (in case parsing gone wrong)
     var baseScaleRadiusBak = game.baseScaleRadius
 
     try {
@@ -35,37 +45,37 @@ class FileManager(private val game: Game) {
         throw new ParseError("Unknown file type or wrong identifiers ")
       }
 
-      // Initializing defaults
-      // Setting data
+      // Initializing defaults (to be overrided later)
+
+      // Game settings
       var weightPerRound = game.weightsPerRound
       var numRounds = game.weightsPerRound
       var botDifficulty = game.botDifficulty
 
-      // Meta data
-      var round: Int = 0
-      var turn: String = ""
+      // Metadata
+      var round = 0
+      var turn = ""
       var humanNames = Array[String]()
       var botNames = Array[String]()
 
-      // State to parse from file
+      // New state to parse from file
       var newState: State = null
 
       // Blocks to parse
-      val blocksToProcess = Map.from(blocks.map((_, false)))
+      val blocksToProcess = Map.from(Blocks.map((_, false)))
       var block = ""
 
       do {
         line = lr.readLine().trim
         if (line.nonEmpty) {
-          if (line == "END") {
+          if (line == EndIndicator) {
             line = null
-          } else if (line(0) == '#') {
+          } else if (line(0) == BlockIndicator) {
             block = line.substring(1).trim.toLowerCase
-            if (blocks.contains(block) && !blocksToProcess(block)) {
+            if (Blocks.contains(block) && !blocksToProcess(block)) {
               blocksToProcess(block) = true
             }
-          } else if (blocks.contains(block)) {
-            // Ex:        WeightPerRound: 20
+          } else if (Blocks.contains(block)) {
             val keyValuePair = line.split(':').map(_.trim)
 
             if (keyValuePair.length != 1 && keyValuePair.length != 2) {
@@ -133,8 +143,8 @@ class FileManager(private val game: Game) {
                       throw new ParseError(line + "\n=> Stack position must be an integer")
                     )
 
-                    stackStringSplitted.drop(1).map(_(0)).foreach(w_code => {
-                      if(w_code == '?'){
+                    stackStringSplitted.drop(1).map(_ (0)).foreach(w_code => {
+                      if (w_code == WILD) {
                         newState.buildWeight(pos, parScale)
                       } else {
                         newState.buildWeight(pos, parScale, newState.players.find(_.playerCode == w_code))
@@ -143,8 +153,8 @@ class FileManager(private val game: Game) {
                   }
                 }
 
-                // Base scale (parent scale is just "_")
-                if (parentScaleCode == '_') {
+                // Base scale
+                if (parentScaleCode == BaseScaleIndicator) {
                   game.baseScaleRadius = scaleRadius
 
                   newState = new State(game)
@@ -154,7 +164,7 @@ class FileManager(private val game: Game) {
 
                   parseStacks(newState.baseScale)
                 } else {
-                  newState.scaleWithCode(parentScaleCode) match {
+                  newState.findScale(parentScaleCode) match {
                     case Some(parentScale: Scale) =>
                       val newScale = newState.buildScale(posOnParentScale, scaleRadius, parentScale, Some(scaleCode))
                       parseStacks(newScale)
@@ -179,7 +189,7 @@ class FileManager(private val game: Game) {
 
       newState.currentRound = round
       newState.currentTurnIdx = if (turn == "") 0 else newState.players.indexWhere(_.name == turn)
-      newState.setScaleIndex(newState.scalesVector.map(_.code).max)
+      newState.sc.set(newState.scalesVector.map(_.code).max)
       game.botDifficulty = botDifficulty
       game.weightsPerRound = weightPerRound
       game.numRounds = numRounds
@@ -196,8 +206,9 @@ class FileManager(private val game: Game) {
 
   }
 
-  /*
-    Save the game state into file
+  /**
+   * Save the game to file
+   * @param filePath path to the the saved location
    */
   def saveGame(filePath: String): Unit = {
     val lw = try {
@@ -209,12 +220,12 @@ class FileManager(private val game: Game) {
 
     lw.write(s"BALANCER $Version SAVE FILE\n")
 
-    lw.write("# Setting\n")
+    lw.write(s"$BlockIndicator Setting\n")
     lw.write("WeightPerRound: " + game.weightsPerRound + "\n")
     lw.write("NumberOfRound: " + game.numRounds + "\n")
     lw.write("BotDifficulty: " + game.botDifficulty + "\n")
 
-    lw.write("# Meta\n")
+    lw.write(s"$BlockIndicator Meta\n")
 
     lw.write("Human: ")
     if (state.humans.nonEmpty) {
@@ -229,10 +240,10 @@ class FileManager(private val game: Game) {
     lw.write("Round: " + state.currentRound + "\n")
     lw.write("Turn: " + state.players(state.currentTurnIdx).name + "\n")
 
-    lw.write("# Scale\n")
+    lw.write(s"$BlockIndicator Scale\n")
     for (scale <- state.scalesVector.sortBy(_.code)) {
       if (scale == state.baseScale) {
-        lw.write("_,0")
+        lw.write(s"$BaseScaleIndicator,0")
       } else {
         lw.write(s"${scale.parentScale.code},${scale.pos}")
       }
@@ -245,18 +256,15 @@ class FileManager(private val game: Game) {
           buf.append(stack.weightsVector.map(_.owner).map {
             case Some(p: Player) =>
               p.playerCode
-            case None =>
-              '?'
-          }
-            .prepended(stack.pos.toString)
-            .mkString(","))
+            case None => WILD
+          }.prepended(stack.pos.toString).mkString(","))
         case scale: Scale =>
       }
       lw.write(buf.mkString(" | "))
       lw.write("\n")
     }
 
-    lw.write("END\n")
+    lw.write(s"$EndIndicator\n")
     lw.close()
   }
 

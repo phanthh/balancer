@@ -13,11 +13,10 @@ import java.io.File
 object Prompts {
 
   def askSavingDialog(reason: String, yes: () => Unit, no: () => Unit, cancel: () => Unit = () => {}) = {
-
     val alert = new Alert(AlertType.Confirmation) {
       initOwner(stage)
       title = reason
-      headerText = "Do you want to save your current game ?"
+      headerText = "Do you want to save your game ?"
       buttonTypes = Seq(
         ButtonType.Yes, ButtonType.No, ButtonType.Cancel)
     }
@@ -64,7 +63,7 @@ object Prompts {
   }
 
   def askNameDialog(header: String): Option[String] = {
-    val textInputDialog = new TextInputDialog("James") {
+    val textInputDialog = new TextInputDialog {
       initOwner(stage)
       headerText = header
       contentText = "Please enter the name:"

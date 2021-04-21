@@ -3,7 +3,7 @@ package balancer.gui
 import balancer.Game
 import balancer.gui.MainGUI.{setGameScene, setMenuScene}
 import balancer.utils.Constants._
-import balancer.utils.Helpers.openURL
+import balancer.utils.Helpers.openURLInDefaultBrowser
 import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
 import scalafx.scene.control._
@@ -187,13 +187,13 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
         // "Github": open the github link using the default browwer
         new MenuItem("Github") {
           onAction = _ => {
-            openURL(GithubURL)
+            openURLInDefaultBrowser(GithubURL)
           }
         },
         // "Gitlab": open the gitlab link using the default browwer
         new MenuItem("Gitlab") {
           onAction = _ => {
-            openURL(GitlabURL)
+            openURLInDefaultBrowser(GitlabURL)
           }
         },
         new SeparatorMenuItem,

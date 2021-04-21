@@ -236,7 +236,7 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
             state.players.find(_.playerCode == c) match {
               case Some(player: Player) =>
                 drawCell("weight", i, j)
-                gc.setFill(player.propColor.opacity(0.5))
+                gc.setFill(player.color.opacity(0.5))
                 gc.fillRect(j * CellWidth, i * CellHeight, CellWidth, CellHeight)
               case None =>
                 drawCell("fulcrum", i, j)

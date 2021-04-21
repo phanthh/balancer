@@ -136,10 +136,10 @@ object MainGUI extends JFXApp {
     if (state.weightLeftOfRound <= 0 || game.over) {
       showInfoDialog(
         titleText = "End of Round",
-        header = s"The winner of this round is: ${game.winner}",
+        header = s"The roundWinner of this round is: ${game.roundWinner}",
         content = ""
       )
-      game.winner.incRoundWon()
+      game.roundWinner.incRoundWon()
       state.currentRound += 1
 
       // If it is also the final round
@@ -148,7 +148,7 @@ object MainGUI extends JFXApp {
         game.over = true
         showInfoDialog(
           titleText = "Game Over!!!",
-          header = s"The winner of the game is: ${game.finalWinner}",
+          header = s"The roundWinner of the game is: ${game.finalWinner}",
           content = "!!!! Congratulation !!!!"
         )
       } else {

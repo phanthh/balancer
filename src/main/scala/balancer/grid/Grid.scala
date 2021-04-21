@@ -57,8 +57,8 @@ class Grid(private val game: Game){
    */
   def updateOffset() = {
     _height = state.scalesVector.map(s => s.coord.y + s.height).max + _padding
-    _maxX = state.scalesVector.map(_.span._2.x).max + _padding
-    _minX = state.scalesVector.map(_.span._1.x).min - _padding
+    _maxX = state.scalesVector.map(_.maxX).max + _padding
+    _minX = state.scalesVector.map(_.minX).min - _padding
     _width = _maxX - _minX
 
     if(_width % 2 == 0) _width += 1
@@ -116,7 +116,7 @@ class Grid(private val game: Game){
    */
   private def register(scale: Scale) = {
     // Rendering the fulcrum
-    val fulcrumHeight = scale.lHeight - 1
+    val fulcrumHeight = scale.lowerHeight - 1
     for(i <- 0 until fulcrumHeight-1){
       put(scale.coord + Coord(0, i), FULCRUM)
     }
@@ -146,5 +146,4 @@ class Grid(private val game: Game){
       }
     }
   }
-
 }
