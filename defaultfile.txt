@@ -1,11 +1,11 @@
 BALANCER 1.3 SAVE FILE
 # Setting
-WeightPerRound: 10
-NumberOfRound: 10
+WeightPerRound: 15
+NumberOfRound: 5
 BotDifficulty: 0.5
 # Meta
 Human: Ben
-Bot: Ken
+Bot: Ken, Jaiden
 Round: 0
 Turn: Ben
 # Scale

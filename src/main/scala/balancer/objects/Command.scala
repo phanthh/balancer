@@ -31,11 +31,15 @@ case class PlaceWeightCommand(val player: Player, val pos: Int, val parentScale:
   }
 
   override def undo() = {
-    affectedStack.pop()
-    if(affectedStack.isEmpty)
-      parentScale.remove(pos)
-    else
-      affectedStack.zipWithIndex.foreach(p => p._1.owner = undoOwnerList(p._2)) // Restore
+    if (state.scalesVector.contains(affectedStack.parentScale)) {
+      affectedStack.pop()
+      if (affectedStack.isEmpty) {
+        parentScale.remove(pos)
+      } else {
+        affectedStack.zipWithIndex.foreach(p => p._1.owner = undoOwnerList(p._2)) // Restore
+      }
+    }
     this
   }
 }
+
