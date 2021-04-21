@@ -2,16 +2,19 @@ package balancer.gui
 
 import balancer.Game
 import balancer.objects.{Bot, Human}
-import balancer.utils.Constants.{CellHeight, CellWidth, ScreenHeight, ScreenWidth, logo}
+import balancer.utils.Constants.{ScreenHeight, ScreenWidth, logo}
 import balancer.utils.Helpers.{placeSomeWildScale, placeSomeWildWeight}
 import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
+import scalafx.animation._
 import scalafx.application.JFXApp
+import scalafx.geometry.Pos
 import scalafx.scene.Scene
+import scalafx.scene.effect.BoxBlur
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{BorderPane, StackPane, VBox}
-import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
+import scalafx.util.Duration
 
 import scala.util.Random
 
@@ -70,11 +73,11 @@ object MainGUI extends JFXApp {
     val (w, h) = getSceneDimension
 
     stage.scene = new Scene(w, h) {
-        root = new BorderPane {
-          top = topMenuBar
-          center = midSplitPane
-        }
+      root = new BorderPane {
+        top = topMenuBar
+        center = midSplitPane
       }
+    }
 
     stage.sizeToScene()
     draw()
@@ -89,22 +92,51 @@ object MainGUI extends JFXApp {
   def draw() = midSplitPane.drawCanvas()
 
   def setMenuScene() = {
-    if(midSplitPane == null) midSplitPane = new MainPane(game)
-    if(topMenuBar == null) topMenuBar = new TopMenuBar(midSplitPane, game)
+    if (midSplitPane == null) midSplitPane = new MainPane(game)
+    if (topMenuBar == null) topMenuBar = new TopMenuBar(midSplitPane, game)
 
     val imgView = new ImageView(logo)
 
+    val transition = new TranslateTransition {
+      duration = Duration(1500)
+      fromY = -20
+      toY = 20
+      autoReverse = true
+      cycleCount = Animation.Indefinite
+      node = imgView
+    }
+    transition.play()
     game.over = true
     midSplitPane.items.clear()
     midSplitPane.items.addAll(
-      new StackPane{
+      new StackPane {
         children = Seq(
           midSplitPane.gameCanvas,
-          imgView
+          new VBox {
+            alignment = Pos.Center
+            midSplitPane.gameCanvas.setEffect(new BoxBlur(10, 10, 3))
+            children = Seq(
+              imgView,
+            )
+          },
         )
-      },
+      }
     )
 
+    val timeline = new Timeline {
+      t =>
+      cycleCount = Animation.Indefinite
+      autoReverse = true
+      keyFrames = Seq(
+        KeyFrame(
+          time = Duration(30000),
+          values = Set(
+            KeyValue(midSplitPane.gameCanvas.hvalue, 1)
+          )
+        ))
+    }
+
+    timeline.play()
 
     val (w, h) = getSceneDimension
 
@@ -118,6 +150,7 @@ object MainGUI extends JFXApp {
     stage.sizeToScene()
     draw()
   }
+
   setMenuScene()
 
   def select(id: String) = stage.getScene.lookup("#" + id)
