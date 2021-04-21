@@ -8,16 +8,15 @@ import scalafx.scene.control.SplitPane
   and the right side pane (InfoPane)
  */
 class MainPane(private val game: Game) extends SplitPane {
-  var infoPane = new InfoPane(game)
-  private val gameCanvas = new GameCanvas(this, game)
-  def getGameCanvas = gameCanvas
+  var sidePane = new InfoPane(game)
+  var gameCanvas = new GameCanvas(this, game)
 
   def gc = gameCanvas.gc
 
-  def updateInfoPane() = infoPane.updateContent()
+  def updateSidePane() = sidePane.updateContent()
   def drawCanvas() = gameCanvas.draw()
   def toggleGrid() = gameCanvas.toggleGrid()
 
-  items.addAll(gameCanvas, infoPane)
+  items.addAll(gameCanvas, sidePane)
   setDividerPosition(0, 0.75)
 }

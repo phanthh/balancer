@@ -1,7 +1,7 @@
 package balancer.gui
 
 import balancer.Game
-import balancer.gui.MainGUI.{draw, setGameScene, setMenuScene}
+import balancer.gui.MainGUI.{draw, game, setGameScene, setMenuScene}
 import balancer.utils.Constants.{Abouts, GithubURL, GitlabURL, Rules, Version}
 import balancer.utils.Helpers.openURL
 import balancer.utils.Prompts
@@ -13,7 +13,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
 
   private def fm = game.fileManager
 
-  private def updateInfoPane() = mainPane.updateInfoPane()
+  private def updateInfoPane() = mainPane.updateSidePane()
 
   menus = List(
     new Menu("File") {

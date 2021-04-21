@@ -10,9 +10,9 @@ import scalafx.geometry.{Point2D, Pos, VPos}
 import scalafx.scene.Group
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.control.ScrollPane
-import scalafx.scene.image.Image
+import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.MouseButton
-import scalafx.scene.layout.VBox
+import scalafx.scene.layout.{StackPane, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.TextAlignment
 
@@ -44,7 +44,7 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
   /**
    * Zooming to the position of the mouse by scrolling the mouse wheel
    */
-  private val viewPortContent = new VBox(zoomNode) {
+  val viewPortContent = new VBox(zoomNode) {
     alignment = Pos.Center
   }
   private var scaleValue = 0.8
@@ -103,8 +103,8 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
     canvas.setScaleY(scaleValue)
   }
 
-  private def grid = game.grid
-  private def state = game.state
+  protected def grid = game.grid
+  protected def state = game.state
 
   /**
    * Execute a turn
@@ -158,7 +158,7 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
       case Some(scale: Scale) =>
         state.execute(placeWeight(state.currentTurn, chosenPos, scale, state))
         endTurnHook()
-        mainPane.updateInfoPane()
+        mainPane.updateSidePane()
         draw()
       case None =>
     }
@@ -175,9 +175,6 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
   def gridPixelHeight = CellHeight * grid.height
 
   // Loading all the sprite
-  lazy val spriteMap = List("ground", "padder0", "padder1", "right", "left", "weight", "fulcrum").map(
-    f => (f, new Image(s"file:assets/tiles/$f.png", CellWidth, CellHeight, false, true))
-  ).toMap
 
   def drawCell(cellType: String, i: Int, j: Int) = {
     gc.drawImage(spriteMap(cellType), CellWidth * j, CellHeight * i)
@@ -186,11 +183,6 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
   private var gridOn = false
   def toggleGrid() = {
     gridOn = !gridOn
-  }
-
-  private var showLogo = false
-  def toggleLogo() = {
-    showLogo = !showLogo
   }
 
   /**
@@ -294,10 +286,9 @@ class GameCanvas(private val mainPane: MainPane, private val game: Game) extends
         }
       }
     }
-
-    // Grey out the canvas if game end
+    // Grey out the canvas if game end or idle
     if (game.over) {
-      gc.setFill(Color(0, 0, 0, 0.4))
+      gc.setFill(Color.Black.opacity(0.5))
       gc.fillRect(0, 0, CellWidth * grid.width, CellHeight * grid.height)
     }
   }

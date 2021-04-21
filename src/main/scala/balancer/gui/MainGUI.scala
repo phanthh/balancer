@@ -2,14 +2,15 @@ package balancer.gui
 
 import balancer.Game
 import balancer.objects.{Bot, Human}
-import balancer.utils.Constants.{ScreenHeight, ScreenWidth}
+import balancer.utils.Constants.{CellHeight, CellWidth, ScreenHeight, ScreenWidth, logo}
 import balancer.utils.Helpers.{placeSomeWildScale, placeSomeWildWeight}
 import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
-import scalafx.scene.control.SplitPane
-import scalafx.scene.layout.BorderPane
+import scalafx.scene.image.ImageView
+import scalafx.scene.layout.{BorderPane, StackPane, VBox}
+import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
 import scala.util.Random
@@ -46,7 +47,7 @@ object MainGUI extends JFXApp {
   var midSplitPane: MainPane = _
 
   def getDefaultFont(size: Int) = Font.loadFont(fontFile, size)
-  setGameScene()
+
 
   // For ease of references
   def state = game.state
@@ -66,19 +67,12 @@ object MainGUI extends JFXApp {
     midSplitPane = new MainPane(game)
     topMenuBar = new TopMenuBar(midSplitPane, game)
     // Preserver ScreenWidth and ScreenHeight
-    val (w, h) =
-      if (stage.getScene == null)
-        (ScreenWidth, ScreenHeight)
-      else
-        (stage.getScene.getWidth.toInt, stage.getScene.getHeight.toInt)
+    val (w, h) = getSceneDimension
 
-    stage.scene =
-      new Scene(w, h) {
-        root = {
-          new BorderPane {
-            top = topMenuBar
-            center = midSplitPane
-          }
+    stage.scene = new Scene(w, h) {
+        root = new BorderPane {
+          top = topMenuBar
+          center = midSplitPane
         }
       }
 
@@ -86,27 +80,47 @@ object MainGUI extends JFXApp {
     draw()
   }
 
-  def setMenuScene() = {
-    // Preserver ScreenWidth and ScreenHeight
-    val (w, h) =
-      if (stage.getScene == null)
-        (ScreenWidth, ScreenHeight)
-      else
-        (stage.getScene.getWidth.toInt, stage.getScene.getHeight.toInt)
-
-    stage.scene =
-      new Scene(w, h) { thisScene =>
-        root = new MenuCanvas
-      }
-    stage.sizeToScene()
-    draw()
-  }
+  private def getSceneDimension =
+    if (stage.getScene == null)
+      (ScreenWidth, ScreenHeight)
+    else
+      (stage.getScene.getWidth.toInt, stage.getScene.getHeight.toInt)
 
   def draw() = midSplitPane.drawCanvas()
 
-  def select(id: String) = {
-    stage.getScene.lookup("#" + id)
+  def setMenuScene() = {
+    if(midSplitPane == null) midSplitPane = new MainPane(game)
+    if(topMenuBar == null) topMenuBar = new TopMenuBar(midSplitPane, game)
+
+    val imgView = new ImageView(logo)
+
+    game.over = true
+    midSplitPane.items.clear()
+    midSplitPane.items.addAll(
+      new StackPane{
+        children = Seq(
+          midSplitPane.gameCanvas,
+          imgView
+        )
+      },
+    )
+
+
+    val (w, h) = getSceneDimension
+
+    stage.scene = new Scene(w, h) {
+      root = new BorderPane {
+        top = topMenuBar
+        center = midSplitPane
+      }
+    }
+
+    stage.sizeToScene()
+    draw()
   }
+  setMenuScene()
+
+  def select(id: String) = stage.getScene.lookup("#" + id)
 
   // This is run after a move is finished (end of a turn)
   def endTurnHook(): Unit = {
@@ -143,8 +157,8 @@ object MainGUI extends JFXApp {
         state.currentTurnIdx = 0
 
         // Place some wild weight and scale
-        placeSomeWildScale(state, amount=1)
-        placeSomeWildWeight(state, amount=5)
+        placeSomeWildScale(state, amount = 1)
+        placeSomeWildWeight(state, amount = 5)
 
         //        showInfoDialog(
         //          titleText = "New round begin !!!",
