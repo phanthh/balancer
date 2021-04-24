@@ -168,7 +168,7 @@ class FileManager(private val game: Game) {
                 } else {
                   newState.findScale(parentScaleCode) match {
                     case Some(parentScale: Scale) =>
-                      val newScale = newState.buildScale(posOnParentScale, scaleRadius, parentScale, Some(scaleCode))
+                      val newScale = newState.buildScale(posOnParentScale, scaleRadius, parentScale, Some(scaleCode)).getOrElse(throw new ParseError("There could only be 26 scales per game"))
                       parseStacks(newScale)
                     case None =>
                       throw new ParseError(line + "\n=> Invalid parent scale code")

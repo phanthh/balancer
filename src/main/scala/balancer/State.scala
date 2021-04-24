@@ -109,17 +109,19 @@ class State(val game: Game) {
    * @param scaleCode the code of the new Scale
    * @return
    */
-  def buildScale(pos: Int, radius: Int, parentScale: Scale, scaleCode: Option[Char] = None) = {
+  def buildScale(pos: Int, radius: Int, parentScale: Scale, scaleCode: Option[Char] = None): Option[Scale] = {
+    if(!sc.hasNext) return None
     val newScale = new Scale(parentScale, pos, radius, scaleCode.getOrElse(sc.next()), this)
     parentScale(pos) = newScale
     scales.add(newScale)
-    newScale
+    Some(newScale)
   }
 
   /**
    * Build a random scale.
     */
   def buildRandomScale(): Unit = {
+    if(!sc.hasNext) return
     val scaleCode = sc.next()
     // Picking parent scalesVector at level i, prioritize lower level scalesVector
     // We are trying to place scale at level i+1
