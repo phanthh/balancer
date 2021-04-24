@@ -3,7 +3,7 @@ package balancer.gui
 import balancer.Game
 import balancer.gui.MainGUI.{setGameScene, setMenuScene}
 import balancer.utils.Constants._
-import balancer.utils.Helpers.openURLInDefaultBrowser
+import balancer.utils.Helpers.{openURLInDefaultBrowser, showErrorIfNeeded}
 import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
 import scalafx.scene.control._
@@ -14,11 +14,24 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
   private def newGame(f: String = null) = {
     game.reset()
     if (f == null) {
-      fm.loadDefault()
+      showErrorIfNeeded(fm.loadDefault())
     } else {
-      fm.loadGame(f)
+      showErrorIfNeeded(fm.loadGame(f))
     }
     setGameScene()
+  }
+
+  private def newPlayer(name: String, isHuman: Boolean) = {
+    state.players.find(_.playerCode == name.head.toUpper) match {
+      case Some(p) =>
+        Prompts.invalidDialog(s"Naming collision with ${p.name}, please enter a player name with different first letter")
+      case None =>
+        if(isHuman) {
+          state.buildHuman(name)
+        } else {
+          state.buildBot(name)
+        }
+    }
   }
 
   private def fm = game.fileManager
@@ -35,7 +48,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
                 yes = () => {
                   Prompts.saveFileDialog(
                     success = (f) => {
-                      fm.saveGame(f.getAbsolutePath)
+                      showErrorIfNeeded(fm.saveGame(f.getAbsolutePath))
                       newGame()
                     },
                     failed = () => {}
@@ -67,7 +80,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
           onAction = _ =>
             Prompts.saveFileDialog(
               success = (f) => {
-                fm.saveGame(f.getAbsolutePath)
+                showErrorIfNeeded(fm.saveGame(f.getAbsolutePath))
               },
               failed = () => {}
             )
@@ -82,7 +95,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
               yes = () => {
                 Prompts.saveFileDialog(
                   success = (f) => {
-                    fm.saveGame(f.getAbsolutePath)
+                    showErrorIfNeeded(fm.saveGame(f.getAbsolutePath))
                     setMenuScene()
                   },
                   failed = () => {}
@@ -104,7 +117,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
                 Prompts.saveFileDialog(
                   success = (f) => {
                     sys.exit(0)
-                    fm.saveGame(f.getAbsolutePath)
+                    showErrorIfNeeded(fm.saveGame(f.getAbsolutePath))
                   },
                   failed = () => {}
                 )
@@ -122,7 +135,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
           onAction = _ =>
             Prompts.askNameDialog("Adding Human Player") match {
               case Some(name) => {
-                state.buildHuman(name)
+                newPlayer(name, true)
                 setGameScene()
               }
               case None =>
@@ -134,7 +147,7 @@ class TopMenuBar(private val mainPane: MainPane, private val game: Game) extends
           onAction = _ =>
             Prompts.askNameDialog("Adding Bot Player") match {
               case Some(name) => {
-                state.buildBot(name)
+                newPlayer(name, false)
                 setGameScene()
               }
               case None =>

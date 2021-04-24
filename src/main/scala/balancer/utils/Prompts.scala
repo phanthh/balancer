@@ -25,6 +25,7 @@ object Prompts {
       case Some(ButtonType.Yes) => yes()
       case Some(ButtonType.No) => no()
       case Some(ButtonType.Cancel) => cancel()
+      case _ =>
     }
   }
 

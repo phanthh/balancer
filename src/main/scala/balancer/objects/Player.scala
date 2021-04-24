@@ -81,7 +81,7 @@ case class Bot(val name: String, val state: State) extends Player {
    * Find the best move by exhaustively searching in the feasible space
    * (guaranteeing not flipping a scale) and testing each move by faking
    * the move and record the resulting score. The best move is chosen
-   * to maximize the obtained points in that turn.
+   * to maximize the obtained points in that turn. (looking 1 step-ahead)
    */
   def bestMove(): Unit = {
     var best_score = -1

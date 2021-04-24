@@ -3,8 +3,6 @@ package balancer.objects
 import balancer.State
 import balancer.grid.Coord
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
  * sealed Container trait only have the two class Scale and Stack:
  * they can store weights, have owners, mass and graphical
@@ -63,7 +61,7 @@ case class Scale(val parentScale: Scale,
    * right most position is indexed at 2*radius. The center is
    * always None.
    */
-  private val board = ArrayBuffer.fill[Option[Container]](2 * radius + 1)(None)
+  private val board = Array.fill[Option[Container]](2 * radius + 1)(None)
 
   /**
    * @return A read-only Vector of the board
@@ -364,7 +362,7 @@ case class Stack(val parentScale: Scale, val pos: Int, protected val state: Stat
     last
   }
 
-  def append(it: Weight) = stack.append(it)
+  def push(it: Weight) = stack.append(it)
 
   /**
    * Remove all weights belong to a player

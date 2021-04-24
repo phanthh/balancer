@@ -12,7 +12,7 @@ object Constants {
   lazy val skylineImages = Seq(
     new Image("file:assets/backgrounds/skyline1.png"),
     new Image("file:assets/backgrounds/skyline2.png"))
-  lazy val logo = new Image("file:assets/logo_edited2.png")
+  lazy val logo = new Image("file:assets/logo.png")
 
   // Settings
   val ScreenWidth = 1280

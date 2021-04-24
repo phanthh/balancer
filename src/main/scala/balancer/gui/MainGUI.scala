@@ -3,7 +3,7 @@ package balancer.gui
 import balancer.Game
 import balancer.objects.{Bot, Human}
 import balancer.utils.Constants.{ScreenHeight, ScreenWidth, logo}
-import balancer.utils.Helpers.{placeSomeWildScale, placeSomeWildWeight}
+import balancer.utils.Helpers.{placeSomeWildScale, placeSomeWildWeight, showErrorIfNeeded}
 import balancer.utils.Prompts
 import balancer.utils.Prompts.showInfoDialog
 import scalafx.animation._
@@ -23,14 +23,13 @@ object MainGUI extends JFXApp {
   private var topMenuBar: TopMenuBar = _
   private var midSplitPane: MainPane = _
 
-  game.fileManager.loadDefault()
-
   stage = new JFXApp.PrimaryStage {
     title = "Balancer"
     width = ScreenWidth
     height = ScreenHeight
   }
 
+  showErrorIfNeeded(game.fileManager.loadDefault())
   // If there is no player in the default file -> prompt for name
   if (game.state.players.isEmpty) {
     Prompts.askNameDialog("Default file has no player") match {
@@ -38,7 +37,7 @@ object MainGUI extends JFXApp {
         game.state.buildHuman(name)
       case None =>
     }
-    game.fileManager.loadDefault()
+    showErrorIfNeeded(game.fileManager.loadDefault())
   }
 
   def setGameScene() = {

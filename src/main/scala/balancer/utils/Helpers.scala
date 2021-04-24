@@ -82,6 +82,13 @@ object Helpers {
 
   def getDefaultFont(size: Int) = Font.loadFont(FontFile, size)
 
+  def showErrorIfNeeded(errMsg: Option[String]) = {
+    errMsg match {
+      case Some(errMsg: String) => Prompts.invalidDialog(errMsg)
+      case None =>
+    }
+  }
+
   @inline def clamp[@specialized(Int, Double) T : Ordering](value: T, low: T, high: T): T = {
     import Ordered._
     if (value < low) low else if (value > high) high else value

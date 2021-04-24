@@ -5,7 +5,7 @@ import balancer.utils.Constants.{MaxRandomFind, MaxUndo}
 import balancer.utils.Helpers.{clamp, loop}
 import balancer.utils.OccupiedPosition
 
-import scala.collection.mutable.{ArrayBuffer, LinkedHashSet}
+import scala.collection.mutable.{ArrayBuffer, HashSet}
 import scala.util.Random
 
 /**
@@ -62,7 +62,7 @@ class State(val game: Game) {
    * A hash set for quick retrival of scales. Linked for reliability and
    * ease of debugging.
    */
-  private val scales = LinkedHashSet[Scale](baseScale)
+  private val scales = HashSet[Scale](baseScale)
 
   def scalesVector = scales.toVector
 
@@ -193,12 +193,12 @@ class State(val game: Game) {
       case Some(scale: Scale) => throw new OccupiedPosition
       case Some(stack: Stack) =>
         val newWeight = new Weight(stack, this, owner)
-        stack.append(newWeight)
+        stack.push(newWeight)
         stack
       case None =>
         val newStack = new Stack(parentScale, pos, this)
         val newWeight = new Weight(newStack, this, owner)
-        newStack.append(newWeight)
+        newStack.push(newWeight)
         parentScale(pos) = newStack
         newStack
     }

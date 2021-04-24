@@ -25,13 +25,15 @@ class FileManager(private val game: Game) {
    *
    * @param filePath the path to the save file
    */
-  def loadGame(filePath: String): Unit = {
+  def loadGame(filePath: String): Option[String] = {
 
     val lr = try {
       new BufferedReader(new FileReader(filePath))
     } catch {
       case e: FileNotFoundException =>
-        println(s"'$filePath': File not found"); return
+        val errorString = s"'$filePath': File not found"
+        println(errorString)
+        return Some(errorString)
     }
     // Begin parsing
 
@@ -196,26 +198,32 @@ class FileManager(private val game: Game) {
 
       // Finally, update state
       game.state = newState
+      None
 
     } catch {
       case e: ParseError =>
         println(e.getMessage)
-        // Restore when failed
         game.baseScaleRadius = baseScaleRadiusBak
+        Some(e.getMessage)
+      case e =>
+        println(e.getMessage)
+        game.baseScaleRadius = baseScaleRadiusBak
+        Some(e.getMessage)
     }
-
   }
 
   /**
    * Save the game to file
    * @param filePath path to the the saved location
    */
-  def saveGame(filePath: String): Unit = {
+  def saveGame(filePath: String): Option[String] = {
     val lw = try {
       new BufferedWriter(new FileWriter(filePath))
     } catch {
       case e: FileNotFoundException =>
-        println(s"'$filePath': File not found"); return
+        val errorString = s"'$filePath': File not found"
+        println(errorString)
+        return Some(errorString)
     }
 
     lw.write(s"BALANCER $Version SAVE FILE\n")
@@ -266,6 +274,7 @@ class FileManager(private val game: Game) {
 
     lw.write(s"$EndIndicator\n")
     lw.close()
+    None
   }
 
   private def state = game.state
