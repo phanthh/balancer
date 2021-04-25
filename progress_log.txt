@@ -1,0 +1,57 @@
+Wednesday 17.3
+1-3 lines description of what classes have been added or updated and what functionality have been implemented in them (even if they were not ready yet).
+What methods / functionality have been tested so far in classes so that they work properly?
+What possibly difficult errors have occurred and have they been resolved?
+What has been the workload used during this time with some 5 hours accuracy.
+Whether you are ahead or lagging behind what you presented in the project plan (roughly at this phase).
+
+Most of the core classes are implemented, this including Weight, Scale, Stack,
+FileManager, Game, State, Grid ... the console and graphical version of the game
+are also mostly completed. The algorithms are also implemented and run as
+planned, however, more testing will be needed.
+
+All the basic methods and attributes of the core classes are tested using the
+console version of the program. They all work as expected, however, more testing
+maybe needed when linking them together.
+
+Implementing the algorithms require a refactoring of the players action, which
+means a new Command class is needed. All the traits are refactored to
+Traits.scala. Constants and helper functions are also refactored. The random()
+and bestMove() produce a lot of bugs and took quite some time to making it work.
+
+Trying to get the GameCanvas to pan and zoom at the mouse location is much
+harder than expected. It took me a couple hours to get it done.
+
+I have work for an approximate of 20 hours on the project since I want to get it
+done as fast as possible.
+
+I think I am ahead of the project plan.
+
+
+
+Wednesday 31.3
+
+Most of the program has already been fully implemented, however, visually the UI
+interface is very unstructured. The UI elements has been changed and the layout
+has been modified to be more fitting to the eye.  Zooming and panning is also
+updated to not over-zoom and over-pan. Some click registering issues when
+placing the weight are also fixed. There was not a lot of progress made since
+the last report.
+
+Testing is done mostly on the GUI. A lof of time was spent micro-tuning the UI.
+The UI logic that identify the user's click on the canvas and placing the weight
+accordingly encountered some bugs and took some time to debug.
+
+During this period, I spent 1 full session of 6 hours to code the project.
+
+I think I am a head of the project plan.
+
+
+Wednesday 14.4
+
+Not a lot of progress was made during this period due to overlapping courses and
+the evaluation week comming up.
+
+I think I am behind of the project plan now. There are still the project
+document. The game also need a visual upgrade, colored block and white
+background is not visually appealing.
