@@ -22,7 +22,7 @@ object Constants {
   val MaxUndo = 20
   val MaxRandomFind = 100
   val DefaultFile = "defaultfile.txt"
-  val FontFile = "file:fonts/cyber.otf"
+  val FontFile = "file:assets/fonts/cyber.otf"
 
   // Infos
   val Version = 1.0
