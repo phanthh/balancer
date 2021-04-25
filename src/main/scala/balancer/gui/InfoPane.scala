@@ -4,7 +4,7 @@ import balancer.Game
 import balancer.gui.MainGUI.selectElementWithId
 import balancer.objects.{Bot, Player}
 import balancer.utils.Helpers.{getDefaultFont, getTextColorFitBG, toBackgroundCSS}
-import scalafx.beans.binding.{BindingIncludes, Bindings}
+import scalafx.beans.binding.Bindings
 import scalafx.beans.property.StringProperty
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control._
